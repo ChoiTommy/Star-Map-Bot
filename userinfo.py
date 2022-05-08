@@ -2,6 +2,15 @@ import json
 from telegram import Update
 from telegram.ext import CallbackContext
 
+def utcOffset_to_tzstring(offset) -> str:
+    offset /= 3600000 # 3600000 ms
+    tz_hour = int(offset)
+    tz_minutes = int((abs(offset) - abs(tz_hour)) * 60)
+    if tz_hour >= 0:
+        return f"UTC+{tz_hour}:{tz_minutes if tz_minutes>=10 else '0'+str(tz_minutes)}"
+    else:
+        return f"UTC{tz_hour}:{tz_minutes if tz_minutes>=10 else '0'+str(tz_minutes)}"
+
 def show_user_info(update: Update, context: CallbackContext) -> None:
     user_id = str(update.effective_user.id)
     with open("locations.json", 'r') as file:
@@ -14,8 +23,9 @@ Your currently set location is
 Latitude: {data[user_id]["latitude"]}
 Longitude: {data[user_id]["longitude"]}
 Location: {data[user_id]["address"]}
+Timezone: {utcOffset_to_tzstring(data[user_id]["utcOffset"])}
 
-/setlocation to modify it. /deletemyinfo to delete your data.
+/setlocation to modify. /deletemyinfo to delete your data.
             '''
         )
     else:

@@ -4,9 +4,10 @@ from telegram.ext import CallbackContext
 
 # star map URLs
 STAR_MAP_URL = "https://www.heavens-above.com/SkyAndTelescope/StSkyChartPDF.ashx"
-'''params: time, latitude, longitude, location, utcOffset'''
+'''
+params to be injected: time, latitude, longitude, location, utcOffset(in ms)
+'''
 REST_OF_THE_URL = f"showEquator=false&showEcliptic=true&showStarNames=true&showPlanetNames=true&showConsNames=true&showConsLines=true&showConsBoundaries=false&showSpecials=false&use24hClock=true"
-# 28800000ms == 28800s == 8 hours (UTC+8)
 
 
 def send_star_map(update: Update, context: CallbackContext) -> None:

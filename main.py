@@ -1,7 +1,7 @@
 # https://www.epochconverter.com/
 # https://nominatim.org/release-docs/develop/api/Reverse/
 
-# TODO pdf to image, red scale img, star map features toggles, etc.
+# TODO pdf to image, red scale img, star map features toggles, show moon phases, etc.
 import misc, userinfo, settings, starmap
 
 import logging
