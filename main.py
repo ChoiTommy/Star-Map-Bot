@@ -2,7 +2,7 @@
 # https://nominatim.org/release-docs/develop/api/Reverse/
 
 # TODO pdf to image, red scale img, star map features toggles, show moon phases, etc.
-import misc, userinfo, settings, starmap
+import misc, userinfo, settings, starmap, astrodata
 
 import logging
 import os
@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 # Load credentials from enviroment variables
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
+WEATHER_API_KEY = os.getenv("WEATHER_API_KEY")
 
 def main() -> None:
     # Create the Updater and pass it your bot's token.
@@ -31,7 +32,8 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("credits", misc.show_credits))
     dispatcher.add_handler(CommandHandler("starmap", starmap.send_star_map))
     dispatcher.add_handler(CommandHandler("myinfo", userinfo.show_user_info))
-    dispatcher.add_handler(CommandHandler("deletemyinfo", userinfo.delete_user_info))
+    dispatcher.add_handler(CommandHandler("deletemyinfo", userinfo.delete_user_info)) # request for confirmation before proceeding
+    dispatcher.add_handler(CommandHandler("astrodata", astrodata.show_astro_data))
 
     dispatcher.add_handler(ConversationHandler(
         entry_points = [CommandHandler("setlocation", settings.set_location)],
