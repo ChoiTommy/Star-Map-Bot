@@ -5,6 +5,17 @@ from telegram.ext import CallbackContext
 
 # WEATHER_API_URL = f"https://api.weatherapi.com/v1/astronomy.json?key={main.WEATHER_API_KEY}"# &q=1.354069,103.687933&dt=2022-05-08
 
+moon_phase_dict = {
+    "New Moon" : "🌑",
+    "Waxing Crescent" : "🌒",
+    "First Quarter" : "🌓",
+    "Waxing Gibbous" : "🌔",
+    "Full Moon" : "🌕",
+    "Waning Gibbous" : "🌖",
+    "Third Quarter" : "🌗",
+    "Waning Crescent" : "🌘"
+}
+
 def show_astro_data(update: Update, context: CallbackContext) -> None:
     user_id = str(update.effective_user.id)
     with open("locations.json", 'r') as file:
@@ -28,12 +39,12 @@ def show_astro_data(update: Update, context: CallbackContext) -> None:
 
         update.message.reply_text(
             f"""
-*🌠Astronomical data*:
+🌠*Astronomical data*:
 Sunrise: {sunrise}
 Sunset: {sunset}
 Moonrise: {moonrise}
 Moonset: {moonset}
-Moon phase: {moon_phase}
+Moon phase: {moon_phase} {moon_phase_dict[moon_phase]}
 Moon illumination: {moon_illumination}
             """,
             parse_mode=ParseMode.MARKDOWN_V2
