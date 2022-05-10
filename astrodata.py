@@ -12,7 +12,7 @@ moon_phase_dict = {
     "Waxing Gibbous" : "🌔",
     "Full Moon" : "🌕",
     "Waning Gibbous" : "🌖",
-    "Third Quarter" : "🌗",
+    "Last Quarter" : "🌗",
     "Waning Crescent" : "🌘"
 }
 

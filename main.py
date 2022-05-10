@@ -2,7 +2,7 @@
 # https://nominatim.org/release-docs/develop/api/Reverse/
 
 # TODO pdf to image, red scale img, star map features toggles, show moon phases, etc.
-import misc, userinfo, settings, starmap, astrodata
+import misc, userinfo, settings, starmap, astrodata, weather
 
 import logging
 import os
@@ -34,6 +34,7 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("myinfo", userinfo.show_user_info))
     dispatcher.add_handler(CommandHandler("deletemyinfo", userinfo.delete_user_info)) # request for confirmation before proceeding
     dispatcher.add_handler(CommandHandler("astrodata", astrodata.show_astro_data))
+    dispatcher.add_handler(CommandHandler("weather", weather.show_weather_data))
 
     dispatcher.add_handler(ConversationHandler(
         entry_points = [CommandHandler("setlocation", settings.set_location)],
