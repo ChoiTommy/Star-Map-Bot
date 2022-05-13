@@ -1,5 +1,7 @@
 import main
 import json, urllib.request, ssl
+import time
+from datetime import datetime
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 
@@ -21,7 +23,7 @@ def show_astro_data(update: Update, context: CallbackContext) -> None:
     with open("locations.json", 'r') as file:
         data = json.load(file)
 
-    if data.get(user_id) != None:
+    if user_id in data:
         lat = data[user_id]["latitude"]
         longi = data[user_id]["longitude"]
 
@@ -37,17 +39,22 @@ def show_astro_data(update: Update, context: CallbackContext) -> None:
         moon_phase = astro_data["astronomy"]["astro"]["moon_phase"]
         moon_illumination = astro_data["astronomy"]["astro"]["moon_illumination"]
 
+        current_timestamp = int(time.time()) # in UTC
+        current_date_time = datetime.utcfromtimestamp(current_timestamp + data[user_id]["utcOffset"]/1000)
+
         update.message.reply_text(
             f"""
-🌠*Astronomical data*:
+🌠<b>Astronomical data</b>:
 Sunrise: {sunrise}
 Sunset: {sunset}
 Moonrise: {moonrise}
 Moonset: {moonset}
 Moon phase: {moon_phase} {moon_phase_dict[moon_phase]}
 Moon illumination: {moon_illumination}
+
+({current_date_time})
             """,
-            parse_mode=ParseMode.MARKDOWN_V2
+            parse_mode=ParseMode.HTML
         )
     else:
         update.message.reply_text("Please set your location with /setlocation first!")

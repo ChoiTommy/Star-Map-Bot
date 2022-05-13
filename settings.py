@@ -1,4 +1,5 @@
 import json
+# import logging
 import urllib.request, ssl
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext, ConversationHandler
@@ -25,7 +26,7 @@ def set_location(update: Update, context: CallbackContext) -> int:
         data = json.load(file)
     context.user_data["JSON"] = data
 
-    if data.get(user_id) != None:
+    if user_id in data:
         update.message.reply_text(f"Your current location is {data[user_id]['latitude']}, {data[user_id]['longitude']} ({data[user_id]['address']}).")
         update.message.reply_text("Send your new location if you wish to change. /cancel to keep the current setting.")
     else:
@@ -39,21 +40,20 @@ def update_location(update: Update, context: CallbackContext) -> int:
     data = context.user_data["JSON"]
 
     context = ssl._create_unverified_context()
-    NOMINATIM_REVERSE_API = f"https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat={lat}&lon={longi}&accept-language=en-US"
-    # print(NOMINATIM_REVERSE_API)
+    NOMINATIM_REVERSE_API = f"https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat={lat}&lon={longi}&accept-language=en-US&zoom=14"
+    # logging.info(NOMINATIM_REVERSE_API)
     with urllib.request.urlopen(NOMINATIM_REVERSE_API, context=context) as address_file:
         address_data = json.load(address_file)
 
-    if address_data.get("error") != None: # "Unable to geocode"
+    if "error" in address_data: # "Unable to geocode"
         update.message.reply_text("You are in the middle of nowhere, my man. Send me a new location of a less remote place, please.")
         return 0
     else:
-        # address_string = f"{address_data['address']['road']}, {address_data['address']['city'] if address_data['address'].get('city') != None else address_data['address']['town']} {address_data['address']['postcode']}, {address_data['address']['country']}"
-        address_string = address_data["display_name"] #todo extract general location only
+        address_string = address_data["display_name"]
 
         utcOffset = int(get_offset(lat, longi) * 1000) # in ms
 
-        if data.get(user_id) == None:
+        if user_id not in data:
             data.update({user_id:{"username": update.effective_user.username, "latitude": lat, "longitude" : longi, "address" : address_string, "utcOffset" : utcOffset}})
         else:
             data[user_id]["latitude"] = lat
@@ -67,5 +67,5 @@ def update_location(update: Update, context: CallbackContext) -> int:
         return ConversationHandler.END
 
 def cancel(update: Update, context: CallbackContext) -> int:
-    update.message.reply_text('ℹ️The setup process is cancelled.')
+    update.message.reply_text('ℹ️The setup process has been cancelled.')
     return ConversationHandler.END

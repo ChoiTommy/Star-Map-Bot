@@ -1,7 +1,7 @@
 # https://www.epochconverter.com/
 # https://nominatim.org/release-docs/develop/api/Reverse/
 
-# TODO pdf to image, red scale img, star map features toggles, show moon phases, etc.
+# TODO pdf to image, red scale img, star map features toggles, etc.
 import misc, userinfo, settings, starmap, astrodata, weather
 
 import logging
@@ -32,7 +32,6 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("credits", misc.show_credits))
     dispatcher.add_handler(CommandHandler("starmap", starmap.send_star_map))
     dispatcher.add_handler(CommandHandler("myinfo", userinfo.show_user_info))
-    dispatcher.add_handler(CommandHandler("deletemyinfo", userinfo.delete_user_info)) # request for confirmation before proceeding
     dispatcher.add_handler(CommandHandler("astrodata", astrodata.show_astro_data))
     dispatcher.add_handler(CommandHandler("weather", weather.show_weather_data))
 
@@ -43,6 +42,15 @@ def main() -> None:
         },
         fallbacks = [CommandHandler("cancel", settings.cancel)],
         conversation_timeout = 120 # 2 mins
+    ))
+
+    dispatcher.add_handler(ConversationHandler(
+        entry_points = [CommandHandler("deletemyinfo", userinfo.deletion_confirmation)],
+        states = {
+            0: [MessageHandler(Filters.regex("^(Yes|No)$"), userinfo.delete_user_info)]
+        },
+        fallbacks = [CommandHandler("cancel", userinfo.cancel_deletion)],
+        conversation_timeout = 120
     ))
 
     # Start the Bot using polling

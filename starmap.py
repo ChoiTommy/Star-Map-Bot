@@ -15,7 +15,7 @@ def send_star_map(update: Update, context: CallbackContext) -> None:
     with open("locations.json", 'r') as file:
         data = json.load(file)
 
-    if data.get(user_id) != None: # check_if_user_data_exists(update.effective_user):
+    if user_id in data:
 
         lat = str(data[user_id]["latitude"])
         longi = str(data[user_id]["longitude"])

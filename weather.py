@@ -1,5 +1,7 @@
 import main
 import json, urllib.request, ssl
+import time
+from datetime import datetime
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 
@@ -8,7 +10,7 @@ def show_weather_data(update: Update, context: CallbackContext) -> None:
     with open("locations.json", 'r') as file:
         data = json.load(file)
 
-    if data.get(user_id) != None:
+    if user_id in data:
         lat = data[user_id]["latitude"]
         longi = data[user_id]["longitude"]
 
@@ -23,10 +25,14 @@ def show_weather_data(update: Update, context: CallbackContext) -> None:
         precipitaion_mm = weather_data["current"]["precip_mm"]
         cloud_percentage = weather_data["current"]["cloud"]
 
+        current_timestamp = int(time.time()) # in UTC
+        current_date_time = datetime.utcfromtimestamp(current_timestamp + data[user_id]["utcOffset"]/1000)
+
         update.message.reply_photo(
             photo = f"https:{current_condition_icon_url}",
             caption = f"""
 The weather now is <b>{current_condition_text}</b> at a temperature of <b>{temperature}°C</b>. Precipitation is <b>{precipitaion_mm}mm</b>, with cloud coverage of <b>{cloud_percentage}%</b>.
+({current_date_time})
 
 Be prepared before setting out for stargazing!
             """,
