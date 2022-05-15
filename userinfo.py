@@ -8,7 +8,7 @@ Command /cancel is defined by cancel_deletion. It serves the same function as se
 """
 
 import json
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode
 from telegram.ext import CallbackContext, ConversationHandler
 
 
@@ -44,11 +44,12 @@ def show_user_info(update: Update, context: CallbackContext) -> None:
                     'Your currently set location is \n'
                     f'Latitude: {data[user_id]["latitude"]} \n'
                     f'Longitude: {data[user_id]["longitude"]} \n'
-                    f'Location: {data[user_id]["address"]} \n'
+                    f'Location: <i>{data[user_id]["address"]}</i> \n'
                     f'Timezone: {utcOffset_to_tzstring(data[user_id]["utcOffset"])} \n\n'
 
                     '/setlocation to modify. /deletemyinfo to delete your data. \n'
-            )
+            ),
+            parse_mode = ParseMode.HTML
         )
     else:
         update.message.reply_text(

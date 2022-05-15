@@ -7,8 +7,6 @@ Command /astrodata is defined by show_astro_data
 
 import main
 import json, urllib.request, ssl
-import time
-from datetime import datetime
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 
@@ -47,9 +45,7 @@ def show_astro_data(update: Update, context: CallbackContext) -> None:
         moonset = astro_data["astronomy"]["astro"]["moonset"]
         moon_phase = astro_data["astronomy"]["astro"]["moon_phase"]
         moon_illumination = astro_data["astronomy"]["astro"]["moon_illumination"]
-
-        current_timestamp = int(time.time()) # in UTC
-        current_date_time = datetime.utcfromtimestamp(current_timestamp + data[user_id]["utcOffset"]/1000)
+        current_date_time = astro_data["location"]["localtime"]
 
         update.message.reply_text(
             text = ("🌠<b>Astronomical data</b>: \n"

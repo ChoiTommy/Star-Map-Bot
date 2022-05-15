@@ -1,4 +1,6 @@
 *.png
+*.jpg
+*.pdf
 .env
 *.json
 __pycache__

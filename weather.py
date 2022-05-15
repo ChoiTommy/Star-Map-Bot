@@ -7,8 +7,6 @@ Command /weather is defined by show_weather_data
 
 import main
 import json, urllib.request, ssl
-import time
-from datetime import datetime
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 
@@ -37,9 +35,7 @@ def show_weather_data(update: Update, context: CallbackContext) -> None:
         temperature = weather_data["current"]["temp_c"]
         precipitaion_mm = weather_data["current"]["precip_mm"]
         cloud_percentage = weather_data["current"]["cloud"]
-
-        current_timestamp = int(time.time()) # in UTC
-        current_date_time = datetime.utcfromtimestamp(current_timestamp + data[user_id]["utcOffset"]/1000)
+        current_date_time = weather_data["location"]["localtime"]
 
         update.message.reply_photo(
             photo = f"https:{current_condition_icon_url}",
