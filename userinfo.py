@@ -1,8 +1,27 @@
+"""
+userinfo is a module that consists of functions regarding user's info.
+
+Usage:
+Command /myinfo is defined by show_user_info
+Command /deletemyinfo is defined by deletion_confirmation and delete_user_info
+Command /cancel is defined by cancel_deletion. It serves the same function as settings.cancel.
+"""
+
 import json
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import CallbackContext, ConversationHandler
 
-def utcOffset_to_tzstring(offset) -> str:
+
+def utcOffset_to_tzstring(offset=0) -> str:
+    """This function generates a timezone string (e.g. UTC+9:00) from a UTC offset in integer.
+
+    Args:
+        offset (int): UTC offset in milliseconds
+
+    Returns:
+        str: Timezone string like 'UTC+9:00' or 'UTC-10:30'
+    """
+
     offset /= 3600000 # 3600000 ms
     tz_hour = int(offset)
     tz_minutes = int((abs(offset) - abs(tz_hour)) * 60)
@@ -11,7 +30,10 @@ def utcOffset_to_tzstring(offset) -> str:
     else:
         return f"UTC{tz_hour}:{tz_minutes if tz_minutes>=10 else '0'+str(tz_minutes)}"
 
+
 def show_user_info(update: Update, context: CallbackContext) -> None:
+    """Display user info when the command /myinfo is called. User info consists of latitude, longitude, address and timezone."""
+
     user_id = str(update.effective_user.id)
     with open("locations.json", 'r') as file:
         data = json.load(file)
@@ -36,7 +58,10 @@ You have yet to set any location.
             '''
         )
 
+
 def deletion_confirmation(update: Update, context: CallbackContext) -> int:
+    """Ask for confirmation to delete the user info from the server. Return Conversation.END if user has no data on the server, else returns 0."""
+
     user_id = str(update.effective_user.id)
     with open("locations.json", 'r') as file:
         data = json.load(file)
@@ -52,7 +77,10 @@ def deletion_confirmation(update: Update, context: CallbackContext) -> int:
         )
         return 0
 
+
 def delete_user_info(update: Update, context: CallbackContext) -> int:
+    """Perform deletion on users' data if 'Yes' is retrieved. Return ConversationHandler.END to halt the ConversationHandler."""
+
     if update.message.text == 'Yes':
         user_id = str(update.effective_user.id)
         del context.user_data["JSON"][user_id]
@@ -63,6 +91,9 @@ def delete_user_info(update: Update, context: CallbackContext) -> int:
     else:
         return cancel_deletion(update, context)
 
+
 def cancel_deletion(update: Update, context: CallbackContext) -> int:
+    """Cancel the deletion operation with the command /cancel. Return ConversationHandler.END"""
+
     update.message.reply_text("Got it! My generous user. Your data are still in my hands.", reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END

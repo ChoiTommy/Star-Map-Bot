@@ -1,3 +1,10 @@
+"""
+weather is a module that consists of functions fetching and displaying weather data relevant to stargazing.
+
+Usage:
+Command /weather is defined by show_weather_data
+"""
+
 import main
 import json, urllib.request, ssl
 import time
@@ -5,7 +12,10 @@ from datetime import datetime
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 
+
 def show_weather_data(update: Update, context: CallbackContext) -> None:
+    """Fetch and send a simple weather report showing weather data necessary for stargazing."""
+
     user_id = str(update.effective_user.id)
     with open("locations.json", 'r') as file:
         data = json.load(file)
@@ -38,5 +48,6 @@ Be prepared before setting out for stargazing!
             """,
             parse_mode = ParseMode.HTML
         )
+
     else:
         update.message.reply_text("Please set your location with /setlocation first!")

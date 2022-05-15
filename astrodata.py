@@ -1,3 +1,10 @@
+"""
+astrodata is a module that consists of functions fetching and displaying astronomical data.
+
+Usage:
+Command /astrodata is defined by show_astro_data
+"""
+
 import main
 import json, urllib.request, ssl
 import time
@@ -5,9 +12,8 @@ from datetime import datetime
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 
-# WEATHER_API_URL = f"https://api.weatherapi.com/v1/astronomy.json?key={main.WEATHER_API_KEY}"# &q=1.354069,103.687933&dt=2022-05-08
 
-moon_phase_dict = {
+moon_phase_dict = { # dict for getting the corresponding moon phase emojis
     "New Moon" : "🌑",
     "Waxing Crescent" : "🌒",
     "First Quarter" : "🌓",
@@ -18,7 +24,10 @@ moon_phase_dict = {
     "Waning Crescent" : "🌘"
 }
 
+
 def show_astro_data(update: Update, context: CallbackContext) -> None:
+    """Fetch and send a list of astronomical data to the user."""
+
     user_id = str(update.effective_user.id)
     with open("locations.json", 'r') as file:
         data = json.load(file)
