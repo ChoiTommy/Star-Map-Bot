@@ -13,7 +13,15 @@ from telegram.ext import CallbackContext
 # Star map URL
 STAR_MAP_URL = "https://www.heavens-above.com/SkyAndTelescope/StSkyChartPDF.ashx"
 # params to be injected: time, latitude, longitude, location, utcOffset(in ms)
-REST_OF_THE_URL = f"showEquator=false&showEcliptic=true&showStarNames=true&showPlanetNames=true&showConsNames=true&showConsLines=true&showConsBoundaries=false&showSpecials=false&use24hClock=true"
+REST_OF_THE_URL =  ("&showEquator=false"
+                    "&showEcliptic=true"
+                    "&showStarNames=true"
+                    "&showPlanetNames=true"
+                    "&showConsNames=true"
+                    "&showConsLines=true"
+                    "&showConsBoundaries=false"
+                    "&showSpecials=false"
+                    "&use24hClock=true")
 
 
 def send_star_map(update: Update, context: CallbackContext) -> None:
@@ -31,10 +39,19 @@ def send_star_map(update: Update, context: CallbackContext) -> None:
         utcOffset = str(data[user_id]["utcOffset"])
 
         # time.time(): seconds (floating point) since the epoch in UTC
-        fetch_target = f"{STAR_MAP_URL}?time={str(int(time.time()*1000))}&latitude={lat}&longitude={longi}&location={address}&utcOffset={utcOffset}&{REST_OF_THE_URL}"
+        fetch_target = (f"{STAR_MAP_URL}"
+                        f"?time={str(int(time.time()*1000))}"
+                        f"&latitude={lat}"
+                        f"&longitude={longi}"
+                        f"&location={address}"
+                        f"&utcOffset={utcOffset}"
+                        f"{REST_OF_THE_URL}")
 
         update.message.reply_document(document = fetch_target)
-        update.message.reply_text("Enjoy the stunning stars\! Be considerate and *leave no trace* while stargazing\!", parse_mode=ParseMode.MARKDOWN_V2)
+        update.message.reply_text(
+            text = "Enjoy the stunning stars\! Be considerate and *leave no trace* while stargazing\!",
+            parse_mode=ParseMode.MARKDOWN_V2
+        )
 
     else:
         update.message.reply_text("Please set your location with /setlocation first!")

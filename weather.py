@@ -24,8 +24,11 @@ def show_weather_data(update: Update, context: CallbackContext) -> None:
         lat = data[user_id]["latitude"]
         longi = data[user_id]["longitude"]
 
+        WEATHER_API_URL =  (f"https://api.weatherapi.com/v1/current.json"
+                            f"?key={main.WEATHER_API_KEY}"
+                            f"&q={lat},{longi}")
+
         context = ssl._create_unverified_context()
-        WEATHER_API_URL = f"https://api.weatherapi.com/v1/current.json?key={main.WEATHER_API_KEY}&q={lat},{longi}"
         with urllib.request.urlopen(WEATHER_API_URL, context=context) as weather_file:
             weather_data = json.load(weather_file)
 
@@ -40,12 +43,12 @@ def show_weather_data(update: Update, context: CallbackContext) -> None:
 
         update.message.reply_photo(
             photo = f"https:{current_condition_icon_url}",
-            caption = f"""
-The weather now is <b>{current_condition_text}</b> at a temperature of <b>{temperature}°C</b>. Precipitation is <b>{precipitaion_mm}mm</b>, with cloud coverage of <b>{cloud_percentage}%</b>.
-({current_date_time})
+            caption =  (f"The weather now is <b>{current_condition_text}</b> at a temperature of <b>{temperature}°C</b>. "
+                        f"Precipitation is <b>{precipitaion_mm}mm</b>, with cloud coverage of <b>{cloud_percentage}%</b>. \n"
+                        f"({current_date_time}) \n\n"
 
-Be prepared before setting out for stargazing!
-            """,
+                        "Be prepared before setting out for stargazing!"
+            ),
             parse_mode = ParseMode.HTML
         )
 

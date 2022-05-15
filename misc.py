@@ -13,7 +13,10 @@ def show_credits(update: Update, context: CallbackContext) -> None:
     """Display the data source of the star map and a link to this GitHub repo."""
 
     update.message.reply_text(
-        text = "Star map is made available to you by skyandtelescope.org. Astronomical data are provided by WeatherAPI.com. Visit their website for more information.",
+        text = ("Star map is made available to you by skyandtelescope.org. "
+                "Astronomical data are provided by WeatherAPI.com. "
+                "Visit their website for more information. "
+        ),
         reply_markup = InlineKeyboardMarkup([
             [InlineKeyboardButton("Visit skyandtelescope.org", url="https://skyandtelescope.org/")],
             [InlineKeyboardButton("Check out their interactive sky chart", url="https://skyandtelescope.org/interactive-sky-chart/")],

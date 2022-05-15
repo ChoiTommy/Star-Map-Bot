@@ -50,7 +50,10 @@ def set_location(update: Update, context: CallbackContext) -> int:
         update.message.reply_text(f"Your current location is {data[user_id]['latitude']}, {data[user_id]['longitude']} ({data[user_id]['address']}).")
         update.message.reply_text("Send your new location if you wish to change. /cancel to keep the current setting.")
     else:
-        update.message.reply_text("Send your location to me :O Trust me I won\'t tell others ~\(unless someone pays me A LOT\)~ ", parse_mode = ParseMode.MARKDOWN_V2)
+        update.message.reply_text(
+            text = "Send your location to me :O Trust me I won\'t tell others ~\(unless someone pays me A LOT\)~ ",
+            parse_mode = ParseMode.MARKDOWN_V2
+        )
     return 0 # proceed to update_location
 
 
@@ -63,7 +66,13 @@ def update_location(update: Update, context: CallbackContext) -> int:
     data = context.user_data["JSON"]
 
     context = ssl._create_unverified_context()
-    NOMINATIM_REVERSE_API = f"https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat={lat}&lon={longi}&accept-language=en-US&zoom=14"
+    NOMINATIM_REVERSE_API = ("https://nominatim.openstreetmap.org/reverse"
+                            "?format=jsonv2"
+                            f"&lat={lat}"
+                            f"&lon={longi}"
+                            "&accept-language=en-US"
+                            "&zoom=14")
+
     # logging.info(NOMINATIM_REVERSE_API)
     with urllib.request.urlopen(NOMINATIM_REVERSE_API, context=context) as address_file:
         address_data = json.load(address_file)

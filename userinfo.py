@@ -40,22 +40,22 @@ def show_user_info(update: Update, context: CallbackContext) -> None:
 
     if user_id in data:
         update.message.reply_text(
-            f'''Hi @{update.effective_user.username},
-Your currently set location is
-Latitude: {data[user_id]["latitude"]}
-Longitude: {data[user_id]["longitude"]}
-Location: {data[user_id]["address"]}
-Timezone: {utcOffset_to_tzstring(data[user_id]["utcOffset"])}
+            text = (f'Hi @{update.effective_user.username}, \n'
+                    'Your currently set location is \n'
+                    f'Latitude: {data[user_id]["latitude"]} \n'
+                    f'Longitude: {data[user_id]["longitude"]} \n'
+                    f'Location: {data[user_id]["address"]} \n'
+                    f'Timezone: {utcOffset_to_tzstring(data[user_id]["utcOffset"])} \n\n'
 
-/setlocation to modify. /deletemyinfo to delete your data.
-            '''
+                    '/setlocation to modify. /deletemyinfo to delete your data. \n'
+            )
         )
     else:
         update.message.reply_text(
-            f'''Hi @{update.effective_user.username},
-You have yet to set any location.
-/setlocation to start off.
-            '''
+            text = (f'Hi @{update.effective_user.username}, \n'
+                    'You have yet to set any location. \n'
+                    '/setlocation to start off. \n'
+            )
         )
 
 
@@ -68,7 +68,10 @@ def deletion_confirmation(update: Update, context: CallbackContext) -> int:
     context.user_data["JSON"] = data
 
     if user_id not in data:
-        update.message.reply_text("Hi new user, rest assured we have not collected any data from you, so nothing has been erased. Perhaps you can try /setlocation and give me something to delete afterwards?")
+        update.message.reply_text(
+            text = "Hi new user, rest assured we have not collected any data from you, so nothing has been erased. " \
+                    "Perhaps you can try /setlocation and give me something to delete afterwards?"
+        )
         return ConversationHandler.END
     else:
         update.message.reply_text(
@@ -86,7 +89,12 @@ def delete_user_info(update: Update, context: CallbackContext) -> int:
         del context.user_data["JSON"][user_id]
         with open("locations.json", 'w') as file:
             json.dump(context.user_data["JSON"], file, indent = 4)
-        update.message.reply_text("Voilà! I have erased your existence (on my server). Keep it up and leave no trace in the cyber world! \n/myinfo <- click it to see for yourself, scumbag", reply_markup=ReplyKeyboardRemove())
+        update.message.reply_text(
+            text = ("Voilà! I have erased your existence. Keep it up and leave no trace in the cyber world! \n"
+                    "/myinfo <- click it to see for yourself, scumbag"
+            ),
+            reply_markup = ReplyKeyboardRemove()
+        )
         return ConversationHandler.END
     else:
         return cancel_deletion(update, context)

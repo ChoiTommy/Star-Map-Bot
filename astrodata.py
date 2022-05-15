@@ -52,18 +52,18 @@ def show_astro_data(update: Update, context: CallbackContext) -> None:
         current_date_time = datetime.utcfromtimestamp(current_timestamp + data[user_id]["utcOffset"]/1000)
 
         update.message.reply_text(
-            f"""
-🌠<b>Astronomical data</b>:
-Sunrise: {sunrise}
-Sunset: {sunset}
-Moonrise: {moonrise}
-Moonset: {moonset}
-Moon phase: {moon_phase} {moon_phase_dict[moon_phase]}
-Moon illumination: {moon_illumination}
+            text = ("🌠<b>Astronomical data</b>: \n"
+                    f"Sunrise: {sunrise} \n"
+                    f"Sunset: {sunset} \n"
+                    f"Moonrise: {moonrise} \n"
+                    f"Moonset: {moonset} \n"
+                    f"Moon phase: {moon_phase} {moon_phase_dict[moon_phase]} \n"
+                    f"Moon illumination: {moon_illumination} \n\n"
 
-({current_date_time})
-            """,
-            parse_mode=ParseMode.HTML
+                    f"({current_date_time}) \n"
+            ),
+            parse_mode = ParseMode.HTML
         )
+
     else:
         update.message.reply_text("Please set your location with /setlocation first!")
