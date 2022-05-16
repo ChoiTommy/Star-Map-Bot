@@ -10,7 +10,6 @@ import requests
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 import fitz
-# import tempfile
 
 
 # Star map URL
@@ -41,28 +40,19 @@ def send_star_map(update: Update, context: CallbackContext) -> None:
         address = data[user_id]["address"].replace(',', "%2c").replace(' ', "%20")
         utcOffset = str(data[user_id]["utcOffset"])
 
-        # time.time(): seconds (floating point) since the epoch in UTC
         fetch_target = (f"{STAR_MAP_URL}"
-                        f"?time={str(int(time.time()*1000))}"
+                        f"?time={str(int(time.time()*1000))}" # time.time(): seconds (floating point) since the epoch in UTC
                         f"&latitude={lat}"
                         f"&longitude={longi}"
                         f"&location={address}"
                         f"&utcOffset={utcOffset}"
                         f"{REST_OF_THE_URL}")
 
-        pdffile = "star_map.pdf"
-        # Download the data behind the URL
-        response = requests.get(fetch_target)
-        # Open the response into a new file called star_map.pdf
-        open(pdffile, "wb").write(response.content)
-
-        # with tempfile.NamedTemporaryFile(mode="w+b") as tmp: # tmp is "star_map.pdf"
-        #    tmp.write(response.content)
-
-        doc = fitz.open(pdffile)
+        response = requests.get(fetch_target) # Download the data behind the URL
+        doc = fitz.open(stream=response.content)
         page = doc.load_page(0)  # number of page
         pix = page.get_pixmap(dpi=200, colorspace=fitz.csRGB, annots=False)
-        pix.tint_with(black=-129010, white=0) # no idea on how these values work, just trial and error
+        pix.tint_with(black=-129010, white=0) # no idea on how these values work, just do trial and error
 
         # update.message.reply_document(document = fetch_target) # pdf
         update.message.reply_document(document=pix.tobytes())
