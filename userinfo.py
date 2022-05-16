@@ -31,7 +31,7 @@ def utcOffset_to_tzstring(offset=0) -> str:
         return f"UTC{tz_hour}:{tz_minutes if tz_minutes>=10 else '0'+str(tz_minutes)}"
 
 
-def show_user_info(update: Update, context: CallbackContext) -> None:
+async def show_user_info(update: Update, context: CallbackContext) -> None:
     """Display user info when the command /myinfo is called. User info consists of latitude, longitude, address and timezone."""
 
     user_id = str(update.effective_user.id)
@@ -39,7 +39,7 @@ def show_user_info(update: Update, context: CallbackContext) -> None:
         data = json.load(file)
 
     if user_id in data:
-        update.message.reply_text(
+        await update.message.reply_text(
             text = (f'Hi @{update.effective_user.username}, \n'
                     'Your currently set location is \n'
                     f'Latitude: {data[user_id]["latitude"]} \n'
@@ -52,7 +52,7 @@ def show_user_info(update: Update, context: CallbackContext) -> None:
             parse_mode = ParseMode.HTML
         )
     else:
-        update.message.reply_text(
+        await update.message.reply_text(
             text = (f'Hi @{update.effective_user.username}, \n'
                     'You have yet to set any location. \n'
                     '/setlocation to start off. \n'
@@ -60,7 +60,7 @@ def show_user_info(update: Update, context: CallbackContext) -> None:
         )
 
 
-def deletion_confirmation(update: Update, context: CallbackContext) -> int:
+async def deletion_confirmation(update: Update, context: CallbackContext) -> int:
     """Ask for confirmation to delete the user info from the server. Return Conversation.END if user has no data on the server, else returns 0."""
 
     user_id = str(update.effective_user.id)
@@ -69,20 +69,20 @@ def deletion_confirmation(update: Update, context: CallbackContext) -> int:
     context.user_data["JSON"] = data
 
     if user_id not in data:
-        update.message.reply_text(
+        await update.message.reply_text(
             text = "Hi new user, rest assured we have not collected any data from you, so nothing has been erased. " \
                     "Perhaps you can try /setlocation and give me something to delete afterwards?"
         )
         return ConversationHandler.END
     else:
-        update.message.reply_text(
+        await update.message.reply_text(
             "Are you sure you want to delete your location data? Note that this action cannot be undone.",
             reply_markup = ReplyKeyboardMarkup([['Yes', 'No']], resize_keyboard = True)
         )
         return 0
 
 
-def delete_user_info(update: Update, context: CallbackContext) -> int:
+async def delete_user_info(update: Update, context: CallbackContext) -> int:
     """Perform deletion on users' data if 'Yes' is retrieved. Return ConversationHandler.END to halt the ConversationHandler."""
 
     if update.message.text == 'Yes':
@@ -90,7 +90,7 @@ def delete_user_info(update: Update, context: CallbackContext) -> int:
         del context.user_data["JSON"][user_id]
         with open("locations.json", 'w') as file:
             json.dump(context.user_data["JSON"], file, indent = 4)
-        update.message.reply_text(
+        await update.message.reply_text(
             text = ("Voilà! I have erased your existence. Keep it up and leave no trace in the cyber world! \n"
                     "/myinfo <- click it to see for yourself, scumbag"
             ),
@@ -101,8 +101,8 @@ def delete_user_info(update: Update, context: CallbackContext) -> int:
         return cancel_deletion(update, context)
 
 
-def cancel_deletion(update: Update, context: CallbackContext) -> int:
+async def cancel_deletion(update: Update, context: CallbackContext) -> int:
     """Cancel the deletion operation with the command /cancel. Return ConversationHandler.END"""
 
-    update.message.reply_text("Got it! My generous user. Your data are still in my hands.", reply_markup=ReplyKeyboardRemove())
+    await update.message.reply_text("Got it! My generous user. Your data are still in my hands.", reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END

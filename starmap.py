@@ -26,7 +26,7 @@ REST_OF_THE_URL =  ("&showEquator=false"
                     "&use24hClock=true")
 
 
-def send_star_map(update: Update, context: CallbackContext) -> None:
+async def send_star_map(update: Update, context: CallbackContext) -> None:
     """Fetch and forward a star map to user based on the set location and the current time."""
 
     user_id = str(update.effective_user.id)
@@ -54,9 +54,9 @@ def send_star_map(update: Update, context: CallbackContext) -> None:
         pix = page.get_pixmap(dpi=200, colorspace=fitz.csRGB, annots=False)
         pix.tint_with(black=-129010, white=0) # no idea on how these values work, just do trial and error
 
-        # update.message.reply_document(document = fetch_target) # pdf
-        update.message.reply_document(document=pix.tobytes())
-        update.message.reply_text(
+        # await update.message.reply_document(document = fetch_target) # pdf
+        await update.message.reply_document(document=pix.tobytes())
+        await update.message.reply_text(
             text = "Enjoy the stunning stars\! Be considerate and *leave no trace* while stargazing\!",
             parse_mode = ParseMode.MARKDOWN_V2
         )
@@ -64,4 +64,4 @@ def send_star_map(update: Update, context: CallbackContext) -> None:
         doc.close()
 
     else:
-        update.message.reply_text("Please set your location with /setlocation first!")
+        await update.message.reply_text("Please set your location with /setlocation first!")

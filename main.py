@@ -41,39 +41,39 @@ def main() -> None:
     """Entry point of the script."""
 
     # Create the Updater and pass it your bot's token.
-    updater = Updater(BOT_TOKEN)
+    updater = Application.builder().token(BOT_TOKEN).build()
 
-    # Get the dispatcher to register handlers
-    dispatcher = updater.dispatcher
+    # Get the application to register handlers
+    application = updater.application
 
     # Register command handlers
-    dispatcher.add_handler(CommandHandler("start", misc.bot_tutorial))
-    dispatcher.add_handler(CommandHandler("credits", misc.show_credits))
-    dispatcher.add_handler(CommandHandler("starmap", starmap.send_star_map))
-    dispatcher.add_handler(CommandHandler("myinfo", userinfo.show_user_info))
-    dispatcher.add_handler(CommandHandler("astrodata", astrodata.show_astro_data))
-    dispatcher.add_handler(CommandHandler("weather", weather.show_weather_data))
+    application.add_handler(CommandHandler("start", misc.bot_tutorial))
+    application.add_handler(CommandHandler("credits", misc.show_credits))
+    application.add_handler(CommandHandler("starmap", starmap.send_star_map))
+    application.add_handler(CommandHandler("myinfo", userinfo.show_user_info))
+    application.add_handler(CommandHandler("astrodata", astrodata.show_astro_data))
+    application.add_handler(CommandHandler("weather", weather.show_weather_data))
 
-    dispatcher.add_handler(ConversationHandler(
+    application.add_handler(ConversationHandler(
         entry_points = [CommandHandler("setlocation", settings.set_location)],
         states = {
-            0: [MessageHandler(Filters.location, settings.update_location)]
+            0: [MessageHandler(filters.LOCATION, settings.update_location)]
         },
         fallbacks = [CommandHandler("cancel", settings.cancel)],
         conversation_timeout = 120 # 2 mins
     ))
 
-    dispatcher.add_handler(ConversationHandler(
+    application.add_handler(ConversationHandler(
         entry_points = [CommandHandler("deletemyinfo", userinfo.deletion_confirmation)],
         states = {
-            0: [MessageHandler(Filters.regex("^(Yes|No)$"), userinfo.delete_user_info)]
+            0: [MessageHandler(filters.Regex("^(Yes|No)$"), userinfo.delete_user_info)]
         },
         fallbacks = [CommandHandler("cancel", userinfo.cancel_deletion)],
         conversation_timeout = 120
     ))
 
     # Start the Bot using polling
-    updater.start_polling()
+    application.run_polling()
     updater.idle()
 
 

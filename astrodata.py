@@ -23,7 +23,7 @@ moon_phase_dict = { # dict for getting the corresponding moon phase emojis
 }
 
 
-def show_astro_data(update: Update, context: CallbackContext) -> None:
+async def show_astro_data(update: Update, context: CallbackContext) -> None:
     """Fetch and send a list of astronomical data to the user."""
 
     user_id = str(update.effective_user.id)
@@ -47,7 +47,7 @@ def show_astro_data(update: Update, context: CallbackContext) -> None:
         moon_illumination = astro_data["astronomy"]["astro"]["moon_illumination"]
         current_date_time = astro_data["location"]["localtime"]
 
-        update.message.reply_text(
+        await update.message.reply_text(
             text = ("🌠<b>Astronomical data</b>: \n"
                     f"Sunrise: {sunrise} \n"
                     f"Sunset: {sunset} \n"
@@ -62,4 +62,4 @@ def show_astro_data(update: Update, context: CallbackContext) -> None:
         )
 
     else:
-        update.message.reply_text("Please set your location with /setlocation first!")
+        await update.message.reply_text("Please set your location with /setlocation first!")

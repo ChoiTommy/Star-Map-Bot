@@ -11,7 +11,7 @@ from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 
 
-def show_weather_data(update: Update, context: CallbackContext) -> None:
+async def show_weather_data(update: Update, context: CallbackContext) -> None:
     """Fetch and send a simple weather report showing weather data necessary for stargazing."""
 
     user_id = str(update.effective_user.id)
@@ -37,7 +37,7 @@ def show_weather_data(update: Update, context: CallbackContext) -> None:
         cloud_percentage = weather_data["current"]["cloud"]
         current_date_time = weather_data["location"]["localtime"]
 
-        update.message.reply_photo(
+        await update.message.reply_photo(
             photo = f"https:{current_condition_icon_url}",
             caption =  (f"The weather now is <b>{current_condition_text}</b> at a temperature of <b>{temperature}°C</b>. "
                         f"Precipitation is <b>{precipitation_mm}mm</b>, with cloud coverage of <b>{cloud_percentage}%</b>. \n"
@@ -49,4 +49,4 @@ def show_weather_data(update: Update, context: CallbackContext) -> None:
         )
 
     else:
-        update.message.reply_text("Please set your location with /setlocation first!")
+        await update.message.reply_text("Please set your location with /setlocation first!")
