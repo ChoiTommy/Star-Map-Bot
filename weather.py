@@ -35,12 +35,20 @@ def show_weather_data(update: Update, context: CallbackContext) -> None:
         temperature = weather_data["current"]["temp_c"]
         precipitation_mm = weather_data["current"]["precip_mm"]
         cloud_percentage = weather_data["current"]["cloud"]
+        visibility_km = weather_data["current"]["vis_km"]
+        uv_index = weather_data["current"]["uv"]
+
         current_date_time = weather_data["location"]["localtime"]
 
         update.message.reply_photo(
             photo = f"https:{current_condition_icon_url}",
-            caption =  (f"The weather now is <b>{current_condition_text}</b> at a temperature of <b>{temperature}°C</b>. "
-                        f"Precipitation is <b>{precipitation_mm}mm</b>, with cloud coverage of <b>{cloud_percentage}%</b>. \n"
+            caption =  ("Current weather at your location: \n"
+                        f"Condition: <b>{current_condition_text}</b> \n"
+                        f"Temperature: <b>{temperature}°C</b> \n"
+                        f"Precipitation: <b>{precipitation_mm} mm</b> \n"
+                        f"Cloud coverage: <b>{cloud_percentage}%</b> \n"
+                        f"Visibility: <b>{visibility_km} km</b> \n"
+                        f"UV index: <b>{uv_index}</b> \n"
                         f"({current_date_time}) \n\n"
 
                         "Be prepared before setting out for stargazing!"

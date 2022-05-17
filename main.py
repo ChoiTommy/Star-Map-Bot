@@ -15,7 +15,7 @@ Send /credits to view the data sources of all the infomation this bot provides.
 Send /cancel to halt any operations.
 """
 
-# TODO pdf to image, red scale img, star map features toggles, etc.
+# TODO star map features toggles, astronomy news rss.
 import misc, userinfo, settings, starmap, astrodata, weather
 
 import logging
