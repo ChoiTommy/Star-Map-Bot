@@ -9,8 +9,8 @@ Command /cancel is defined by cancel. It functions the same as userinfo.cancel_d
 import json
 # import logging
 import urllib.request, ssl
-from telegram import Update, ParseMode
-from telegram.ext import CallbackContext, ConversationHandler
+from telegram import Update
+from telegram.ext import ContextTypes, ConversationHandler
 from datetime import datetime
 from pytz import timezone, utc
 from timezonefinder import TimezoneFinder
@@ -38,7 +38,7 @@ def get_offset(lat, longi):
     return (today_utc - today_target).total_seconds()
 
 
-async def set_location(update: Update, context: CallbackContext) -> int:
+async def set_location(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """If their record exists, ask users if they want to update their location. Return 0 to proceed to update_location."""
 
     user_id = str(update.effective_user.id)
@@ -50,14 +50,13 @@ async def set_location(update: Update, context: CallbackContext) -> int:
         await update.message.reply_text(f"Your current location is {data[user_id]['latitude']}, {data[user_id]['longitude']} ({data[user_id]['address']}).")
         await update.message.reply_text("Send your new location if you wish to change. /cancel to keep the current setting.")
     else:
-        await update.message.reply_text(
+        await update.message.reply_markdown_v2(
             text = "Send your location to me :O Trust me I won\'t tell others ~\(unless someone pays me A LOT\)~ ",
-            parse_mode = ParseMode.MARKDOWN_V2
         )
     return 0 # proceed to update_location
 
 
-async def update_location(update: Update, context: CallbackContext) -> int:
+async def update_location(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Read in a location from the user. Fetch the address string from nominatim reverse API. Save/Update the record. Return ConversationHandler.END."""
 
     user_id = str(update.effective_user.id)
@@ -100,7 +99,7 @@ async def update_location(update: Update, context: CallbackContext) -> int:
         return ConversationHandler.END
 
 
-async def cancel(update: Update, context: CallbackContext) -> int:
+async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Exit from the ConversationHandler. Halt the location setting process. Return ConversationHandler.END."""
 
     await update.message.reply_text('ℹ️The setup process has been cancelled.')

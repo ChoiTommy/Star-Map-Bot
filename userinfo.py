@@ -8,8 +8,8 @@ Command /cancel is defined by cancel_deletion. It serves the same function as se
 """
 
 import json
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode
-from telegram.ext import CallbackContext, ConversationHandler
+from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram.ext import ContextTypes, ConversationHandler
 
 
 def utcOffset_to_tzstring(offset=0) -> str:
@@ -31,7 +31,7 @@ def utcOffset_to_tzstring(offset=0) -> str:
         return f"UTC{tz_hour}:{tz_minutes if tz_minutes>=10 else '0'+str(tz_minutes)}"
 
 
-async def show_user_info(update: Update, context: CallbackContext) -> None:
+async def show_user_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Display user info when the command /myinfo is called. User info consists of latitude, longitude, address and timezone."""
 
     user_id = str(update.effective_user.id)
@@ -39,7 +39,7 @@ async def show_user_info(update: Update, context: CallbackContext) -> None:
         data = json.load(file)
 
     if user_id in data:
-        await update.message.reply_text(
+        await update.message.reply_html(
             text = (f'Hi @{update.effective_user.username}, \n'
                     'Your currently set location is \n'
                     f'Latitude: {data[user_id]["latitude"]} \n'
@@ -48,8 +48,7 @@ async def show_user_info(update: Update, context: CallbackContext) -> None:
                     f'Timezone: {utcOffset_to_tzstring(data[user_id]["utcOffset"])} \n\n'
 
                     '/setlocation to modify. /deletemyinfo to delete your data. \n'
-            ),
-            parse_mode = ParseMode.HTML
+            )
         )
     else:
         await update.message.reply_text(
@@ -60,7 +59,7 @@ async def show_user_info(update: Update, context: CallbackContext) -> None:
         )
 
 
-async def deletion_confirmation(update: Update, context: CallbackContext) -> int:
+async def deletion_confirmation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Ask for confirmation to delete the user info from the server. Return Conversation.END if user has no data on the server, else returns 0."""
 
     user_id = str(update.effective_user.id)
@@ -82,7 +81,7 @@ async def deletion_confirmation(update: Update, context: CallbackContext) -> int
         return 0
 
 
-async def delete_user_info(update: Update, context: CallbackContext) -> int:
+async def delete_user_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Perform deletion on users' data if 'Yes' is retrieved. Return ConversationHandler.END to halt the ConversationHandler."""
 
     if update.message.text == 'Yes':
@@ -101,7 +100,7 @@ async def delete_user_info(update: Update, context: CallbackContext) -> int:
         return cancel_deletion(update, context)
 
 
-async def cancel_deletion(update: Update, context: CallbackContext) -> int:
+async def cancel_deletion(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Cancel the deletion operation with the command /cancel. Return ConversationHandler.END"""
 
     await update.message.reply_text("Got it! My generous user. Your data are still in my hands.", reply_markup=ReplyKeyboardRemove())

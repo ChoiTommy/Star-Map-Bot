@@ -7,8 +7,8 @@ Command /astrodata is defined by show_astro_data
 
 import main
 import json, urllib.request, ssl
-from telegram import Update, ParseMode
-from telegram.ext import CallbackContext
+from telegram import Update
+from telegram.ext import ContextTypes
 
 
 moon_phase_dict = { # dict for getting the corresponding moon phase emojis
@@ -23,7 +23,7 @@ moon_phase_dict = { # dict for getting the corresponding moon phase emojis
 }
 
 
-async def show_astro_data(update: Update, context: CallbackContext) -> None:
+async def show_astro_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Fetch and send a list of astronomical data to the user."""
 
     user_id = str(update.effective_user.id)
@@ -47,7 +47,7 @@ async def show_astro_data(update: Update, context: CallbackContext) -> None:
         moon_illumination = astro_data["astronomy"]["astro"]["moon_illumination"]
         current_date_time = astro_data["location"]["localtime"]
 
-        await update.message.reply_text(
+        await update.message.reply_html(
             text = ("🌠<b>Astronomical data</b>: \n"
                     f"Sunrise: {sunrise} \n"
                     f"Sunset: {sunset} \n"
@@ -57,8 +57,7 @@ async def show_astro_data(update: Update, context: CallbackContext) -> None:
                     f"Moon illumination: {moon_illumination} \n\n"
 
                     f"({current_date_time}) \n"
-            ),
-            parse_mode = ParseMode.HTML
+            )
         )
 
     else:

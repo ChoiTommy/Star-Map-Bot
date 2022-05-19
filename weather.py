@@ -7,11 +7,12 @@ Command /weather is defined by show_weather_data
 
 import main
 import json, urllib.request, ssl
-from telegram import Update, ParseMode
-from telegram.ext import CallbackContext
+from telegram import Update
+from telegram.constants import ParseMode
+from telegram.ext import ContextTypes
 
 
-async def show_weather_data(update: Update, context: CallbackContext) -> None:
+async def show_weather_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Fetch and send a simple weather report showing weather data necessary for stargazing."""
 
     user_id = str(update.effective_user.id)

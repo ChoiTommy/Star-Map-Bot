@@ -6,10 +6,10 @@ Command /credits is defined by show_credits
 Command /start is defined by bot_tutorial
 """
 
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
-from telegram.ext import CallbackContext
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import ContextTypes
 
-async def show_credits(update: Update, context: CallbackContext) -> None:
+async def show_credits(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Display the data source of the star map and a link to this GitHub repo."""
 
     await update.message.reply_text(
@@ -38,10 +38,9 @@ Press the menu button at the bottom left of your screen to view all the commands
 """
 
 
-async def bot_tutorial(update: Update, context: CallbackContext) -> None: # TODO: privacy policy
+async def bot_tutorial(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None: # TODO: privacy policy
     """Act as a welcome message and tutorial to anyone who starts the bot"""
 
-    await update.message.reply_text(
-        text = TUTORIAL_TEXT,
-        parse_mode = ParseMode.HTML
+    await update.message.reply_html(
+        text = TUTORIAL_TEXT
     )

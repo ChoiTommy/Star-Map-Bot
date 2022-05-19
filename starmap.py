@@ -7,8 +7,8 @@ Command /starmap is defined by send_star_map
 
 import json, time
 import requests
-from telegram import Update, ParseMode
-from telegram.ext import CallbackContext
+from telegram import Update
+from telegram.ext import ContextTypes
 import fitz
 
 
@@ -26,7 +26,7 @@ REST_OF_THE_URL =  ("&showEquator=false"
                     "&use24hClock=true")
 
 
-async def send_star_map(update: Update, context: CallbackContext) -> None:
+async def send_star_map(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Fetch and forward a star map to user based on the set location and the current time."""
 
     user_id = str(update.effective_user.id)
@@ -56,9 +56,8 @@ async def send_star_map(update: Update, context: CallbackContext) -> None:
 
         # await update.message.reply_document(document = fetch_target) # pdf
         await update.message.reply_document(document=pix.tobytes())
-        await update.message.reply_text(
+        await update.message.reply_markdown_v2(
             text = "Enjoy the stunning stars\! Be considerate and *leave no trace* while stargazing\!",
-            parse_mode = ParseMode.MARKDOWN_V2
         )
 
         doc.close()

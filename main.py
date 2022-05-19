@@ -20,8 +20,8 @@ import misc, userinfo, settings, starmap, astrodata, weather
 
 import logging
 import os
-from telegram import Update, ParseMode
-from telegram.ext import Updater, CommandHandler, ConversationHandler, MessageHandler, Filters
+from telegram import Update
+from telegram.ext import Application, ContextTypes, CommandHandler, ConversationHandler, MessageHandler, filters
 from dotenv import load_dotenv
 
 
@@ -40,11 +40,8 @@ WEATHER_API_KEY = os.getenv("WEATHER_API_KEY")
 def main() -> None:
     """Entry point of the script."""
 
-    # Create the Updater and pass it your bot's token.
-    updater = Application.builder().token(BOT_TOKEN).build()
-
-    # Get the application to register handlers
-    application = updater.application
+    # Create the Application and pass it your bot's token.
+    application = Application.builder().token(BOT_TOKEN).build()
 
     # Register command handlers
     application.add_handler(CommandHandler("start", misc.bot_tutorial))
@@ -74,8 +71,7 @@ def main() -> None:
 
     # Start the Bot using polling
     application.run_polling()
-    updater.idle()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
