@@ -5,7 +5,7 @@ Usage:
 Command /weather is defined by show_weather_data
 """
 
-import main
+import constants
 import json, urllib.request, ssl
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
@@ -22,8 +22,9 @@ def show_weather_data(update: Update, context: CallbackContext) -> None:
         lat = data[user_id]["latitude"]
         longi = data[user_id]["longitude"]
 
-        WEATHER_API_URL =  (f"https://api.weatherapi.com/v1/current.json"
-                            f"?key={main.WEATHER_API_KEY}"
+        WEATHER_API_URL =  ("https://api.weatherapi.com/v1/"
+                            "current.json"
+                            f"?key={constants.WEATHER_API_KEY}"
                             f"&q={lat},{longi}")
 
         context = ssl._create_unverified_context()

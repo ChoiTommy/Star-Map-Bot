@@ -16,13 +16,11 @@ Send /cancel to halt any operations.
 """
 
 # TODO star map features toggles, astronomy news rss.
-import misc, userinfo, settings, starmap, astrodata, weather
+import misc, userinfo, settings, starmap, astrodata, weather, constants
 
 import logging
-import os
 from telegram import Update, ParseMode
 from telegram.ext import Updater, CommandHandler, ConversationHandler, MessageHandler, Filters
-from dotenv import load_dotenv
 
 
 # Enable logging
@@ -31,17 +29,12 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Load credentials from environment variables
-load_dotenv()
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-WEATHER_API_KEY = os.getenv("WEATHER_API_KEY")
-
 
 def main() -> None:
     """Entry point of the script."""
 
     # Create the Updater and pass it your bot's token.
-    updater = Updater(BOT_TOKEN)
+    updater = Updater(constants.BOT_TOKEN)
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

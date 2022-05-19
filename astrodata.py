@@ -5,22 +5,10 @@ Usage:
 Command /astrodata is defined by show_astro_data
 """
 
-import main
+import constants
 import json, urllib.request, ssl
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
-
-
-moon_phase_dict = { # dict for getting the corresponding moon phase emojis
-    "New Moon" : "🌑",
-    "Waxing Crescent" : "🌒",
-    "First Quarter" : "🌓",
-    "Waxing Gibbous" : "🌔",
-    "Full Moon" : "🌕",
-    "Waning Gibbous" : "🌖",
-    "Last Quarter" : "🌗",
-    "Waning Crescent" : "🌘"
-}
 
 
 def show_astro_data(update: Update, context: CallbackContext) -> None:
@@ -35,7 +23,11 @@ def show_astro_data(update: Update, context: CallbackContext) -> None:
         longi = data[user_id]["longitude"]
 
         context = ssl._create_unverified_context()
-        WEATHER_API_URL = f"https://api.weatherapi.com/v1/astronomy.json?key={main.WEATHER_API_KEY}&q={lat},{longi}"
+        WEATHER_API_URL =  ("https://api.weatherapi.com/v1/"
+                            "astronomy.json"
+                            f"?key={constants.WEATHER_API_KEY}"
+                            f"&q={lat},{longi}")
+
         with urllib.request.urlopen(WEATHER_API_URL, context=context) as astro_file:
             astro_data = json.load(astro_file)
 
@@ -53,7 +45,7 @@ def show_astro_data(update: Update, context: CallbackContext) -> None:
                     f"Sunset: {sunset} \n"
                     f"Moonrise: {moonrise} \n"
                     f"Moonset: {moonset} \n"
-                    f"Moon phase: {moon_phase} {moon_phase_dict[moon_phase]} \n"
+                    f"Moon phase: {moon_phase} {constants.MOON_PHASE_DICT[moon_phase]} \n"
                     f"Moon illumination: {moon_illumination} \n\n"
 
                     f"({current_date_time}) \n"
