@@ -1,41 +1,17 @@
 """
-settings is a module that consists of functions setting up and updating user's location. Some helper functions are also involved.
+settings is a module that consists of functions setting up and updating user's location.
 
 Usage:
 Command /setlocation is defined by set_location and update_location
 Command /cancel is defined by cancel. It functions the same as userinfo.cancel_deletion
 """
 
+import helpers
 import json
 # import logging
 import urllib.request, ssl
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext, ConversationHandler
-from datetime import datetime
-from pytz import timezone, utc
-from timezonefinder import TimezoneFinder
-
-
-tf = TimezoneFinder()
-
-
-def get_offset(lat, longi):
-    """Returns a location's timezone offset from UTC in seconds.
-
-    Args:
-        lat (float): Latitude of a point.
-        longi (float): Longitude of a point.
-
-    Returns:
-        float: Timezone offset from UTC in seconds.
-    """
-
-    today = datetime.now()
-    tz_target = timezone(tf.certain_timezone_at(lng=longi, lat=lat))
-    # ATTENTION: tz_target could be None! handle error case
-    today_target = tz_target.localize(today)
-    today_utc = utc.localize(today)
-    return (today_utc - today_target).total_seconds()
 
 
 def set_location(update: Update, context: CallbackContext) -> int:
@@ -84,7 +60,7 @@ def update_location(update: Update, context: CallbackContext) -> int:
     else:
         address_string = address_data["display_name"]
 
-        utcOffset = int(get_offset(lat, longi) * 1000) # in ms
+        utcOffset = int(helpers.get_offset(lat, longi) * 1000) # in ms
 
         if user_id not in data:
             data.update({user_id:{"username": update.effective_user.username, "latitude": lat, "longitude" : longi, "address" : address_string, "utcOffset" : utcOffset}})

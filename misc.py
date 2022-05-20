@@ -1,5 +1,5 @@
 """
-misc is a module that consists of miscellaneous functions not relating to the main features of the bot.
+misc is a module that consists of miscellaneous features not relating to the main features of the bot.
 
 Usage:
 Command /credits is defined by show_credits

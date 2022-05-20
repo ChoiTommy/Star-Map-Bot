@@ -43,7 +43,7 @@ def show_weather_data(update: Update, context: CallbackContext) -> None:
 
         update.message.reply_photo(
             photo = f"https:{current_condition_icon_url}",
-            caption =  ("Current weather at your location: \n"
+            caption =  ("Weather at your location: \n"
                         f"Condition: <b>{current_condition_text}</b> \n"
                         f"Temperature: <b>{temperature}°C</b> \n"
                         f"Precipitation: <b>{precipitation_mm} mm</b> \n"

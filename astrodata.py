@@ -46,7 +46,7 @@ def show_astro_data(update: Update, context: CallbackContext) -> None:
                     f"Moonrise: {moonrise} \n"
                     f"Moonset: {moonset} \n"
                     f"Moon phase: {moon_phase} {constants.MOON_PHASE_DICT[moon_phase]} \n"
-                    f"Moon illumination: {moon_illumination} \n\n"
+                    f"Moon illumination: {moon_illumination}% \n\n"
 
                     f"({current_date_time}) \n"
             ),

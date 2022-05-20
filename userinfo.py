@@ -7,28 +7,10 @@ Command /deletemyinfo is defined by deletion_confirmation and delete_user_info
 Command /cancel is defined by cancel_deletion. It serves the same function as settings.cancel.
 """
 
+import helpers
 import json
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode
 from telegram.ext import CallbackContext, ConversationHandler
-
-
-def utcOffset_to_tzstring(offset=0) -> str:
-    """This function generates a timezone string (e.g. UTC+9:00) from a UTC offset in integer.
-
-    Args:
-        offset (int): UTC offset in milliseconds
-
-    Returns:
-        str: Timezone string like 'UTC+9:00' or 'UTC-10:30'
-    """
-
-    offset /= 3600000 # 3600000 ms
-    tz_hour = int(offset)
-    tz_minutes = int((abs(offset) - abs(tz_hour)) * 60)
-    if tz_hour >= 0:
-        return f"UTC+{tz_hour}:{tz_minutes if tz_minutes>=10 else '0'+str(tz_minutes)}"
-    else:
-        return f"UTC{tz_hour}:{tz_minutes if tz_minutes>=10 else '0'+str(tz_minutes)}"
 
 
 def show_user_info(update: Update, context: CallbackContext) -> None:
@@ -45,7 +27,7 @@ def show_user_info(update: Update, context: CallbackContext) -> None:
                     f'Latitude: {data[user_id]["latitude"]} \n'
                     f'Longitude: {data[user_id]["longitude"]} \n'
                     f'Location: <i>{data[user_id]["address"]}</i> \n'
-                    f'Timezone: {utcOffset_to_tzstring(data[user_id]["utcOffset"])} \n\n'
+                    f'Timezone: {helpers.utcOffset_to_tzstring(data[user_id]["utcOffset"])} \n\n'
 
                     '/setlocation to modify. /deletemyinfo to delete your data. \n'
             ),
