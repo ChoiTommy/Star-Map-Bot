@@ -27,7 +27,7 @@ def set_location(update: Update, context: CallbackContext) -> int:
         update.message.reply_text("Send your new location if you wish to change. /cancel to keep the current setting.")
     else:
         update.message.reply_text(
-            text = "Send your location to me :O Trust me I won\'t tell others. ||~\(unless someone pays me A LOT\)~|| ",
+            text = "Send your location to me :O Trust me I won\'t tell others\. ||~\(unless someone pays me A LOT\)~|| ",
             parse_mode = ParseMode.MARKDOWN_V2
         )
     return 0 # proceed to update_location
