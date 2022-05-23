@@ -66,7 +66,14 @@ def main() -> None:
     ))
 
     # Start the Bot using polling
-    updater.start_polling()
+    # updater.start_polling()
+    # updater.idle()
+
+    # Start listening to webhook
+    updater.start_webhook(listen = "0.0.0.0",
+                      port = constants.PORT,
+                      url_path = constants.BOT_TOKEN,
+                      webhook_url = "https://star-map-bot.herokuapp.com/" + constants.BOT_TOKEN)
     updater.idle()
 
 

@@ -1,5 +1,5 @@
 <div align="center">
-	<img src="icon.png" alt="drawing" width="150"/>
+	<img src="assets/icon.png" alt="Icon" width="150"/>
     <h1>Star Map Bot</h1>
     <p>
     	A simple and easy-to-use telegram bot that provides you with stargazing infomation.
