@@ -19,6 +19,6 @@ MOON_PHASE_DICT = {
     "Waxing Gibbous" : "🌔",
     "Full Moon" : "🌕",
     "Waning Gibbous" : "🌖",
-    "Last Quarter" : "🌗",
+    "Third Quarter" : "🌗",
     "Waning Crescent" : "🌘"
 }

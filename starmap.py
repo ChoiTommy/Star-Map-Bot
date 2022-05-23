@@ -51,13 +51,18 @@ def send_star_map(update: Update, context: CallbackContext) -> None:
         response = requests.get(fetch_target) # Download the data behind the URL
         doc = fitz.open(stream=response.content)
         page = doc.load_page(0)  # number of page
-        pix = page.get_pixmap(dpi=200, colorspace=fitz.csRGB, annots=False)
+        pix = page.get_pixmap(
+            dpi = 200,
+            colorspace = fitz.csRGB,
+            annots = False,
+            clip = fitz.IRect(1, 1, 600, 650)
+        )
         pix.tint_with(black=-129010, white=0) # no idea on how these values work, just do trial and error
 
         # update.message.reply_document(document = fetch_target) # pdf
-        update.message.reply_document(document=pix.tobytes())
-        update.message.reply_text(
-            text = "Enjoy the stunning stars\! Be considerate and *leave no trace* while stargazing\!",
+        update.message.reply_document(
+            document = pix.tobytes(),
+            caption = "Enjoy the stunning stars\! Be considerate and *leave no trace* while stargazing\!",
             parse_mode = ParseMode.MARKDOWN_V2
         )
 

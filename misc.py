@@ -32,7 +32,7 @@ TUTORIAL_TEXT = f"""
 
 To get the most out of this bot, you are required to set a location (/setlocation). This location data is used for generating star maps, displaying weather and astronomical data at that specific location only. Users can delete their data at anytime with the command /deletemyinfo.
 
-As weather and astronomical data do not differ much within few kilometers' range, feel free to turn off 'Precise Location' (on iOS) for Telegram in Settings. When setting up you location, you can move the map around in the Telegram app to provide a location wherever you want too.
+As weather and astronomical data do not differ much within few kilometers' range, feel free to turn off 'Precise Location' (on iOS) or choose "Approximate location" (on Android) for Telegram in Settings. When setting up you location, you can move the map around in the Telegram app to provide a location wherever you want too.
 
 Press the menu button at the bottom left of your screen to view all the commands available.
 """
