@@ -7,6 +7,7 @@ Command /starmap is defined by send_star_map
 
 import json, time
 import requests
+from firebase_admin import db
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 import fitz
@@ -30,15 +31,16 @@ def send_star_map(update: Update, context: CallbackContext) -> None:
     """Fetch and forward a star map to user based on the set location and the current time."""
 
     user_id = str(update.effective_user.id)
-    with open("locations.json", 'r') as file:
-        data = json.load(file)
 
-    if user_id in data:
+    ref = db.reference(f"/Users/{user_id}")
+    data = ref.get()
 
-        lat = str(data[user_id]["latitude"])
-        longi = str(data[user_id]["longitude"])
-        address = data[user_id]["address"].replace(',', "%2c").replace(' ', "%20")
-        utcOffset = str(data[user_id]["utcOffset"])
+    if data != None:
+
+        lat = str(data["latitude"])
+        longi = str(data["longitude"])
+        address = data["address"].replace(',', "%2c").replace(' ', "%20")
+        utcOffset = str(data["utcOffset"])
 
         fetch_target = (f"{STAR_MAP_URL}"
                         f"?time={str(int(time.time()*1000))}" # time.time(): seconds (floating point) since the epoch in UTC

@@ -3,3 +3,4 @@ pymupdf
 pytz
 timezonefinder
 requests
+firebase-admin

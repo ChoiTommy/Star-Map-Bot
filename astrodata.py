@@ -7,6 +7,7 @@ Command /astrodata is defined by show_astro_data
 
 import constants
 import json, urllib.request, ssl
+from firebase_admin import db
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
 
@@ -15,12 +16,12 @@ def show_astro_data(update: Update, context: CallbackContext) -> None:
     """Fetch and send a list of astronomical data to the user."""
 
     user_id = str(update.effective_user.id)
-    with open("locations.json", 'r') as file:
-        data = json.load(file)
+    ref = db.reference(f"/Users/{user_id}")
+    data = ref.get()
 
-    if user_id in data:
-        lat = data[user_id]["latitude"]
-        longi = data[user_id]["longitude"]
+    if data != None:
+        lat = data["latitude"]
+        longi = data["longitude"]
 
         context = ssl._create_unverified_context()
         WEATHER_API_URL =  ("https://api.weatherapi.com/v1/"

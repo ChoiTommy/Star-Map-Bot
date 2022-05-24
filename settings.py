@@ -10,6 +10,7 @@ import helpers
 import json
 # import logging
 import urllib.request, ssl
+from firebase_admin import db
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext, ConversationHandler
 
@@ -18,12 +19,12 @@ def set_location(update: Update, context: CallbackContext) -> int:
     """If their record exists, ask users if they want to update their location. Return 0 to proceed to update_location."""
 
     user_id = str(update.effective_user.id)
-    with open("locations.json", 'r') as file:
-        data = json.load(file)
-    context.user_data["JSON"] = data
 
-    if user_id in data:
-        update.message.reply_text(f"Your current location is {data[user_id]['latitude']}, {data[user_id]['longitude']} ({data[user_id]['address']}).")
+    ref = db.reference(f"/Users/{user_id}")
+    data = ref.get()
+
+    if data != None:
+        update.message.reply_text(f"Your current location is {data['latitude']}, {data['longitude']} ({data['address']}).")
         update.message.reply_text("Send your new location if you wish to change. /cancel to keep the current setting.")
     else:
         update.message.reply_text(
@@ -39,7 +40,6 @@ def update_location(update: Update, context: CallbackContext) -> int:
     user_id = str(update.effective_user.id)
     lat = update.message.location.latitude
     longi = update.message.location.longitude
-    data = context.user_data["JSON"]
 
     context = ssl._create_unverified_context()
     NOMINATIM_REVERSE_API = ("https://nominatim.openstreetmap.org/reverse"
@@ -58,20 +58,22 @@ def update_location(update: Update, context: CallbackContext) -> int:
         return 0 # ask for a new location until user has given a valid one
 
     else:
-        address_string = address_data["display_name"]
-
+        address_string = address_data["display_name"] # from nominatim
         utcOffset = int(helpers.get_offset(lat, longi) * 1000) # in ms
 
-        if user_id not in data:
-            data.update({user_id:{"username": update.effective_user.username, "latitude": lat, "longitude" : longi, "address" : address_string, "utcOffset" : utcOffset}})
-        else:
-            data[user_id]["latitude"] = lat
-            data[user_id]["longitude"] = longi
-            data[user_id]["address"] = address_string
-            data[user_id]["utcOffset"] = utcOffset
+        ref = db.reference(f"/Users/{user_id}")
+        data = ref.get()
 
-        with open("locations.json", 'w') as file:
-            json.dump(data, file, indent = 4)
+        if data == None:
+            ref.set({"username": update.effective_user.username, "latitude": lat, "longitude" : longi, "address" : address_string, "utcOffset" : utcOffset})
+        else:
+            ref.update({
+                "latitude" : lat,
+                "longitude" : longi,
+                "address" : address_string,
+                "utcOffset" : utcOffset
+            })
+
         update.message.reply_text(f"All set! Your new location is {lat}, {longi} ({address_string}).")
         return ConversationHandler.END
 

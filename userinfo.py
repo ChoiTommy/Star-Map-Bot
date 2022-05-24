@@ -9,6 +9,7 @@ Command /cancel is defined by cancel_deletion. It serves the same function as se
 
 import helpers
 import json
+from firebase_admin import db
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode
 from telegram.ext import CallbackContext, ConversationHandler
 
@@ -17,17 +18,17 @@ def show_user_info(update: Update, context: CallbackContext) -> None:
     """Display user info when the command /myinfo is called. User info consists of latitude, longitude, address and timezone."""
 
     user_id = str(update.effective_user.id)
-    with open("locations.json", 'r') as file:
-        data = json.load(file)
+    ref = db.reference(f"/Users/{user_id}")
+    data = ref.get()
 
-    if user_id in data:
+    if data != None:
         update.message.reply_text(
             text = (f'Hi @{update.effective_user.username}, \n'
                     'Your currently set location is \n'
-                    f'Latitude: {data[user_id]["latitude"]} \n'
-                    f'Longitude: {data[user_id]["longitude"]} \n'
-                    f'Location: <i>{data[user_id]["address"]}</i> \n'
-                    f'Timezone: {helpers.utcOffset_to_tzstring(data[user_id]["utcOffset"])} \n\n'
+                    f'Latitude: {data["latitude"]} \n'
+                    f'Longitude: {data["longitude"]} \n'
+                    f'Location: <i>{data["address"]}</i> \n'
+                    f'Timezone: {helpers.utcOffset_to_tzstring(data["utcOffset"])} \n\n'
 
                     '/setlocation to modify. /deletemyinfo to delete your data. \n'
             ),
@@ -46,11 +47,10 @@ def deletion_confirmation(update: Update, context: CallbackContext) -> int:
     """Ask for confirmation to delete the user info from the server. Return Conversation.END if user has no data on the server, else returns 0."""
 
     user_id = str(update.effective_user.id)
-    with open("locations.json", 'r') as file:
-        data = json.load(file)
-    context.user_data["JSON"] = data
+    ref = db.reference(f"/Users/{user_id}")
+    data = ref.get()
 
-    if user_id not in data:
+    if data == None:
         update.message.reply_text(
             text = "Hi new user, rest assured we have not collected any data from you, so nothing has been erased. " \
                     "Perhaps you can try /setlocation and give me something to delete afterwards?"
@@ -69,9 +69,9 @@ def delete_user_info(update: Update, context: CallbackContext) -> int:
 
     if update.message.text == 'Yes':
         user_id = str(update.effective_user.id)
-        del context.user_data["JSON"][user_id]
-        with open("locations.json", 'w') as file:
-            json.dump(context.user_data["JSON"], file, indent = 4)
+        ref = db.reference(f"/Users/{user_id}")
+        ref.set({})
+
         update.message.reply_text(
             text = ("Voilà! I have erased your existence. Keep it up and leave no trace in the cyber world! \n"
                     "/myinfo <- click it to see for yourself, scumbag"

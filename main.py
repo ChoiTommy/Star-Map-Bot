@@ -19,6 +19,8 @@ Send /cancel to halt any operations.
 import misc, userinfo, settings, starmap, astrodata, weather, constants
 
 import logging
+import firebase_admin
+from firebase_admin import credentials
 from telegram import Update, ParseMode
 from telegram.ext import Updater, CommandHandler, ConversationHandler, MessageHandler, Filters
 
@@ -32,6 +34,14 @@ logger = logging.getLogger(__name__)
 
 def main() -> None:
     """Entry point of the script."""
+
+    cred = credentials.Certificate("google-credentials.json")
+    firebase_admin.initialize_app(
+        credential = cred,
+        options = {
+            "databaseURL" : "https://star-map-bot-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        }
+    )
 
     # Create the Updater and pass it your bot's token.
     updater = Updater(constants.BOT_TOKEN)
