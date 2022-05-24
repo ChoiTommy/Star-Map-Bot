@@ -5,7 +5,7 @@ Usage:
 Command /starmap is defined by send_star_map
 """
 
-import json, time
+import time
 import requests
 from firebase_admin import db
 from telegram import Update, ParseMode

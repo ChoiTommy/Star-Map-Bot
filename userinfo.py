@@ -8,7 +8,6 @@ Command /cancel is defined by cancel_deletion. It serves the same function as se
 """
 
 import helpers
-import json
 from firebase_admin import db
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode
 from telegram.ext import CallbackContext, ConversationHandler

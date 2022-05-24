@@ -8,7 +8,6 @@ Command /cancel is defined by cancel. It functions the same as userinfo.cancel_d
 
 import helpers
 import json
-# import logging
 import urllib.request, ssl
 from firebase_admin import db
 from telegram import Update, ParseMode
