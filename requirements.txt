@@ -1,6 +1,6 @@
-python-telegram-bot
-pymupdf
-pytz
-timezonefinder
-requests
-firebase-admin
+python-telegram-bot==13.11
+pymupdf==1.19.6
+pytz==2022.1
+timezonefinder==6.0.0
+requests==2.27.1
+firebase-admin==5.2.0
