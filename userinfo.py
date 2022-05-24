@@ -29,16 +29,14 @@ def show_user_info(update: Update, context: CallbackContext) -> None:
                     f'Location: <i>{data["address"]}</i> \n'
                     f'Timezone: {helpers.utcOffset_to_tzstring(data["utcOffset"])} \n\n'
 
-                    '/setlocation to modify. /deletemyinfo to delete your data. \n'
-            ),
+                    '/setlocation to modify. /deletemyinfo to delete your data. \n'),
             parse_mode = ParseMode.HTML
         )
     else:
         update.message.reply_text(
             text = (f'Hi @{update.effective_user.username}, \n'
                     'You have yet to set any location. \n'
-                    '/setlocation to start off. \n'
-            )
+                    '/setlocation to start off. \n')
         )
 
 
@@ -51,8 +49,8 @@ def deletion_confirmation(update: Update, context: CallbackContext) -> int:
 
     if data == None:
         update.message.reply_text(
-            text = "Hi new user, rest assured we have not collected any data from you, so nothing has been erased. " \
-                    "Perhaps you can try /setlocation and give me something to delete afterwards?"
+            text = ("Hi new user, rest assured we have not collected any data from you, so nothing has been erased. "
+                    "Perhaps you can try /setlocation and give me something to delete afterwards?")
         )
         return ConversationHandler.END
     else:
@@ -66,15 +64,14 @@ def deletion_confirmation(update: Update, context: CallbackContext) -> int:
 def delete_user_info(update: Update, context: CallbackContext) -> int:
     """Perform deletion on users' data if 'Yes' is retrieved. Return ConversationHandler.END to halt the ConversationHandler."""
 
-    if update.message.text == 'Yes':
+    if update.message.text == "Yes":
         user_id = str(update.effective_user.id)
         ref = db.reference(f"/Users/{user_id}")
         ref.set({})
 
         update.message.reply_text(
             text = ("Voilà! I have erased your existence. Keep it up and leave no trace in the cyber world! \n"
-                    "/myinfo <- click it to see for yourself, scumbag"
-            ),
+                    "/myinfo <- click it to see for yourself, scumbag"),
             reply_markup = ReplyKeyboardRemove()
         )
         return ConversationHandler.END

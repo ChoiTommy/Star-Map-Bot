@@ -15,7 +15,7 @@ Send /credits to view the data sources of all the infomation this bot provides.
 Send /cancel to halt any operations.
 """
 
-# TODO API request async, star map features toggles, astronomy news rss.
+# TODO API request async, star map features toggles, astronomy news rss, subscriber (send info actively to subscribed users)
 import misc, userinfo, settings, starmap, astrodata, weather, constants
 
 import logging
@@ -63,7 +63,7 @@ def main() -> None:
             0: [MessageHandler(Filters.location, settings.update_location)]
         },
         fallbacks = [CommandHandler("cancel", settings.cancel)],
-        conversation_timeout = 120 # 2 mins
+        conversation_timeout = 300 # 5 mins
     ))
 
     dispatcher.add_handler(ConversationHandler(
@@ -72,7 +72,7 @@ def main() -> None:
             0: [MessageHandler(Filters.regex("^(Yes|No)$"), userinfo.delete_user_info)]
         },
         fallbacks = [CommandHandler("cancel", userinfo.cancel_deletion)],
-        conversation_timeout = 120
+        conversation_timeout = 300
     ))
 
     # Start the Bot using polling

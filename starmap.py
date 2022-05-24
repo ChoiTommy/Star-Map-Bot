@@ -16,7 +16,7 @@ import fitz
 # Star map URL
 STAR_MAP_URL = "https://www.heavens-above.com/SkyAndTelescope/StSkyChartPDF.ashx"
 # params to be injected: time, latitude, longitude, location, utcOffset(in ms)
-REST_OF_THE_URL =  ("&showEquator=false"
+REST_OF_THE_URL = ("&showEquator=false"
                     "&showEcliptic=true"
                     "&showStarNames=true"
                     "&showPlanetNames=true"

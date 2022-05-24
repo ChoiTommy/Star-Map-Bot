@@ -6,6 +6,8 @@
     </p>
 </div>
 
+[![CodeFactor](https://www.codefactor.io/repository/github/choitommy/star-map-bot/badge)](https://www.codefactor.io/repository/github/choitommy/star-map-bot)
+
 # Credits
 - [Skyandtelescope](https://skyandtelescope.org)
 - [WeatherAPI](https://www.weatherapi.com)

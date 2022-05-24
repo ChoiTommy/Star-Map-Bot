@@ -7,8 +7,7 @@ Command /cancel is defined by cancel. It functions the same as userinfo.cancel_d
 """
 
 import helpers
-import json
-import urllib.request, ssl
+import requests
 from firebase_admin import db
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext, ConversationHandler
@@ -40,7 +39,6 @@ def update_location(update: Update, context: CallbackContext) -> int:
     lat = update.message.location.latitude
     longi = update.message.location.longitude
 
-    context = ssl._create_unverified_context()
     NOMINATIM_REVERSE_API = ("https://nominatim.openstreetmap.org/reverse"
                             "?format=jsonv2"
                             f"&lat={lat}"
@@ -48,9 +46,8 @@ def update_location(update: Update, context: CallbackContext) -> int:
                             "&accept-language=en-US"
                             "&zoom=14")
 
-    # logging.info(NOMINATIM_REVERSE_API)
-    with urllib.request.urlopen(NOMINATIM_REVERSE_API, context=context) as address_file:
-        address_data = json.load(address_file)
+    response = requests.get(NOMINATIM_REVERSE_API)
+    address_data = response.json()
 
     if "error" in address_data: # Safeguarding, "Unable to geocode"
         update.message.reply_text("You are in the middle of nowhere, my man. Send me a new location of a less remote place, please.")

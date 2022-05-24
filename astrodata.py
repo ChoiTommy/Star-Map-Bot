@@ -6,7 +6,7 @@ Command /astrodata is defined by show_astro_data
 """
 
 import constants
-import json, urllib.request, ssl
+import requests
 from firebase_admin import db
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
@@ -23,14 +23,13 @@ def show_astro_data(update: Update, context: CallbackContext) -> None:
         lat = data["latitude"]
         longi = data["longitude"]
 
-        context = ssl._create_unverified_context()
-        WEATHER_API_URL =  ("https://api.weatherapi.com/v1/"
+        WEATHER_API_URL = ("https://api.weatherapi.com/v1/"
                             "astronomy.json"
                             f"?key={constants.WEATHER_API_KEY}"
                             f"&q={lat},{longi}")
 
-        with urllib.request.urlopen(WEATHER_API_URL, context=context) as astro_file:
-            astro_data = json.load(astro_file)
+        response = requests.get(WEATHER_API_URL)
+        astro_data = response.json()
 
         sunrise = astro_data["astronomy"]["astro"]["sunrise"]
         sunset = astro_data["astronomy"]["astro"]["sunset"]
@@ -49,8 +48,7 @@ def show_astro_data(update: Update, context: CallbackContext) -> None:
                     f"Moon phase: {moon_phase} {constants.MOON_PHASE_DICT[moon_phase]} \n"
                     f"Moon illumination: {moon_illumination}% \n\n"
 
-                    f"({current_date_time}) \n"
-            ),
+                    f"({current_date_time}) \n"),
             parse_mode = ParseMode.HTML
         )
 
