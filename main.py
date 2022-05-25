@@ -15,7 +15,7 @@ Send /credits to view the data sources of all the infomation this bot provides.
 Send /cancel to halt any operations.
 """
 
-# TODO API request async, star map features toggles, astronomy news rss, subscriber (send info actively to subscribed users)
+# TODO Refresh button, API request async, star map features toggles, astronomy news rss, subscriber (send info actively to subscribed users)
 import misc, userinfo, settings, starmap, astrodata, weather, constants
 
 import logging

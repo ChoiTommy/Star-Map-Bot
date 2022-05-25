@@ -10,6 +10,7 @@ import requests
 from firebase_admin import db
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
+from tabulate import tabulate
 
 
 def show_astro_data(update: Update, context: CallbackContext) -> None:
@@ -39,14 +40,21 @@ def show_astro_data(update: Update, context: CallbackContext) -> None:
         moon_illumination = astro_data["astronomy"]["astro"]["moon_illumination"]
         current_date_time = astro_data["location"]["localtime"]
 
+        tble = [
+            ['🌞','Sun'],
+            ["Rise", sunrise],
+            ["Set", sunset],
+            [],
+            ['🌝', 'Moon'],
+            ["Rise", moonrise],
+            ["Set", moonset],
+            ["Phase", f"{moon_phase} {constants.MOON_PHASE_DICT[moon_phase]}"],
+            ["Illum.", f"{moon_illumination}%"]
+        ]
+
         update.message.reply_text(
             text = ("🌠<b>Astronomical data</b>: \n"
-                    f"Sunrise: {sunrise} \n"
-                    f"Sunset: {sunset} \n"
-                    f"Moonrise: {moonrise} \n"
-                    f"Moonset: {moonset} \n"
-                    f"Moon phase: {moon_phase} {constants.MOON_PHASE_DICT[moon_phase]} \n"
-                    f"Moon illumination: {moon_illumination}% \n\n"
+                    f"<code>{tabulate(tble, tablefmt='simple')}</code> \n"
 
                     f"({current_date_time}) \n"),
             parse_mode = ParseMode.HTML

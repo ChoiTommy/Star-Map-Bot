@@ -10,6 +10,7 @@ import requests
 from firebase_admin import db
 from telegram import Update, ParseMode
 from telegram.ext import CallbackContext
+from tabulate import tabulate
 
 
 def show_weather_data(update: Update, context: CallbackContext) -> None:
@@ -37,19 +38,25 @@ def show_weather_data(update: Update, context: CallbackContext) -> None:
         precipitation_mm = weather_data["current"]["precip_mm"]
         cloud_percentage = weather_data["current"]["cloud"]
         visibility_km = weather_data["current"]["vis_km"]
+        humidity = weather_data["current"]["humidity"]
         uv_index = weather_data["current"]["uv"]
 
         current_date_time = weather_data["location"]["localtime"]
 
+        tble = [
+            ["Temp.", f"{temperature}°C"],
+            ["Precip.", f"{precipitation_mm} mm"],
+            ["Cloud", f"{cloud_percentage}%"],
+            ["Visibility", f"{visibility_km} km"],
+            ["Humidity", f"{humidity}%"],
+            ["UV index", uv_index]
+        ]
+
         update.message.reply_photo(
             photo = f"https:{current_condition_icon_url}",
-            caption = ("Weather at your location: \n"                           # TODO better formatting for data display
-                        f"Condition: <b>{current_condition_text}</b> \n"
-                        f"Temperature: <b>{temperature}°C</b> \n"
-                        f"Precipitation: <b>{precipitation_mm} mm</b> \n"
-                        f"Cloud coverage: <b>{cloud_percentage}%</b> \n"
-                        f"Visibility: <b>{visibility_km} km</b> \n"
-                        f"UV index: <b>{uv_index}</b> \n"
+            caption = (f"Weather now is: <b>{current_condition_text}</b> \n"
+
+                        f"<code>{tabulate(tble, tablefmt='fancy_grid')}</code> \n"
                         f"({current_date_time}) \n\n"
 
                         "Be prepared before setting out for stargazing!"),
