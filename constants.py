@@ -11,6 +11,9 @@ import os
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 WEATHER_API_KEY = os.getenv("WEATHER_API_KEY")
 PORT = os.getenv("PORT")
+GOOGLE_APPLICATION_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+DATABASE_URL = os.getenv("DATABASE_URL")
+
 
 # dict for getting the corresponding moon phase emojis
 MOON_PHASE_DICT = {
@@ -23,3 +26,8 @@ MOON_PHASE_DICT = {
     "Third Quarter" : "🌗",
     "Waning Crescent" : "🌘"
 }
+
+
+REFRESH_WEATHER_CALLBACK_DATA = "REFRESH_WEATHER"
+REFRESH_ASTRODATA_CALLBACK_DATA = "REFRESH_ASTRODATA"
+REFRESH_STARMAP_CALLBACK_DATA = "REFRESH_STARMAP"

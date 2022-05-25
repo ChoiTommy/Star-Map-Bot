@@ -15,14 +15,14 @@ Send /credits to view the data sources of all the infomation this bot provides.
 Send /cancel to halt any operations.
 """
 
-# TODO Refresh button, API request async, star map features toggles, astronomy news rss, subscriber (send info actively to subscribed users)
-import misc, userinfo, settings, starmap, astrodata, weather, constants
+# TODO API request async, star map features toggles, astronomy news rss, subscriber (send info actively to subscribed users)
+import misc, userinfo, settings, starmap, astrodata, weather, constants, callback_queries
 
 import logging
 import firebase_admin
 from firebase_admin import credentials
 from telegram import Update, ParseMode
-from telegram.ext import Updater, CommandHandler, ConversationHandler, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, ConversationHandler, MessageHandler, CallbackQueryHandler, Filters
 
 
 # Enable logging
@@ -35,11 +35,11 @@ logger = logging.getLogger(__name__)
 def main() -> None:
     """Entry point of the script."""
 
-    cred = credentials.Certificate("google-credentials.json")
+    cred = credentials.Certificate(constants.GOOGLE_APPLICATION_CREDENTIALS)
     firebase_admin.initialize_app(
         credential = cred,
         options = {
-            "databaseURL" : "https://star-map-bot-default-rtdb.asia-southeast1.firebasedatabase.app/"
+            "databaseURL" : constants.DATABASE_URL
         }
     )
 
@@ -74,6 +74,8 @@ def main() -> None:
         fallbacks = [CommandHandler("cancel", userinfo.cancel_deletion)],
         conversation_timeout = 300
     ))
+
+    dispatcher.add_handler(CallbackQueryHandler(callback_queries.callback))
 
     # Start the Bot using polling
     # updater.start_polling()
