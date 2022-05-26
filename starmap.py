@@ -21,7 +21,7 @@ REFRESH_STARMAP_BUTTON = InlineKeyboardMarkup([
 # Star map URL
 STAR_MAP_URL = "https://www.heavens-above.com/SkyAndTelescope/StSkyChartPDF.ashx"
 # params to be injected: time, latitude, longitude, location, utcOffset(in ms)
-REST_OF_THE_URL = ("&showEquator=false"
+REST_OF_THE_URL = ("&showEquator=false"         # TODO switch to a dict header
                     "&showEcliptic=true"
                     "&showStarNames=true"
                     "&showPlanetNames=true"
@@ -47,14 +47,14 @@ def send_star_map(update: Update, context: CallbackContext) -> None:
         address = data["address"].replace(',', "%2c").replace(' ', "%20")
         utcOffset = str(data["utcOffset"])
 
-        current_timestamp = int(time.time()) # in UTC
-        current_date_time = datetime.utcfromtimestamp(current_timestamp + data["utcOffset"]/1000)
+        current_date_time = get_current_date_time_string(data["utcOffset"]/1000)
 
         pix = fetch_star_map(lat, longi, address, utcOffset)
 
         # update.message.reply_document(document = fetch_target) # pdf
         update.message.reply_document(
             document = pix.tobytes(),
+            filename = f"Star_Map_{current_date_time.replace(' ', '_').replace(':', '_')}.png",
             caption = f"Enjoy the stunning stars! Be considerate and leave no trace while stargazing! \n ({current_date_time})",
             reply_markup = REFRESH_STARMAP_BUTTON
         )
@@ -82,13 +82,12 @@ def update_star_map(update: Update, context: CallbackContext) -> str:
         address = data["address"].replace(',', "%2c").replace(' ', "%20")
         utcOffset = str(data["utcOffset"])
 
-        current_timestamp = int(time.time()) # in UTC
-        current_date_time = datetime.utcfromtimestamp(current_timestamp + data["utcOffset"]/1000)
+        current_date_time = get_current_date_time_string(data["utcOffset"]/1000)
 
         pix = fetch_star_map(lat, longi, address, utcOffset)
 
         update.callback_query.message.edit_media(
-            media = InputMediaDocument(pix.tobytes()),
+            media = InputMediaDocument(media=pix.tobytes(), filename=f"Star_Map_{current_date_time.replace(' ', '_').replace(':', '_')}.png"),
         ).edit_caption(
             caption = f"Enjoy the stunning stars! Be considerate and leave no trace while stargazing! \n ({current_date_time})",
             reply_markup = REFRESH_STARMAP_BUTTON
@@ -133,3 +132,16 @@ def fetch_star_map(latitude, longitude, address, utcOffset):
     doc.close()
 
     return pix
+
+
+def get_current_date_time_string(utcOffset) -> str:
+    """Get a string of current date and time. e.g. 2022-05-26 00:00:00
+
+    Args:
+        utcOffset (int): UTC offset in seconds
+
+    Returns:
+        str: a string consisting of date and time
+    """
+    current_timestamp = int(time.time()) # in UTC
+    return str(datetime.utcfromtimestamp(current_timestamp + utcOffset))

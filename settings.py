@@ -61,7 +61,13 @@ def update_location(update: Update, context: CallbackContext) -> int:
         data = ref.get()
 
         if data == None:
-            ref.set({"username": update.effective_user.username, "latitude": lat, "longitude" : longi, "address" : address_string, "utcOffset" : utcOffset})
+            ref.set({
+                "username": update.effective_user.username,
+                "latitude": lat,
+                "longitude" : longi,
+                "address" : address_string,
+                "utcOffset" : utcOffset
+            })
         else:
             ref.update({
                 "latitude" : lat,
