@@ -8,7 +8,7 @@ Command /astrodata is defined by show_astro_data
 import constants
 import requests
 from firebase_admin import db
-from telegram import Update, ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import Update, ParseMode, InlineKeyboardMarkup, InlineKeyboardButton, error
 from telegram.ext import CallbackContext
 from tabulate import tabulate
 
@@ -65,16 +65,17 @@ def update_astro_data(update: Update, context: CallbackContext) -> str:
                     f"<code>{tabulate(tble, tablefmt='simple')}</code> \n"
                     f"({current_date_time}) \n")
 
-        try:   # todo rewrite here
+        try:
             update.callback_query.message.edit_text(
                 text = new_text,
                 parse_mode = ParseMode.HTML,
                 reply_markup = REFRESH_ASTRODATA_BUTTON
             )
-        except:
-            pass
+        except error.BadRequest:
+            return "You're doing this too frequently. Go get a life."
+        else:
+            return "Astrodata refreshed"
 
-        return "Astrodata refreshed"
     else:
         update.callback_query.message.delete()
         return "Please set your location first!"

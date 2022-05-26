@@ -5,11 +5,10 @@ Usage:
 Command /starmap is defined by send_star_map
 """
 
-import constants
+import constants, helpers
 import time
 import requests
 from firebase_admin import db
-from datetime import datetime
 from telegram import Update, ParseMode, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaDocument
 from telegram.ext import CallbackContext
 import fitz
@@ -47,7 +46,7 @@ def send_star_map(update: Update, context: CallbackContext) -> None:
         address = data["address"].replace(',', "%2c").replace(' ', "%20")
         utcOffset = str(data["utcOffset"])
 
-        current_date_time = get_current_date_time_string(data["utcOffset"]/1000)
+        current_date_time = helpers.get_current_date_time_string(data["utcOffset"]/1000)
 
         pix = fetch_star_map(lat, longi, address, utcOffset)
 
@@ -82,7 +81,7 @@ def update_star_map(update: Update, context: CallbackContext) -> str:
         address = data["address"].replace(',', "%2c").replace(' ', "%20")
         utcOffset = str(data["utcOffset"])
 
-        current_date_time = get_current_date_time_string(data["utcOffset"]/1000)
+        current_date_time = helpers.get_current_date_time_string(data["utcOffset"]/1000)
 
         pix = fetch_star_map(lat, longi, address, utcOffset)
 
@@ -132,16 +131,3 @@ def fetch_star_map(latitude, longitude, address, utcOffset):
     doc.close()
 
     return pix
-
-
-def get_current_date_time_string(utcOffset) -> str:
-    """Get a string of current date and time. e.g. 2022-05-26 00:00:00
-
-    Args:
-        utcOffset (int): UTC offset in seconds
-
-    Returns:
-        str: a string consisting of date and time
-    """
-    current_timestamp = int(time.time()) # in UTC
-    return str(datetime.utcfromtimestamp(current_timestamp + utcOffset))

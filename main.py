@@ -16,7 +16,7 @@ Send /cancel to halt any operations.
 """
 
 # TODO API request async, star map features toggles, astronomy news rss, subscriber (send info actively to subscribed users)
-import misc, userinfo, settings, starmap, astrodata, weather, constants, callback_queries
+import misc, userinfo, starmap, astrodata, weather, constants, callback_queries
 
 import logging
 import firebase_admin
@@ -58,11 +58,11 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("weather", weather.show_weather_data))
 
     dispatcher.add_handler(ConversationHandler(
-        entry_points = [CommandHandler("setlocation", settings.set_location)],
+        entry_points = [CommandHandler("setlocation", userinfo.set_location)],
         states = {
-            0: [MessageHandler(Filters.location, settings.update_location)]
+            0: [MessageHandler(Filters.location, userinfo.update_location)]
         },
-        fallbacks = [CommandHandler("cancel", settings.cancel)],
+        fallbacks = [CommandHandler("cancel", userinfo.cancel_location_setup)],
         conversation_timeout = 300 # 5 mins
     ))
 
@@ -78,14 +78,13 @@ def main() -> None:
     dispatcher.add_handler(CallbackQueryHandler(callback_queries.callback))
 
     # Start the Bot using polling
-    # updater.start_polling()
-    # updater.idle()
+    updater.start_polling()
 
     # Start listening to webhook
-    updater.start_webhook(listen = "0.0.0.0",
-                      port = constants.PORT,
-                      url_path = constants.BOT_TOKEN,
-                      webhook_url = "https://star-map-bot.herokuapp.com/" + constants.BOT_TOKEN)
+    # updater.start_webhook(listen = "0.0.0.0",
+    #                   port = constants.PORT,
+    #                   url_path = constants.BOT_TOKEN,
+    #                   webhook_url = "https://star-map-bot.herokuapp.com/" + constants.BOT_TOKEN)
     updater.idle()
 
 

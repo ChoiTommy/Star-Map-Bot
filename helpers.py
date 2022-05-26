@@ -3,6 +3,7 @@ helpers is a module that consists of all the helper functions used in this bot.
 
 """
 
+import time
 from datetime import datetime
 from pytz import timezone, utc
 from timezonefinder import TimezoneFinder
@@ -47,3 +48,16 @@ def utcOffset_to_tzstring(offset=0) -> str:
         return f"UTC+{tz_hour}:{tz_minutes if tz_minutes>=10 else '0'+str(tz_minutes)}"
     else:
         return f"UTC{tz_hour}:{tz_minutes if tz_minutes>=10 else '0'+str(tz_minutes)}"
+
+
+def get_current_date_time_string(utcOffset) -> str:
+    """Get a string of current date and time. e.g. 2022-05-26 00:00:00
+
+    Args:
+        utcOffset (int): UTC offset in seconds
+
+    Returns:
+        str: a string consisting of date and time
+    """
+    current_timestamp = int(time.time()) # in UTC
+    return str(datetime.utcfromtimestamp(current_timestamp + utcOffset))
