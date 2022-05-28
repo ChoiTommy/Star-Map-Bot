@@ -11,25 +11,25 @@ from telegram.ext import CallbackContext
 
 
 SUN_PIC_URLS = [  # 19 images, indices from 0..18
-    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_2048_0193.jpg",          # AIA 193 Å
-    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_2048_0304.jpg",          # AIA 304 Å
-    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_2048_0171.jpg",          # AIA 171 Å
-    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_2048_0211.jpg",          # AIA 211 Å
-    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_2048_0131.jpg",          # AIA 131 Å
-    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_2048_0335.jpg",          # AIA 335 Å
-    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_2048_0094.jpg",          # AIA 094 Å
-    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_2048_1600.jpg",          # AIA 1600 Å
-    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_2048_1700.jpg",          # AIA 1700 Å
-    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_2048_211193171.jpg",     # AIA 211 Å, 193 Å, 171 Å
-    "https://sdo.gsfc.nasa.gov/assets/img/latest/f_304_211_171_2048.jpg",        # AIA 304 Å, 211 Å, 171 Å
-    "https://sdo.gsfc.nasa.gov/assets/img/latest/f_094_335_193_2048.jpg",        # AIA 094 Å, 335 Å, 193 Å
-    "https://sdo.gsfc.nasa.gov/assets/img/latest/f_HMImag_171_2048.jpg",         # AIA 171 Å & HMIB
-    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_2048_HMIB.jpg",          # HMI Magnetogram
-    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_2048_HMIBC.jpg",         # HMI Colorized Magnetogram
-    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_2048_HMIIC.jpg",         # HMI Intensitygram - colored <- starting point
-    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_2048_HMIIF.jpg",         # HMI Intensitygram - Flattened
-    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_2048_HMII.jpg",          # HMI Intensitygram
-    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_2048_HMID.jpg"           # HMI Dopplergram
+    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0193.jpg",          # AIA 193 Å
+    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0304.jpg",          # AIA 304 Å
+    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0171.jpg",          # AIA 171 Å
+    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0211.jpg",          # AIA 211 Å
+    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0131.jpg",          # AIA 131 Å
+    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0335.jpg",          # AIA 335 Å
+    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0094.jpg",          # AIA 094 Å
+    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_1600.jpg",          # AIA 1600 Å
+    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_1700.jpg",          # AIA 1700 Å
+    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_211193171.jpg",     # AIA 211 Å, 193 Å, 171 Å
+    "https://sdo.gsfc.nasa.gov/assets/img/latest/f_304_211_171_1024.jpg",        # AIA 304 Å, 211 Å, 171 Å
+    "https://sdo.gsfc.nasa.gov/assets/img/latest/f_094_335_193_1024.jpg",        # AIA 094 Å, 335 Å, 193 Å
+    "https://sdo.gsfc.nasa.gov/assets/img/latest/f_HMImag_171_1024.jpg",         # AIA 171 Å & HMIB
+    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMIB.jpg",          # HMI Magnetogram
+    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMIBC.jpg",         # HMI Colorized Magnetogram
+    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMIIC.jpg",         # HMI Intensitygram - colored <- starting point
+    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMIIF.jpg",         # HMI Intensitygram - Flattened
+    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMII.jpg",          # HMI Intensitygram
+    "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMID.jpg"           # HMI Dopplergram
 ]
 
 SUN_PIC_NAMES = [

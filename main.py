@@ -8,6 +8,7 @@ Send /start to get a welcome message from the bot.
 Send /setlocation to set your location to enable the the core features.
 Send /starmap to get a star map pdf at the location set.
 Send /astrodata to get a list of astronomical data at the location set.
+Send /sun to view a series of sun images in various wavelengths.
 Send /weather to get a weather report at the location set.
 Send /myinfo to view the data associate with you stored on the server.
 Send /deletemyinfo to purge you data permanently on the server.

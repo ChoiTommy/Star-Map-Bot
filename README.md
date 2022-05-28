@@ -11,5 +11,6 @@
 # Credits
 - [Skyandtelescope](https://skyandtelescope.org)
 - [WeatherAPI](https://www.weatherapi.com)
+- [NASA SDO Data](https://sdo.gsfc.nasa.gov/data/)
 - [Python telegram bot](https://github.com/python-telegram-bot/python-telegram-bot)
 - [Google material icons](https://fonts.google.com/icons)
