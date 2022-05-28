@@ -2,7 +2,7 @@
 callback_queries is a module for handling callback queries.
 
 """
-import weather, astrodata, starmap, constants
+import weather, astrodata, starmap, sun, constants
 
 from telegram import Update
 from telegram.ext import CallbackContext
@@ -23,6 +23,10 @@ def callback(update: Update, context: CallbackContext) -> None:
 
     elif query.data == constants.REFRESH_STARMAP_CALLBACK_DATA:
         status = starmap.update_star_map(update, context)
+        query.answer(text=status)
+
+    elif "SUN" in query.data:
+        status = sun.update_sun_pic(update, context)
         query.answer(text=status)
 
     else:

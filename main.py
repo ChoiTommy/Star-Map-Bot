@@ -16,7 +16,7 @@ Send /cancel to halt any operations.
 """
 
 # TODO API request async, star map features toggles, astronomy news rss, subscriber (send info actively to subscribed users)
-import misc, userinfo, starmap, astrodata, weather, constants, callback_queries
+import misc, userinfo, starmap, astrodata, weather, sun, constants, callback_queries
 
 import logging
 import firebase_admin
@@ -56,6 +56,7 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("myinfo", userinfo.show_user_info))
     dispatcher.add_handler(CommandHandler("astrodata", astrodata.show_astro_data))
     dispatcher.add_handler(CommandHandler("weather", weather.show_weather_data))
+    dispatcher.add_handler(CommandHandler("sun", sun.send_sun_pic))
 
     dispatcher.add_handler(ConversationHandler(
         entry_points = [CommandHandler("setlocation", userinfo.set_location)],
