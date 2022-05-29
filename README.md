@@ -7,6 +7,7 @@
 </div>
 
 [![CodeFactor](https://www.codefactor.io/repository/github/choitommy/star-map-bot/badge)](https://www.codefactor.io/repository/github/choitommy/star-map-bot)
+[![Telegram Bot](https://img.shields.io/badge/Telegram-bot-blue?logo=telegram)](https://t.me/star_map_bot)
 
 # Credits
 - [Skyandtelescope](https://skyandtelescope.org)

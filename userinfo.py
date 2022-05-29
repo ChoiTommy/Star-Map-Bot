@@ -10,7 +10,7 @@ Command /cancel is defined by cancel_location_setup or cancel_deletion
 import helpers
 import requests
 from firebase_admin import db
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode
+from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import CallbackContext, ConversationHandler
 
 
@@ -22,7 +22,8 @@ def show_user_info(update: Update, context: CallbackContext) -> None:
     data = ref.get()
 
     if data != None:
-        update.message.reply_text(
+        msg = update.message.reply_location(latitude=data["latitude"], longitude=data["longitude"])
+        update.message.reply_html(
             text = (f'Hi @{update.effective_user.username}, \n'
                     'Your currently set location is \n'
                     f'Latitude: {data["latitude"]} \n'
@@ -31,7 +32,7 @@ def show_user_info(update: Update, context: CallbackContext) -> None:
                     f'Timezone: {helpers.utcOffset_to_tzstring(data["utcOffset"])} \n\n'
 
                     '/setlocation to modify. /deletemyinfo to delete your data. \n'),
-            parse_mode = ParseMode.HTML
+            reply_to_message_id = msg.message_id
         )
     else:
         update.message.reply_text(
@@ -54,7 +55,7 @@ def set_location(update: Update, context: CallbackContext) -> int:
         update.message.reply_markdown_v2("Send your new location \(Telegram location or a stirng in `lat, lon` format\) if you wish to change\. \n/cancel to keep the current setting\.")
     else:
         update.message.reply_markdown_v2(
-            text = ("Send your location to me \(Either a Telegram location object or a string in the format of `<lat: float>, <lon: float>`\) \n"
+            text = ("Send your location to me \(Either a Telegram location object or a string in the format of `lat: float, lon: float`\) \n"
                     "Trust me I won\'t tell others :O ||~\(unless someone pays me A LOT\)~|| "),
         )
     return 0 # proceed to update_location

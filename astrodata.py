@@ -31,12 +31,11 @@ def show_astro_data(update: Update, context: CallbackContext) -> None:
 
         tble, current_date_time = fetch_astro_data(lat, longi)
 
-        update.message.reply_text(
+        update.message.reply_html(
             text = ("🌠<b>Astronomical data</b>: \n"
                     f"<code>{tabulate(tble, tablefmt='simple')}</code> \n"
 
                     f"({current_date_time}) \n"),
-            parse_mode = ParseMode.HTML,
             reply_markup = REFRESH_ASTRODATA_BUTTON
         )
 
