@@ -62,7 +62,7 @@ def main() -> None:
     dispatcher.add_handler(ConversationHandler(
         entry_points = [CommandHandler("setlocation", userinfo.set_location)],
         states = {
-            0: [MessageHandler(Filters.location, userinfo.update_location)]
+            0: [MessageHandler(Filters.location | Filters.regex("[0-9]*\.[0-9]+,[ ]?[0-9]*\.[0-9]+"), userinfo.update_location)]
         },
         fallbacks = [CommandHandler("cancel", userinfo.cancel_location_setup)],
         conversation_timeout = 300 # 5 mins

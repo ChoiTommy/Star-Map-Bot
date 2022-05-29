@@ -50,12 +50,12 @@ def set_location(update: Update, context: CallbackContext) -> int:
     data = ref.get()
 
     if data != None:
-        update.message.reply_text(f"Your current location is {data['latitude']}, {data['longitude']} ({data['address']}).")
-        update.message.reply_text("Send your new location if you wish to change. /cancel to keep the current setting.")
+        update.message.reply_text(f"Your location is {data['latitude']}, {data['longitude']} ({data['address']}).")
+        update.message.reply_markdown_v2("Send your new location \(Telegram location or a stirng in `lat, lon` format\) if you wish to change\. \n/cancel to keep the current setting\.")
     else:
-        update.message.reply_text(
-            text = "Send your location to me :O Trust me I won\'t tell others\. ||~\(unless someone pays me A LOT\)~|| ",
-            parse_mode = ParseMode.MARKDOWN_V2
+        update.message.reply_markdown_v2(
+            text = ("Send your location to me \(Either a Telegram location object or a string in the format of `<lat: float>, <lon: float>`\) \n"
+                    "Trust me I won\'t tell others :O ||~\(unless someone pays me A LOT\)~|| "),
         )
     return 0 # proceed to update_location
 
@@ -64,8 +64,12 @@ def update_location(update: Update, context: CallbackContext) -> int:
     """Read in a location from the user. Fetch the address string from nominatim reverse API. Save/Update the record. Return ConversationHandler.END."""
 
     user_id = str(update.effective_user.id)
-    lat = update.message.location.latitude
-    longi = update.message.location.longitude
+
+    if update.message.location != None:
+        lat, longi = update.message.location.latitude, update.message.location.longitude
+    else:
+        lat = float(update.message.text[:update.message.text.find(',')])
+        longi = float(update.message.text[update.message.text.find(',')+1:])
 
     NOMINATIM_REVERSE_API = ("https://nominatim.openstreetmap.org/reverse"
                             "?format=jsonv2"
@@ -142,7 +146,7 @@ def delete_user_info(update: Update, context: CallbackContext) -> int:
     if update.message.text == "Yes":
         user_id = str(update.effective_user.id)
         ref = db.reference(f"/Users/{user_id}")
-        ref.set({})
+        ref.set({})     # delete the record
 
         update.message.reply_text(
             text = ("Voilà! I have erased your existence. Keep it up and leave no trace in the cyber world! \n"

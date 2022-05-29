@@ -1,4 +1,4 @@
-python-telegram-bot==13.11
+python-telegram-bot==13.12
 pymupdf==1.19.6
 pytz==2022.1
 timezonefinder==6.0.0

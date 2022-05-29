@@ -1,11 +1,12 @@
 """
-sun is a module that consists of functions fetching and displaying sun images from NASA.
+sun is a module that consists of functions fetching and displaying near-real-time sun images from NASA.
 
 Usage:
 Command /sun is defined by send_sun_pic
 """
 
 import helpers
+import time
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto
 from telegram.ext import CallbackContext
 
@@ -63,7 +64,7 @@ def send_sun_pic(update: Update, context: CallbackContext) -> None:
     default_starting_point = 15
 
     update.message.reply_photo(
-        photo = SUN_PIC_URLS[default_starting_point] + f"?a={current_date_time}",
+        photo = SUN_PIC_URLS[default_starting_point] + f"?a={int(time.time()/900)}",  # new url in ~ every 15 mins
         caption = (f"{default_starting_point+1}. {SUN_PIC_NAMES[default_starting_point]} \n"
                     f"(Last refreshed: \n{current_date_time} UTC)"),
         reply_markup = InlineKeyboardMarkup([
@@ -81,7 +82,7 @@ def update_sun_pic(update: Update, context: CallbackContext) -> str:
     current_date_time = helpers.get_current_date_time_string(0) # UTC time
 
     update.callback_query.message.edit_media(
-        media = InputMediaPhoto(media=(SUN_PIC_URLS[sun_number] + f"?a={current_date_time}"))
+        media = InputMediaPhoto(media=(SUN_PIC_URLS[sun_number] + f"?a={int(time.time()/900)}"))
     ).edit_caption(
         caption = (f"{sun_number+1}. {SUN_PIC_NAMES[sun_number]} \n"
                     f"(Last refreshed: \n{current_date_time} UTC)"),
