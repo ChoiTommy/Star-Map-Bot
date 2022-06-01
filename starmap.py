@@ -5,17 +5,22 @@ Usage:
 Command /starmap is defined by send_star_map
 """
 
-import json, time
+import constants, helpers
+import time
 import requests
-from telegram import Update
+from firebase_admin import db
+from telegram import Update, ParseMode, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaDocument
 from telegram.ext import ContextTypes
 import fitz
 
 
+REFRESH_STARMAP_BUTTON = InlineKeyboardMarkup([
+                            [InlineKeyboardButton("Refresh", callback_data=constants.REFRESH_STARMAP_CALLBACK_DATA)]
+                        ])
 # Star map URL
 STAR_MAP_URL = "https://www.heavens-above.com/SkyAndTelescope/StSkyChartPDF.ashx"
 # params to be injected: time, latitude, longitude, location, utcOffset(in ms)
-REST_OF_THE_URL =  ("&showEquator=false"
+REST_OF_THE_URL = ("&showEquator=false"         # TODO switch to a dict header
                     "&showEcliptic=true"
                     "&showStarNames=true"
                     "&showPlanetNames=true"
@@ -27,40 +32,102 @@ REST_OF_THE_URL =  ("&showEquator=false"
 
 
 async def send_star_map(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Fetch and forward a star map to user based on the set location and the current time."""
+    """Forward a star map to user based on the set location and the current time."""
 
     user_id = str(update.effective_user.id)
-    with open("locations.json", 'r') as file:
-        data = json.load(file)
 
-    if user_id in data:
+    ref = db.reference(f"/Users/{user_id}")
+    data = ref.get()
 
-        lat = str(data[user_id]["latitude"])
-        longi = str(data[user_id]["longitude"])
-        address = data[user_id]["address"].replace(',', "%2c").replace(' ', "%20")
-        utcOffset = str(data[user_id]["utcOffset"])
+    if data != None:
 
-        fetch_target = (f"{STAR_MAP_URL}"
-                        f"?time={str(int(time.time()*1000))}" # time.time(): seconds (floating point) since the epoch in UTC
-                        f"&latitude={lat}"
-                        f"&longitude={longi}"
-                        f"&location={address}"
-                        f"&utcOffset={utcOffset}"
-                        f"{REST_OF_THE_URL}")
+        lat = str(data["latitude"])
+        longi = str(data["longitude"])
+        address = data["address"].replace(',', "%2c").replace(' ', "%20")
+        utcOffset = str(data["utcOffset"])
 
-        response = requests.get(fetch_target) # Download the data behind the URL
-        doc = fitz.open(stream=response.content)
-        page = doc.load_page(0)  # number of page
-        pix = page.get_pixmap(dpi=200, colorspace=fitz.csRGB, annots=False)
-        pix.tint_with(black=-129010, white=0) # no idea on how these values work, just do trial and error
+        current_date_time = helpers.get_current_date_time_string(data["utcOffset"]/1000)
 
-        # await update.message.reply_document(document = fetch_target) # pdf
-        await update.message.reply_document(document=pix.tobytes())
-        await update.message.reply_markdown_v2(
-            text = "Enjoy the stunning stars\! Be considerate and *leave no trace* while stargazing\!",
+        pix = fetch_star_map(lat, longi, address, utcOffset)
+
+        # update.message.reply_document(document = fetch_target) # pdf
+        await update.message.reply_document(
+            document = pix.tobytes(),
+            filename = f"Star_Map_{current_date_time.replace(' ', '_').replace(':', '_')}.png",
+            caption = f"Enjoy the stunning stars! Be considerate and leave no trace while stargazing! \n ({current_date_time})",
+            reply_markup = REFRESH_STARMAP_BUTTON
         )
-
-        doc.close()
 
     else:
         await update.message.reply_text("Please set your location with /setlocation first!")
+
+
+async def update_star_map(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+    """Update the star map by replacing the png with a new one.
+
+    Returns:
+        str: Output text to be shown to users
+    """
+
+    user_id = str(update.effective_user.id)
+
+    ref = db.reference(f"/Users/{user_id}")
+    data = ref.get()
+
+    if data != None:
+
+        lat = str(data["latitude"])
+        longi = str(data["longitude"])
+        address = data["address"].replace(',', "%2c").replace(' ', "%20")
+        utcOffset = str(data["utcOffset"])
+
+        current_date_time = helpers.get_current_date_time_string(data["utcOffset"]/1000)
+
+        pix = fetch_star_map(lat, longi, address, utcOffset)
+
+        await update.callback_query.message.edit_media(
+            media = InputMediaDocument(media=pix.tobytes(), filename=f"Star_Map_{current_date_time.replace(' ', '_').replace(':', '_')}.png"),
+        ).edit_caption(
+            caption = f"Enjoy the stunning stars! Be considerate and leave no trace while stargazing! \n ({current_date_time})",
+            reply_markup = REFRESH_STARMAP_BUTTON
+        )
+
+        return "Star map updated"
+    else:
+        await update.callback_query.message.edit_caption().delete()
+        return "Please set your location first!"
+
+def fetch_star_map(latitude, longitude, address, utcOffset):
+    """Fetch a star map from skyandtelescope.com.
+
+    Args:
+        latitude (str): latitude of the location
+        longitude (str): longitude of the location
+        address (str): address text of the above location
+        utcOffset (str): UTC offset in ms
+
+    Returns:
+        fitz.Pixmap: plane rectangular sets of pixels
+    """
+
+    fetch_target = (f"{STAR_MAP_URL}"
+                    f"?time={str(int(time.time()*1000))}" # time.time(): seconds (floating point) since the epoch in UTC
+                    f"&latitude={latitude}"
+                    f"&longitude={longitude}"
+                    f"&location={address}"
+                    f"&utcOffset={utcOffset}"
+                    f"{REST_OF_THE_URL}")
+
+    response = requests.get(fetch_target) # Download the data behind the URL
+    doc = fitz.open(stream=response.content)
+    page = doc.load_page(0)  # number of page
+    pix = page.get_pixmap(
+        dpi = 200,
+        colorspace = fitz.csRGB,
+        annots = False,
+        clip = fitz.IRect(1, 1, 600, 650)
+    )
+    pix.tint_with(black=-129010, white=0) # no idea on how these values work, just do trial and error
+    doc.close()
+
+    return pix

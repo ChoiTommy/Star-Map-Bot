@@ -5,60 +5,117 @@ Usage:
 Command /astrodata is defined by show_astro_data
 """
 
-import main
-import json, urllib.request, ssl
-from telegram import Update
+import constants
+import requests
+from firebase_admin import db
+from telegram import Update, ParseMode, InlineKeyboardMarkup, InlineKeyboardButton, error
 from telegram.ext import ContextTypes
+from tabulate import tabulate
 
 
-moon_phase_dict = { # dict for getting the corresponding moon phase emojis
-    "New Moon" : "🌑",
-    "Waxing Crescent" : "🌒",
-    "First Quarter" : "🌓",
-    "Waxing Gibbous" : "🌔",
-    "Full Moon" : "🌕",
-    "Waning Gibbous" : "🌖",
-    "Last Quarter" : "🌗",
-    "Waning Crescent" : "🌘"
-}
+REFRESH_ASTRODATA_BUTTON = InlineKeyboardMarkup([
+                            [InlineKeyboardButton("Refresh", callback_data=constants.REFRESH_ASTRODATA_CALLBACK_DATA)]
+                        ])
 
 
 async def show_astro_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Fetch and send a list of astronomical data to the user."""
+    """Send a list of astronomical data to the user."""
 
     user_id = str(update.effective_user.id)
-    with open("locations.json", 'r') as file:
-        data = json.load(file)
+    ref = db.reference(f"/Users/{user_id}")
+    data = ref.get()
 
-    if user_id in data:
-        lat = data[user_id]["latitude"]
-        longi = data[user_id]["longitude"]
+    if data != None:
+        lat = data["latitude"]
+        longi = data["longitude"]
 
-        context = ssl._create_unverified_context()
-        WEATHER_API_URL = f"https://api.weatherapi.com/v1/astronomy.json?key={main.WEATHER_API_KEY}&q={lat},{longi}"
-        with urllib.request.urlopen(WEATHER_API_URL, context=context) as astro_file:
-            astro_data = json.load(astro_file)
-
-        sunrise = astro_data["astronomy"]["astro"]["sunrise"]
-        sunset = astro_data["astronomy"]["astro"]["sunset"]
-        moonrise = astro_data["astronomy"]["astro"]["moonrise"]
-        moonset = astro_data["astronomy"]["astro"]["moonset"]
-        moon_phase = astro_data["astronomy"]["astro"]["moon_phase"]
-        moon_illumination = astro_data["astronomy"]["astro"]["moon_illumination"]
-        current_date_time = astro_data["location"]["localtime"]
+        tble, current_date_time = fetch_astro_data(lat, longi)
 
         await update.message.reply_html(
             text = ("🌠<b>Astronomical data</b>: \n"
-                    f"Sunrise: {sunrise} \n"
-                    f"Sunset: {sunset} \n"
-                    f"Moonrise: {moonrise} \n"
-                    f"Moonset: {moonset} \n"
-                    f"Moon phase: {moon_phase} {moon_phase_dict[moon_phase]} \n"
-                    f"Moon illumination: {moon_illumination} \n\n"
+                    f"<code>{tabulate(tble, tablefmt='simple')}</code> \n"
 
-                    f"({current_date_time}) \n"
-            )
+                    f"({current_date_time}) \n"),
+            reply_markup = REFRESH_ASTRODATA_BUTTON
         )
 
     else:
         await update.message.reply_text("Please set your location with /setlocation first!")
+
+
+async def update_astro_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+    """Update a list of astronomical data by editing the original message.
+
+    Returns:
+        str: Output text to be shown to users
+    """
+
+    user_id = str(update.effective_user.id)
+    ref = db.reference(f"/Users/{user_id}")
+    data = ref.get()
+
+    if data != None:
+        lat = data["latitude"]
+        longi = data["longitude"]
+
+        tble, current_date_time = fetch_astro_data(lat, longi)
+
+        new_text = ("🌠<b>Astronomical data</b>: \n"
+                    f"<code>{tabulate(tble, tablefmt='simple')}</code> \n"
+                    f"({current_date_time}) \n")
+
+        try:
+            await update.callback_query.message.edit_text(
+                text = new_text,
+                parse_mode = ParseMode.HTML,
+                reply_markup = REFRESH_ASTRODATA_BUTTON
+            )
+        except error.BadRequest:
+            return "You're doing this too frequently. Go get a life."
+        else:
+            return "Astrodata refreshed"
+
+    else:
+        await update.callback_query.message.delete()
+        return "Please set your location first!"
+
+
+def fetch_astro_data(latitude, longitude) -> None:
+    """Fetch a list of astronomical data from weatherapi.com.
+
+    Args:
+        latitude (float): latitude of the location
+        longitude (float): longitude of the location
+
+    Returns:
+        list of list : for generating pretty table
+        str : Current date and time
+    """
+
+    WEATHER_API_URL = ("https://api.weatherapi.com/v1/"
+                        "astronomy.json"
+                        f"?key={constants.WEATHER_API_KEY}"
+                        f"&q={latitude},{longitude}")
+
+    response = requests.get(WEATHER_API_URL)
+    astro_data = response.json()
+
+    sunrise = astro_data["astronomy"]["astro"]["sunrise"]
+    sunset = astro_data["astronomy"]["astro"]["sunset"]
+    moonrise = astro_data["astronomy"]["astro"]["moonrise"]
+    moonset = astro_data["astronomy"]["astro"]["moonset"]
+    moon_phase = astro_data["astronomy"]["astro"]["moon_phase"]
+    moon_illumination = astro_data["astronomy"]["astro"]["moon_illumination"]
+    current_date_time = astro_data["location"]["localtime"]
+
+    return [
+        ['🌞','Sun'],
+        ["Rise", sunrise],
+        ["Set", sunset],
+        [],
+        ['🌝', 'Moon'],
+        ["Rise", moonrise],
+        ["Set", moonset],
+        ["Phase", f"{moon_phase} {constants.MOON_PHASE_DICT[moon_phase]}"],
+        ["Illum.", f"{moon_illumination}%"]
+    ], current_date_time

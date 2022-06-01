@@ -1,5 +1,5 @@
 """
-misc is a module that consists of miscellaneous functions not relating to the main features of the bot.
+misc is a module that consists of miscellaneous features not relating to the main features of the bot.
 
 Usage:
 Command /credits is defined by show_credits
@@ -13,13 +13,11 @@ async def show_credits(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     """Display the data source of the star map and a link to this GitHub repo."""
 
     await update.message.reply_text(
-        text = ("Star map is made available to you by skyandtelescope.org. "
-                "Astronomical and weather data are provided by WeatherAPI.com. "
-                "Visit their website for more information. "
-        ),
+        text = ("Star map is made available to you by skyandtelescope.org. \n"
+                "Astronomical and weather data are provided by WeatherAPI.com. \n"
+                "Courtesy of NASA/SDO and the AIA, EVE, and HMI science teams for the near-real-time (NRT) images. \n"),
         reply_markup = InlineKeyboardMarkup([
             [InlineKeyboardButton("Visit skyandtelescope.org", url="https://skyandtelescope.org/")],
-            [InlineKeyboardButton("Check out their interactive sky chart", url="https://skyandtelescope.org/interactive-sky-chart/")],
             [InlineKeyboardButton("Follow this project on GitHub", url="https://github.com/ChoiTommy/Star-Map-Bot")]
         ])
     )
@@ -32,7 +30,7 @@ TUTORIAL_TEXT = f"""
 
 To get the most out of this bot, you are required to set a location (/setlocation). This location data is used for generating star maps, displaying weather and astronomical data at that specific location only. Users can delete their data at anytime with the command /deletemyinfo.
 
-As weather and astronomical data do not differ much within few kilometers' range, feel free to turn off 'Precise Location' (on iOS) for Telegram in Settings. When setting up you location, you can move the map around in the Telegram app to provide a location wherever you want too.
+As weather and astronomical data do not differ much within few kilometers' range, feel free to turn off 'Precise Location' (on iOS) or choose "Approximate location" (on Android) for Telegram in Settings. When setting up you location, you can move the map around in the Telegram app to provide a location wherever you want too.
 
 Press the menu button at the bottom left of your screen to view all the commands available.
 """
