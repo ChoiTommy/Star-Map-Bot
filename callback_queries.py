@@ -5,10 +5,10 @@ callback_queries is a module for handling callback queries.
 import weather, astrodata, starmap, sun, constants
 
 from telegram import Update
-from telegram.ext import CallbackContext
+from telegram.ext import ContextTypes
 
 
-def callback(update: Update, context: CallbackContext) -> None:
+async def callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Method for handling callback queries."""
 
     query = update.callback_query

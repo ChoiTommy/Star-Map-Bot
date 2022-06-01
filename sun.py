@@ -8,7 +8,7 @@ Command /sun is defined by send_sun_pic
 import helpers
 import time
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto
-from telegram.ext import CallbackContext
+from telegram.ext import ContextTypes
 
 
 SUN_PIC_URLS = [  # 19 images, indices from 0..18
@@ -56,14 +56,14 @@ SUN_PIC_NAMES = [
 ]
 
 
-def send_sun_pic(update: Update, context: CallbackContext) -> None:
+async def send_sun_pic(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a picture of the currnet sun"""
 
     current_date_time = helpers.get_current_date_time_string(0) # UTC time
 
     default_starting_point = 15
 
-    update.message.reply_photo(
+    await update.message.reply_photo(
         photo = SUN_PIC_URLS[default_starting_point] + f"?a={int(time.time()/900)}",  # new url in ~ every 15 mins
         caption = (f"{default_starting_point+1}. {SUN_PIC_NAMES[default_starting_point]} \n"
                     f"(Last refreshed: \n{current_date_time} UTC)"),
@@ -74,14 +74,14 @@ def send_sun_pic(update: Update, context: CallbackContext) -> None:
     )
 
 
-def update_sun_pic(update: Update, context: CallbackContext) -> str:
+async def update_sun_pic(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Update the sun picture"""
 
     sun_number = int(update.callback_query.data[4:])
 
     current_date_time = helpers.get_current_date_time_string(0) # UTC time
 
-    update.callback_query.message.edit_media(
+    await update.callback_query.message.edit_media(
         media = InputMediaPhoto(media=(SUN_PIC_URLS[sun_number] + f"?a={int(time.time()/900)}"))
     ).edit_caption(
         caption = (f"{sun_number+1}. {SUN_PIC_NAMES[sun_number]} \n"
