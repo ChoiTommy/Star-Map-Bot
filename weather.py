@@ -8,8 +8,9 @@ Command /weather is defined by show_weather_data
 import constants
 import requests
 from firebase_admin import db
-from telegram import Update, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto
-from telegram.ext import ContextTypes
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto
+from telegram.ext import CallbackContext
+from telegram.constants import ParseMode
 from tabulate import tabulate
 
 
@@ -18,7 +19,7 @@ REFRESH_WEATHER_BUTTON = InlineKeyboardMarkup([
                         ])
 
 
-async def show_weather_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def show_weather_data(update: Update, context: CallbackContext) -> None:
     """Send a simple weather report showing weather data necessary for stargazing."""
 
     user_id = str(update.effective_user.id)
@@ -47,7 +48,7 @@ async def show_weather_data(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         await update.message.reply_text("Please set your location with /setlocation first!")
 
 
-async def update_weather_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+async def update_weather_data(update: Update, context: CallbackContext) -> str:
     """Update weather data by editing the original message.
 
         Returns:
@@ -64,9 +65,10 @@ async def update_weather_data(update: Update, context: ContextTypes.DEFAULT_TYPE
 
         tble, current_condition_icon_url, current_condition_text, current_date_time = fetch_weather_data(lat, longi)
 
-        await update.callback_query.message.edit_media(
+        msg = await update.callback_query.message.edit_media(
             media = InputMediaPhoto(media=f"https:{current_condition_icon_url}")
-        ).edit_caption(
+        )
+        await msg.edit_caption(
             caption = (f"Weather now is: <b>{current_condition_text}</b> \n"
 
                         f"<code>{tabulate(tble, tablefmt='fancy_grid')}</code> \n"

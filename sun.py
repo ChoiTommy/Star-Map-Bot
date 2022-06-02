@@ -8,7 +8,7 @@ Command /sun is defined by send_sun_pic
 import helpers
 import time
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto
-from telegram.ext import ContextTypes
+from telegram.ext import CallbackContext
 
 
 SUN_PIC_URLS = [  # 19 images, indices from 0..18
@@ -56,7 +56,7 @@ SUN_PIC_NAMES = [
 ]
 
 
-async def send_sun_pic(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def send_sun_pic(update: Update, context: CallbackContext) -> None:
     """Send a picture of the currnet sun"""
 
     current_date_time = helpers.get_current_date_time_string(0) # UTC time
@@ -74,16 +74,17 @@ async def send_sun_pic(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     )
 
 
-async def update_sun_pic(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+async def update_sun_pic(update: Update, context: CallbackContext) -> str:
     """Update the sun picture"""
 
     sun_number = int(update.callback_query.data[4:])
 
     current_date_time = helpers.get_current_date_time_string(0) # UTC time
 
-    await update.callback_query.message.edit_media(
+    msg = await update.callback_query.message.edit_media(
         media = InputMediaPhoto(media=(SUN_PIC_URLS[sun_number] + f"?a={int(time.time()/900)}"))
-    ).edit_caption(
+    )
+    await msg.edit_caption(
         caption = (f"{sun_number+1}. {SUN_PIC_NAMES[sun_number]} \n"
                     f"(Last refreshed: \n{current_date_time} UTC)"),
         reply_markup = InlineKeyboardMarkup([

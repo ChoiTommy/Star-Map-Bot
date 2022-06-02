@@ -9,8 +9,9 @@ import constants, helpers
 import time
 import requests
 from firebase_admin import db
-from telegram import Update, ParseMode, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaDocument
-from telegram.ext import ContextTypes
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaDocument
+from telegram.ext import CallbackContext
+from telegram.constants import ParseMode
 import fitz
 
 
@@ -31,7 +32,7 @@ REST_OF_THE_URL = ("&showEquator=false"         # TODO switch to a dict header
                     "&use24hClock=true")
 
 
-async def send_star_map(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def send_star_map(update: Update, context: CallbackContext) -> None:
     """Forward a star map to user based on the set location and the current time."""
 
     user_id = str(update.effective_user.id)
@@ -62,7 +63,7 @@ async def send_star_map(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         await update.message.reply_text("Please set your location with /setlocation first!")
 
 
-async def update_star_map(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+async def update_star_map(update: Update, context: CallbackContext) -> str:
     """Update the star map by replacing the png with a new one.
 
     Returns:
@@ -85,16 +86,17 @@ async def update_star_map(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
         pix = fetch_star_map(lat, longi, address, utcOffset)
 
-        await update.callback_query.message.edit_media(
+        msg = await update.callback_query.message.edit_media(
             media = InputMediaDocument(media=pix.tobytes(), filename=f"Star_Map_{current_date_time.replace(' ', '_').replace(':', '_')}.png"),
-        ).edit_caption(
+        )
+        await msg.edit_caption(
             caption = f"Enjoy the stunning stars! Be considerate and leave no trace while stargazing! \n ({current_date_time})",
             reply_markup = REFRESH_STARMAP_BUTTON
         )
 
         return "Star map updated"
     else:
-        await update.callback_query.message.edit_caption().delete()
+        await update.callback_query.message.delete()
         return "Please set your location first!"
 
 def fetch_star_map(latitude, longitude, address, utcOffset):

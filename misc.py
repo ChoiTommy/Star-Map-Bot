@@ -7,9 +7,9 @@ Command /start is defined by bot_tutorial
 """
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ContextTypes
+from telegram.ext import CallbackContext
 
-async def show_credits(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def show_credits(update: Update, context: CallbackContext) -> None:
     """Display the data source of the star map and a link to this GitHub repo."""
 
     await update.message.reply_text(
@@ -36,7 +36,7 @@ Press the menu button at the bottom left of your screen to view all the commands
 """
 
 
-async def bot_tutorial(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None: # TODO: privacy policy
+async def bot_tutorial(update: Update, context: CallbackContext) -> None: # TODO: privacy policy
     """Act as a welcome message and tutorial to anyone who starts the bot"""
 
     await update.message.reply_html(

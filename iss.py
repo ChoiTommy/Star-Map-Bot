@@ -4,13 +4,13 @@
 
 import requests, time
 from telegram import Update, Location
-from telegram.ext import ContextTypes
+from telegram.ext import CallbackContext
 
 
 ISS_LOCATION_URL = "http://api.open-notify.org/iss-now.json"
 
 
-async def iss_live_location(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def iss_live_location(update: Update, context: CallbackContext) -> None:
 
     # todo concurrency
     for i in range(10):

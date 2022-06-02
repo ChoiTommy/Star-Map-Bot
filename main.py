@@ -22,7 +22,7 @@ import misc, userinfo, starmap, astrodata, weather, sun, iss, constants, callbac
 import logging
 import firebase_admin
 from firebase_admin import credentials
-from telegram import Update, ParseMode
+from telegram import Update
 from telegram.ext import Application, ContextTypes, CommandHandler, ConversationHandler, MessageHandler, CallbackQueryHandler, filters
 
 
@@ -45,7 +45,7 @@ def main() -> None:
     )
 
     # Create the Application and pass it your bot's token.
-    application = Application.builder().token(BOT_TOKEN).build()
+    application = Application.builder().token(constants.BOT_TOKEN).build()
 
     # Register command handlers
     application.add_handler(CommandHandler("start", misc.bot_tutorial))
@@ -60,7 +60,7 @@ def main() -> None:
     application.add_handler(ConversationHandler(
         entry_points = [CommandHandler("setlocation", userinfo.set_location)],
         states = {
-            0: [MessageHandler(Filters.location | Filters.regex("[0-9]*\.[0-9]+,[ ]?[0-9]*\.[0-9]+"), userinfo.update_location)]
+            0: [MessageHandler(filters.LOCATION | filters.Regex("[0-9]*\.[0-9]+,[ ]?[0-9]*\.[0-9]+"), userinfo.update_location)]
         },
         fallbacks = [CommandHandler("cancel", userinfo.cancel_location_setup)],
         conversation_timeout = 300 # 5 mins
@@ -78,7 +78,7 @@ def main() -> None:
     application.add_handler(CallbackQueryHandler(callback_queries.callback))
 
     # Start the Bot using polling
-    application.run_polling()
+    application.run_polling(stop_signals=None)
 
 
 if __name__ == "__main__":

@@ -8,8 +8,9 @@ Command /astrodata is defined by show_astro_data
 import constants
 import requests
 from firebase_admin import db
-from telegram import Update, ParseMode, InlineKeyboardMarkup, InlineKeyboardButton, error
-from telegram.ext import ContextTypes
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, error
+from telegram.ext import CallbackContext
+from telegram.constants import ParseMode
 from tabulate import tabulate
 
 
@@ -18,7 +19,7 @@ REFRESH_ASTRODATA_BUTTON = InlineKeyboardMarkup([
                         ])
 
 
-async def show_astro_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def show_astro_data(update: Update, context: CallbackContext) -> None:
     """Send a list of astronomical data to the user."""
 
     user_id = str(update.effective_user.id)
@@ -43,7 +44,7 @@ async def show_astro_data(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         await update.message.reply_text("Please set your location with /setlocation first!")
 
 
-async def update_astro_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+async def update_astro_data(update: Update, context: CallbackContext) -> str:
     """Update a list of astronomical data by editing the original message.
 
     Returns:

@@ -11,10 +11,10 @@ import helpers
 import requests
 from firebase_admin import db
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
-from telegram.ext import ContextTypes, ConversationHandler
+from telegram.ext import CallbackContext, ConversationHandler
 
 
-async def show_user_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def show_user_info(update: Update, context: CallbackContext) -> None:
     """Display user info when the command /myinfo is called. User info consists of latitude, longitude, address and timezone."""
 
     user_id = str(update.effective_user.id)
@@ -42,7 +42,7 @@ async def show_user_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         )
 
 
-async def set_location(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def set_location(update: Update, context: CallbackContext) -> int:
     """If their record exists, ask users if they want to update their location. Return 0 to proceed to update_location."""
 
     user_id = str(update.effective_user.id)
@@ -61,7 +61,7 @@ async def set_location(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
     return 0 # proceed to update_location
 
 
-async def update_location(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def update_location(update: Update, context: CallbackContext) -> int:
     """Read in a location from the user. Fetch the address string from nominatim reverse API. Save/Update the record. Return ConversationHandler.END."""
 
     user_id = str(update.effective_user.id)
@@ -113,14 +113,14 @@ async def update_location(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         return ConversationHandler.END
 
 
-async def cancel_location_setup(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def cancel_location_setup(update: Update, context: CallbackContext) -> int:
     """Exit from the ConversationHandler. Halt the location setting process. Return ConversationHandler.END."""
 
     await update.message.reply_text('ℹ️The setup process has been cancelled.')
     return ConversationHandler.END
 
 
-async def deletion_confirmation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def deletion_confirmation(update: Update, context: CallbackContext) -> int:
     """Ask for confirmation to delete the user info from the server. Return Conversation.END if user has no data on the server, else returns 0."""
 
     user_id = str(update.effective_user.id)
@@ -141,7 +141,7 @@ async def deletion_confirmation(update: Update, context: ContextTypes.DEFAULT_TY
         return 0
 
 
-async def delete_user_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def delete_user_info(update: Update, context: CallbackContext) -> int:
     """Perform deletion on users' data if 'Yes' is retrieved. Return ConversationHandler.END to halt the ConversationHandler."""
 
     if update.message.text == "Yes":
@@ -156,10 +156,10 @@ async def delete_user_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         )
         return ConversationHandler.END
     else:
-        return cancel_deletion(update, context)
+        return await cancel_deletion(update, context)
 
 
-async def cancel_deletion(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def cancel_deletion(update: Update, context: CallbackContext) -> int:
     """Cancel the deletion operation with the command /cancel. Return ConversationHandler.END"""
 
     await update.message.reply_text("Got it! My generous user. Your data are still in my hands.", reply_markup=ReplyKeyboardRemove())
