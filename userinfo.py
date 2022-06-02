@@ -97,16 +97,18 @@ def update_location(update: Update, context: CallbackContext) -> int:
             ref.set({
                 "username": update.effective_user.username,
                 "latitude": lat,
-                "longitude" : longi,
-                "address" : address_string,
-                "utcOffset" : utcOffset
+                "longitude": longi,
+                "address": address_string,
+                "utcOffset": utcOffset,
+                "creation_timestamp": helpers.get_current_date_time_string()  # UTC time
             })
         else:
             ref.update({
                 "latitude" : lat,
                 "longitude" : longi,
                 "address" : address_string,
-                "utcOffset" : utcOffset
+                "utcOffset" : utcOffset,
+                "update_timestamp": helpers.get_current_date_time_string()  # UTC time
             })
 
         update.message.reply_text(f"All set! Your new location is {lat}, {longi} ({address_string}).")
