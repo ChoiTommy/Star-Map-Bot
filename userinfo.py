@@ -24,7 +24,7 @@ def show_user_info(update: Update, context: CallbackContext) -> None:
     if data != None:
         msg = update.message.reply_location(latitude=data["latitude"], longitude=data["longitude"])
         update.message.reply_html(
-            text = (f'Hi @{update.effective_user.username}, \n'
+            text = (f'Hi {update.effective_user.mention_html()}, \n'
                     'Your currently set location is \n'
                     f'Latitude: {data["latitude"]} \n'
                     f'Longitude: {data["longitude"]} \n'
@@ -35,8 +35,8 @@ def show_user_info(update: Update, context: CallbackContext) -> None:
             reply_to_message_id = msg.message_id
         )
     else:
-        update.message.reply_text(
-            text = (f'Hi @{update.effective_user.username}, \n'
+        update.message.reply_html(
+            text = (f'Hi {update.effective_user.mention_html()}, \n'
                     'You have yet to set any location. \n'
                     '/setlocation to start off. \n')
         )
@@ -94,8 +94,9 @@ def update_location(update: Update, context: CallbackContext) -> int:
         data = ref.get()
 
         if data == None:
+            username = update.effective_user.username
             ref.set({
-                "username": update.effective_user.username,
+                "username": username if username is not None else "None",
                 "latitude": lat,
                 "longitude": longi,
                 "address": address_string,
