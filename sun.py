@@ -7,7 +7,7 @@ Command /sun is defined by send_sun_pic
 
 import helpers
 import time
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto, error
 from telegram.ext import CallbackContext
 
 
@@ -81,15 +81,18 @@ def update_sun_pic(update: Update, context: CallbackContext) -> str:
 
     current_date_time = helpers.get_current_date_time_string(0) # UTC time
 
-    update.callback_query.message.edit_media(
-        media = InputMediaPhoto(media=(SUN_PIC_URLS[sun_number] + f"?a={int(time.time()/900)}"))
-    ).edit_caption(
-        caption = (f"{sun_number+1}. {SUN_PIC_NAMES[sun_number]} \n"
-                    f"(Last refreshed: \n{current_date_time} UTC)"),
-        reply_markup = InlineKeyboardMarkup([
-                            [InlineKeyboardButton("<<", callback_data=f"SUN_{(sun_number - 1) % 19}"), InlineKeyboardButton(">>", callback_data=f"SUN_{(sun_number + 1) % 19}")],
-                            [InlineKeyboardButton("Refresh current image", callback_data=f"SUN_{sun_number}")]
-                        ])
-    )
-
-    return "Sun pic refreshed"
+    try:
+        update.callback_query.message.edit_media(
+            media = InputMediaPhoto(media=(SUN_PIC_URLS[sun_number] + f"?a={int(time.time()/900)}"))
+        ).edit_caption(
+            caption = (f"{sun_number+1}. {SUN_PIC_NAMES[sun_number]} \n"
+                        f"(Last refreshed: \n{current_date_time} UTC)"),
+            reply_markup = InlineKeyboardMarkup([
+                                [InlineKeyboardButton("<<", callback_data=f"SUN_{(sun_number - 1) % 19}"), InlineKeyboardButton(">>", callback_data=f"SUN_{(sun_number + 1) % 19}")],
+                                [InlineKeyboardButton("Refresh current image", callback_data=f"SUN_{sun_number}")]
+                            ])
+        )
+    except error.TimedOut:
+        return "An error has occurred. Please try again."
+    else:
+        return "Sun pic refreshed"

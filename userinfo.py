@@ -14,6 +14,8 @@ from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import CallbackContext, ConversationHandler
 
 
+NOMINATIM_REVERSE_API_BASE_URL = "https://nominatim.openstreetmap.org/reverse"
+
 def show_user_info(update: Update, context: CallbackContext) -> None:
     """Display user info when the command /myinfo is called. User info consists of latitude, longitude, address and timezone."""
 
@@ -72,14 +74,15 @@ def update_location(update: Update, context: CallbackContext) -> int:
         lat = float(update.message.text[:update.message.text.find(',')])
         longi = float(update.message.text[update.message.text.find(',')+1:])
 
-    NOMINATIM_REVERSE_API = ("https://nominatim.openstreetmap.org/reverse"
-                            "?format=jsonv2"
-                            f"&lat={lat}"
-                            f"&lon={longi}"
-                            "&accept-language=en-US"
-                            "&zoom=14")
+    params_inject = {
+        "format": "jsonv2",
+        "lat": lat,
+        "lon": longi,
+        "accept-language": "en-US",
+        "zoom": 14
+    }
 
-    response = requests.get(NOMINATIM_REVERSE_API)
+    response = requests.get(NOMINATIM_REVERSE_API_BASE_URL, params=params_inject)
     address_data = response.json()
 
     if "error" in address_data: # Safeguarding, "Unable to geocode"

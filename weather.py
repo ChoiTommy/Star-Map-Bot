@@ -13,6 +13,8 @@ from telegram.ext import CallbackContext
 from tabulate import tabulate
 
 
+WEATHER_API_BASE_URL = "https://api.weatherapi.com/v1/current.json"
+
 REFRESH_WEATHER_BUTTON = InlineKeyboardMarkup([
                             [InlineKeyboardButton("Refresh", callback_data=constants.REFRESH_WEATHER_CALLBACK_DATA)]
                         ])
@@ -96,12 +98,12 @@ def fetch_weather_data(latitude, longitude):
         str : Current date and time
     """
 
-    WEATHER_API_URL = ("https://api.weatherapi.com/v1/"
-                        "current.json"
-                        f"?key={constants.WEATHER_API_KEY}"
-                        f"&q={latitude},{longitude}")
+    params_inject = {
+        "key": constants.WEATHER_API_KEY,
+        "q": [latitude, longitude]
+    }
 
-    response = requests.get(WEATHER_API_URL)
+    response = requests.get(WEATHER_API_BASE_URL, params=params_inject)
     weather_data = response.json()
 
     current_condition_text = weather_data["current"]["condition"]["text"]
