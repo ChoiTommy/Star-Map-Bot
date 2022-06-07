@@ -14,6 +14,8 @@ from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import CallbackContext, ConversationHandler
 
 
+NOMINATIM_REVERSE_API_BASE_URL = "https://nominatim.openstreetmap.org/reverse"
+
 async def show_user_info(update: Update, context: CallbackContext) -> None:
     """Display user info when the command /myinfo is called. User info consists of latitude, longitude, address and timezone."""
 
@@ -24,7 +26,7 @@ async def show_user_info(update: Update, context: CallbackContext) -> None:
     if data != None:
         msg = await update.message.reply_location(latitude=data["latitude"], longitude=data["longitude"])
         await update.message.reply_html(
-            text = (f'Hi @{update.effective_user.username}, \n'
+            text = (f'Hi {update.effective_user.mention_html()}, \n'
                     'Your currently set location is \n'
                     f'Latitude: {data["latitude"]} \n'
                     f'Longitude: {data["longitude"]} \n'
@@ -35,8 +37,8 @@ async def show_user_info(update: Update, context: CallbackContext) -> None:
             reply_to_message_id = msg.message_id
         )
     else:
-        await update.message.reply_text(
-            text = (f'Hi @{update.effective_user.username}, \n'
+        await update.message.reply_html(
+            text = (f'Hi {update.effective_user.mention_html()}, \n'
                     'You have yet to set any location. \n'
                     '/setlocation to start off. \n')
         )
@@ -72,14 +74,15 @@ async def update_location(update: Update, context: CallbackContext) -> int:
         lat = float(update.message.text[:update.message.text.find(',')])
         longi = float(update.message.text[update.message.text.find(',')+1:])
 
-    NOMINATIM_REVERSE_API = ("https://nominatim.openstreetmap.org/reverse"
-                            "?format=jsonv2"
-                            f"&lat={lat}"
-                            f"&lon={longi}"
-                            "&accept-language=en-US"
-                            "&zoom=14")
+    params_inject = {
+        "format": "jsonv2",
+        "lat": lat,
+        "lon": longi,
+        "accept-language": "en-US",
+        "zoom": 14
+    }
 
-    response = requests.get(NOMINATIM_REVERSE_API)
+    response = requests.get(NOMINATIM_REVERSE_API_BASE_URL, params=params_inject)
     address_data = response.json()
 
     if "error" in address_data: # Safeguarding, "Unable to geocode"
@@ -94,19 +97,22 @@ async def update_location(update: Update, context: CallbackContext) -> int:
         data = ref.get()
 
         if data == None:
+            username = update.effective_user.username
             ref.set({
-                "username": update.effective_user.username,
+                "username": username if username is not None else "None",
                 "latitude": lat,
-                "longitude" : longi,
-                "address" : address_string,
-                "utcOffset" : utcOffset
+                "longitude": longi,
+                "address": address_string,
+                "utcOffset": utcOffset,
+                "creation_timestamp": helpers.get_current_date_time_string()  # UTC time
             })
         else:
             ref.update({
                 "latitude" : lat,
                 "longitude" : longi,
                 "address" : address_string,
-                "utcOffset" : utcOffset
+                "utcOffset" : utcOffset,
+                "update_timestamp": helpers.get_current_date_time_string()  # UTC time
             })
 
         await update.message.reply_text(f"All set! Your new location is {lat}, {longi} ({address_string}).")

@@ -15,21 +15,23 @@ from telegram.constants import ParseMode
 import fitz
 
 
+STAR_MAP_BASE_URL = "https://www.heavens-above.com/SkyAndTelescope/StSkyChartPDF.ashx"
+# params to be injected: time, latitude, longitude, location, utcOffset(in ms)
+REST_OF_THE_PARAM = {
+    "showEquator": False,
+    "showEcliptic": True,
+    "showStarNames": False,
+    "showPlanetNames": True,
+    "showConsNames": True,
+    "showConsLines": True,
+    "showConsBoundaries": False,
+    "showSpecials": False,
+    "use24hClock": True
+}
+
 REFRESH_STARMAP_BUTTON = InlineKeyboardMarkup([
                             [InlineKeyboardButton("Refresh", callback_data=constants.REFRESH_STARMAP_CALLBACK_DATA)]
                         ])
-# Star map URL
-STAR_MAP_URL = "https://www.heavens-above.com/SkyAndTelescope/StSkyChartPDF.ashx"
-# params to be injected: time, latitude, longitude, location, utcOffset(in ms)
-REST_OF_THE_URL = ("&showEquator=false"         # TODO switch to a dict header
-                    "&showEcliptic=true"
-                    "&showStarNames=true"
-                    "&showPlanetNames=true"
-                    "&showConsNames=true"
-                    "&showConsLines=true"
-                    "&showConsBoundaries=false"
-                    "&showSpecials=false"
-                    "&use24hClock=true")
 
 
 async def send_star_map(update: Update, context: CallbackContext) -> None:
@@ -44,7 +46,7 @@ async def send_star_map(update: Update, context: CallbackContext) -> None:
 
         lat = str(data["latitude"])
         longi = str(data["longitude"])
-        address = data["address"].replace(',', "%2c").replace(' ', "%20")
+        address = data["address"]
         utcOffset = str(data["utcOffset"])
 
         current_date_time = helpers.get_current_date_time_string(data["utcOffset"]/1000)
@@ -79,7 +81,7 @@ async def update_star_map(update: Update, context: CallbackContext) -> str:
 
         lat = str(data["latitude"])
         longi = str(data["longitude"])
-        address = data["address"].replace(',', "%2c").replace(' ', "%20")
+        address = data["address"]
         utcOffset = str(data["utcOffset"])
 
         current_date_time = helpers.get_current_date_time_string(data["utcOffset"]/1000)
@@ -99,6 +101,7 @@ async def update_star_map(update: Update, context: CallbackContext) -> str:
         await update.callback_query.message.delete()
         return "Please set your location first!"
 
+
 def fetch_star_map(latitude, longitude, address, utcOffset):
     """Fetch a star map from skyandtelescope.com.
 
@@ -112,15 +115,15 @@ def fetch_star_map(latitude, longitude, address, utcOffset):
         fitz.Pixmap: plane rectangular sets of pixels
     """
 
-    fetch_target = (f"{STAR_MAP_URL}"
-                    f"?time={str(int(time.time()*1000))}" # time.time(): seconds (floating point) since the epoch in UTC
-                    f"&latitude={latitude}"
-                    f"&longitude={longitude}"
-                    f"&location={address}"
-                    f"&utcOffset={utcOffset}"
-                    f"{REST_OF_THE_URL}")
+    params_inject = {
+        "time": int(time.time()*1000), # time.time(): seconds (floating point) since the epoch in UTC
+        "latitude": latitude,
+        "longitude": longitude,
+        "location": address,
+        "utcOffset": utcOffset
+    }
 
-    response = requests.get(fetch_target) # Download the data behind the URL
+    response = requests.get(STAR_MAP_BASE_URL, params=params_inject|REST_OF_THE_PARAM) # | to merge two dictionaries
     doc = fitz.open(stream=response.content)
     page = doc.load_page(0)  # number of page
     pix = page.get_pixmap(
