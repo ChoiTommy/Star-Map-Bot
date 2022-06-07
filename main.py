@@ -10,6 +10,7 @@ Send /starmap to get a star map pdf at the location set.
 Send /astrodata to get a list of astronomical data at the location set.
 Send /sun to view a series of sun images in various wavelengths.
 Send /weather to get a weather report at the location set.
+Send /iss to get the live location of the International Space Station.
 Send /myinfo to view the data associate with you stored on the server.
 Send /deletemyinfo to purge you data permanently on the server.
 Send /credits to view the data sources of all the infomation this bot provides.
@@ -45,7 +46,7 @@ def main() -> None:
     )
 
     # Create the Application and pass it your bot's token.
-    application = Application.builder().token(constants.BOT_TOKEN).build()
+    application = Application.builder().token(constants.BOT_TOKEN).concurrent_updates(True).build()
 
     # Register command handlers
     application.add_handler(CommandHandler("start", misc.bot_tutorial))
