@@ -3,6 +3,8 @@ sun is a module that consists of functions fetching and displaying near-real-tim
 
 Usage:
 Command /sun is defined by send_sun_pic
+
+TODO Fetch images periodically (every 15 mins) for faster access
 """
 
 import helpers
@@ -47,7 +49,7 @@ SUN_PIC_NAMES = [
     "AIA 304 Å, 211 Å, 171 Å",
     "AIA 094 Å, 335 Å, 193 Å",
     "AIA 171 Å & HMIB",
-    "HMI Magnet ogram",
+    "HMI Magnetogram",
     "HMI Colorized Magnetogram",
     "HMI Intensitygram - colored",
     "HMI Intensitygram - Flattened",
@@ -65,7 +67,8 @@ async def send_sun_pic(update: Update, context: CallbackContext) -> None:
 
     await update.message.reply_photo(
         photo = SUN_PIC_URLS[default_starting_point] + f"?a={int(time.time()/900)}",  # new url in ~ every 15 mins
-        caption = (f"{default_starting_point+1}. {SUN_PIC_NAMES[default_starting_point]} \n"
+        caption = (f"🌞 Live Sun Pics \n"
+                    f"{SUN_PIC_NAMES[default_starting_point]} \n"
                     f"(Last refreshed: \n{current_date_time} UTC)"),
         reply_markup = InlineKeyboardMarkup([
                             [InlineKeyboardButton("<<", callback_data=f"SUN_{default_starting_point-1}"), InlineKeyboardButton(">>", callback_data=f"SUN_{default_starting_point+1}")],
@@ -82,18 +85,21 @@ async def update_sun_pic(update: Update, context: CallbackContext) -> str:
     current_date_time = helpers.get_current_date_time_string(0) # UTC time
 
     try:
-        msg = await update.callback_query.message.edit_media(
-            media = InputMediaPhoto(media=(SUN_PIC_URLS[sun_number] + f"?a={int(time.time()/900)}"))
-        )
-        await msg.edit_caption(
-            caption = (f"{sun_number+1}. {SUN_PIC_NAMES[sun_number]} \n"
-                        f"(Last refreshed: \n{current_date_time} UTC)"),
+        await update.callback_query.message.edit_media(
+            media = InputMediaPhoto(
+                media = (SUN_PIC_URLS[sun_number] + f"?a={int(time.time()/900)}"),
+                caption = (f"🌞 Live Sun Pics \n"
+                        f"{SUN_PIC_NAMES[sun_number]} \n"
+                        f"(Last refreshed: \n{current_date_time} UTC)")
+            ),
             reply_markup = InlineKeyboardMarkup([
                                 [InlineKeyboardButton("<<", callback_data=f"SUN_{(sun_number - 1) % 19}"), InlineKeyboardButton(">>", callback_data=f"SUN_{(sun_number + 1) % 19}")],
                                 [InlineKeyboardButton("Refresh current image", callback_data=f"SUN_{sun_number}")]
                             ])
         )
     except error.TimedOut:
-        return "An error has occurred. Please try again."
+        return "Request timeout. Please try again."
+    except error.BadRequest:
+        return "Bad request. Please try again."
     else:
         return "Sun pic refreshed"

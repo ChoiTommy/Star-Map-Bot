@@ -46,7 +46,7 @@ def main() -> None:
     )
 
     # Create the Application and pass it your bot's token.
-    application = Application.builder().token(constants.BOT_TOKEN).concurrent_updates(True).build()
+    application = Application.builder().token(constants.BOT_TOKEN).build()
 
     # Register command handlers
     application.add_handler(CommandHandler("start", misc.bot_tutorial))
@@ -55,8 +55,8 @@ def main() -> None:
     application.add_handler(CommandHandler("myinfo", userinfo.show_user_info))
     application.add_handler(CommandHandler("astrodata", astrodata.show_astro_data))
     application.add_handler(CommandHandler("weather", weather.show_weather_data))
-    application.add_handler(CommandHandler("sun", sun.send_sun_pic))
-    application.add_handler(CommandHandler("iss", iss.iss_live_location))
+    application.add_handler(CommandHandler("sun", sun.send_sun_pic, block=False))
+    application.add_handler(CommandHandler("iss", iss.iss_live_location, block=False))
 
     application.add_handler(ConversationHandler(
         entry_points = [CommandHandler("setlocation", userinfo.set_location)],

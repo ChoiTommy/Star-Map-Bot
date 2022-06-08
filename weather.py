@@ -5,7 +5,7 @@ Usage:
 Command /weather is defined by show_weather_data
 """
 
-import constants
+import constants, helpers
 import requests
 from firebase_admin import db
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto
@@ -32,7 +32,8 @@ async def show_weather_data(update: Update, context: CallbackContext) -> None:
         lat = data["latitude"]
         longi = data["longitude"]
 
-        tble, current_condition_icon_url, current_condition_text, current_date_time = fetch_weather_data(lat, longi)
+        tble, current_condition_icon_url, current_condition_text = fetch_weather_data(lat, longi)
+        current_date_time = helpers.get_current_date_time_string(data["utcOffset"]/1000)
 
         await update.message.reply_photo(
             photo = f"https:{current_condition_icon_url}",
@@ -65,21 +66,23 @@ async def update_weather_data(update: Update, context: CallbackContext) -> str:
         lat = data["latitude"]
         longi = data["longitude"]
 
-        tble, current_condition_icon_url, current_condition_text, current_date_time = fetch_weather_data(lat, longi)
+        tble, current_condition_icon_url, current_condition_text = fetch_weather_data(lat, longi)
+        current_date_time = helpers.get_current_date_time_string(data["utcOffset"]/1000)
 
-        msg = await update.callback_query.message.edit_media(
-            media = InputMediaPhoto(media=f"https:{current_condition_icon_url}")
-        )
-        await msg.edit_caption(
-            caption = (f"Weather now is: <b>{current_condition_text}</b> \n"
+        await update.callback_query.message.edit_media(
+            media = InputMediaPhoto(
+                media = f"https:{current_condition_icon_url}",
+                caption = (f"Weather now is: <b>{current_condition_text}</b> \n"
 
-                        f"<code>{tabulate(tble, tablefmt='fancy_grid')}</code> \n"
-                        f"({current_date_time}) \n\n"
+                            f"<code>{tabulate(tble, tablefmt='fancy_grid')}</code> \n"
+                            f"({current_date_time}) \n\n"
 
-                        "Be prepared before setting out for stargazing!"),
-            parse_mode = ParseMode.HTML,
+                            "Be prepared before setting out for stargazing!"),
+                parse_mode = ParseMode.HTML
+            ),
             reply_markup = REFRESH_WEATHER_BUTTON
         )
+
         return "Weather refreshed"
     else:
         await update.callback_query.message.delete()
@@ -94,10 +97,10 @@ def fetch_weather_data(latitude, longitude):
         longitude (float): longitude of the location
 
     Returns:
-        list of list : for generating pretty table
+        list of list of str: for generating pretty table
         str : URL to the icon of current condition
         str : Description of the current condition
-        str : Current date and time
+        ~~str : Current date and time~~
     """
 
     params_inject = {
@@ -126,4 +129,4 @@ def fetch_weather_data(latitude, longitude):
         ["Visibility", f"{visibility_km} km"],
         ["Humidity", f"{humidity}%"],
         ["UV index", uv_index]
-    ], current_condition_icon_url, current_condition_text, current_date_time
+    ], current_condition_icon_url, current_condition_text

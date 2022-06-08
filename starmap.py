@@ -88,11 +88,12 @@ async def update_star_map(update: Update, context: CallbackContext) -> str:
 
         pix = fetch_star_map(lat, longi, address, utcOffset)
 
-        msg = await update.callback_query.message.edit_media(
-            media = InputMediaDocument(media=pix.tobytes(), filename=f"Star_Map_{current_date_time.replace(' ', '_').replace(':', '_')}.png"),
-        )
-        await msg.edit_caption(
-            caption = f"Enjoy the stunning stars! Be considerate and leave no trace while stargazing! \n ({current_date_time})",
+        await update.callback_query.message.edit_media(
+            media = InputMediaDocument(
+                media = pix.tobytes(),
+                filename = f"Star_Map_{current_date_time.replace(' ', '_').replace(':', '_')}.png",
+                caption = f"Enjoy the stunning stars! Be considerate and leave no trace while stargazing! \n ({current_date_time})"
+            ),
             reply_markup = REFRESH_STARMAP_BUTTON
         )
 
