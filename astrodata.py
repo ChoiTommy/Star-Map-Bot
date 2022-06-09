@@ -36,7 +36,7 @@ async def show_astro_data(update: Update, context: CallbackContext) -> None:
         current_date_time = helpers.get_current_date_time_string(data["utcOffset"]/1000)
 
         await update.message.reply_html(
-            text = ("🌠<b>Astronomical data</b>: \n"
+            text = ("🌠 <b>Astronomical data</b>: \n"
                     f"<code>{tabulate(tble, tablefmt='simple')}</code> \n"
 
                     f"({current_date_time}) \n"),
@@ -65,7 +65,7 @@ async def update_astro_data(update: Update, context: CallbackContext) -> str:
         tble = fetch_astro_data(lat, longi)
         current_date_time = helpers.get_current_date_time_string(data["utcOffset"]/1000)
 
-        new_text = ("🌠<b>Astronomical data</b>: \n"
+        new_text = ("🌠 <b>Astronomical data</b>: \n"
                     f"<code>{tabulate(tble, tablefmt='simple')}</code> \n"
                     f"({current_date_time}) \n")
 

@@ -54,7 +54,7 @@ async def set_location(update: Update, context: CallbackContext) -> int:
 
     if data != None:
         await update.message.reply_text(f"Your location is {data['latitude']}, {data['longitude']} ({data['address']}).")
-        await update.message.reply_markdown_v2("Send your new location \(Telegram location or a stirng in `lat, lon` format\) if you wish to change\. \n/cancel to keep the current setting\.")
+        await update.message.reply_markdown_v2("Send your new location \(Telegram location or a string in `lat, lon` format\) if you wish to change\. \n/cancel to keep the current setting\.")
     else:
         await update.message.reply_markdown_v2(
             text = ("Send your location to me \(Either a Telegram location object or a string in the format of `lat: float, lon: float`\) \n"

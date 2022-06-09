@@ -38,4 +38,6 @@ async def iss_live_location(update: Update, context: CallbackContext) -> None:
                 location = loc
             )
 
-        await asyncio.sleep(5)   # location data updates every 5 secss
+        await asyncio.sleep(5)   # location data updates every 5 secs
+
+    await title.edit_text(text="🛰 ISS Live Location session has ended.")

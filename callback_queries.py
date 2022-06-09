@@ -29,5 +29,13 @@ async def callback(update: Update, context: CallbackContext) -> None:
         status = await sun.update_sun_pic(update, context)
         await query.answer(text=status)
 
+    elif "SHOW" in query.data:
+        status = await sun.show_description(update, context)
+        await query.answer(text=status)
+
+    elif "HIDE" in query.data:
+        status = await sun.hide_description(update, context)
+        await query.answer(text=status)
+
     else:
-        query.answer()
+        await query.answer()

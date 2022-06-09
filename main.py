@@ -13,7 +13,7 @@ Send /weather to get a weather report at the location set.
 Send /iss to get the live location of the International Space Station.
 Send /myinfo to view the data associate with you stored on the server.
 Send /deletemyinfo to purge you data permanently on the server.
-Send /credits to view the data sources of all the infomation this bot provides.
+Send /credits to view the data sources of all the information this bot provides.
 Send /cancel to halt any operations.
 """
 
@@ -79,7 +79,7 @@ def main() -> None:
     application.add_handler(CallbackQueryHandler(callback_queries.callback))
 
     # Start the Bot using polling
-    application.run_polling(stop_signals=None)
+    application.run_polling()
 
 
 if __name__ == "__main__":
