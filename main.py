@@ -10,6 +10,7 @@ Send /starmap to get a star map pdf at the location set.
 Send /astrodata to get a list of astronomical data at the location set.
 Send /sun to view a series of sun images in various wavelengths.
 Send /weather to get a weather report at the location set.
+Send /iss to get the live location of the International Space Station.
 Send /myinfo to view the data associate with you stored on the server.
 Send /deletemyinfo to purge you data permanently on the server.
 Send /credits to view the data sources of all the infomation this bot provides.
@@ -22,8 +23,8 @@ import misc, userinfo, starmap, astrodata, weather, sun, iss, constants, callbac
 import logging
 import firebase_admin
 from firebase_admin import credentials
-from telegram import Update, ParseMode
-from telegram.ext import Updater, CommandHandler, ConversationHandler, MessageHandler, CallbackQueryHandler, Filters
+from telegram import Update
+from telegram.ext import Application, ContextTypes, CommandHandler, ConversationHandler, MessageHandler, CallbackQueryHandler, filters
 
 
 # Enable logging
@@ -44,51 +45,41 @@ def main() -> None:
         }
     )
 
-    # Create the Updater and pass it your bot's token.
-    updater = Updater(constants.BOT_TOKEN)
-
-    # Get the dispatcher to register handlers
-    dispatcher = updater.dispatcher
+    # Create the Application and pass it your bot's token.
+    application = Application.builder().token(constants.BOT_TOKEN).build()
 
     # Register command handlers
-    dispatcher.add_handler(CommandHandler("start", misc.bot_tutorial))
-    dispatcher.add_handler(CommandHandler("credits", misc.show_credits))
-    dispatcher.add_handler(CommandHandler("starmap", starmap.send_star_map))
-    dispatcher.add_handler(CommandHandler("myinfo", userinfo.show_user_info))
-    dispatcher.add_handler(CommandHandler("astrodata", astrodata.show_astro_data))
-    dispatcher.add_handler(CommandHandler("weather", weather.show_weather_data))
-    dispatcher.add_handler(CommandHandler("sun", sun.send_sun_pic))
-    dispatcher.add_handler(CommandHandler("iss", iss.iss_live_location))
+    application.add_handler(CommandHandler("start", misc.bot_tutorial))
+    application.add_handler(CommandHandler("credits", misc.show_credits))
+    application.add_handler(CommandHandler("starmap", starmap.send_star_map))
+    application.add_handler(CommandHandler("myinfo", userinfo.show_user_info))
+    application.add_handler(CommandHandler("astrodata", astrodata.show_astro_data))
+    application.add_handler(CommandHandler("weather", weather.show_weather_data))
+    application.add_handler(CommandHandler("sun", sun.send_sun_pic, block=False))
+    application.add_handler(CommandHandler("iss", iss.iss_live_location, block=False))
 
-    dispatcher.add_handler(ConversationHandler(
+    application.add_handler(ConversationHandler(
         entry_points = [CommandHandler("setlocation", userinfo.set_location)],
         states = {
-            0: [MessageHandler(Filters.location | Filters.regex("[0-9]*\.[0-9]+,[ ]?[0-9]*\.[0-9]+"), userinfo.update_location)]
+            0: [MessageHandler(filters.LOCATION | filters.Regex("[0-9]*\.[0-9]+,[ ]?[0-9]*\.[0-9]+"), userinfo.update_location)]
         },
         fallbacks = [CommandHandler("cancel", userinfo.cancel_location_setup)],
         conversation_timeout = 300 # 5 mins
     ))
 
-    dispatcher.add_handler(ConversationHandler(
+    application.add_handler(ConversationHandler(
         entry_points = [CommandHandler("deletemyinfo", userinfo.deletion_confirmation)],
         states = {
-            0: [MessageHandler(Filters.regex("^(Yes|No)$"), userinfo.delete_user_info)]
+            0: [MessageHandler(filters.Regex("^(Yes|No)$"), userinfo.delete_user_info)]
         },
         fallbacks = [CommandHandler("cancel", userinfo.cancel_deletion)],
         conversation_timeout = 300
     ))
 
-    dispatcher.add_handler(CallbackQueryHandler(callback_queries.callback))
+    application.add_handler(CallbackQueryHandler(callback_queries.callback))
 
     # Start the Bot using polling
-    updater.start_polling()
-
-    # Start listening to webhook
-    # updater.start_webhook(listen = "0.0.0.0",
-    #                   port = constants.PORT,
-    #                   url_path = constants.BOT_TOKEN,
-    #                   webhook_url = "https://star-map-bot.herokuapp.com/" + constants.BOT_TOKEN)
-    updater.idle()
+    application.run_polling(stop_signals=None)
 
 
 if __name__ == "__main__":

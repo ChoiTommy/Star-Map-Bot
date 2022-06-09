@@ -9,8 +9,9 @@ import constants, helpers
 import time
 import requests
 from firebase_admin import db
-from telegram import Update, ParseMode, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaDocument
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaDocument
 from telegram.ext import CallbackContext
+from telegram.constants import ParseMode
 import fitz
 
 
@@ -33,7 +34,7 @@ REFRESH_STARMAP_BUTTON = InlineKeyboardMarkup([
                         ])
 
 
-def send_star_map(update: Update, context: CallbackContext) -> None:
+async def send_star_map(update: Update, context: CallbackContext) -> None:
     """Forward a star map to user based on the set location and the current time."""
 
     user_id = str(update.effective_user.id)
@@ -53,7 +54,7 @@ def send_star_map(update: Update, context: CallbackContext) -> None:
         pix = fetch_star_map(lat, longi, address, utcOffset)
 
         # update.message.reply_document(document = fetch_target) # pdf
-        update.message.reply_document(
+        await update.message.reply_document(
             document = pix.tobytes(),
             filename = f"Star_Map_{current_date_time.replace(' ', '_').replace(':', '_')}.png",
             caption = f"Enjoy the stunning stars! Be considerate and leave no trace while stargazing! \n ({current_date_time})",
@@ -61,10 +62,10 @@ def send_star_map(update: Update, context: CallbackContext) -> None:
         )
 
     else:
-        update.message.reply_text("Please set your location with /setlocation first!")
+        await update.message.reply_text("Please set your location with /setlocation first!")
 
 
-def update_star_map(update: Update, context: CallbackContext) -> str:
+async def update_star_map(update: Update, context: CallbackContext) -> str:
     """Update the star map by replacing the png with a new one.
 
     Returns:
@@ -87,16 +88,18 @@ def update_star_map(update: Update, context: CallbackContext) -> str:
 
         pix = fetch_star_map(lat, longi, address, utcOffset)
 
-        update.callback_query.message.edit_media(
-            media = InputMediaDocument(media=pix.tobytes(), filename=f"Star_Map_{current_date_time.replace(' ', '_').replace(':', '_')}.png"),
-        ).edit_caption(
-            caption = f"Enjoy the stunning stars! Be considerate and leave no trace while stargazing! \n ({current_date_time})",
+        await update.callback_query.message.edit_media(
+            media = InputMediaDocument(
+                media = pix.tobytes(),
+                filename = f"Star_Map_{current_date_time.replace(' ', '_').replace(':', '_')}.png",
+                caption = f"Enjoy the stunning stars! Be considerate and leave no trace while stargazing! \n ({current_date_time})"
+            ),
             reply_markup = REFRESH_STARMAP_BUTTON
         )
 
         return "Star map updated"
     else:
-        update.callback_query.message.edit_caption().delete()
+        await update.callback_query.message.delete()
         return "Please set your location first!"
 
 
