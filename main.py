@@ -8,7 +8,7 @@ Send /start to get a welcome message from the bot.
 Send /setlocation to set your location to enable the the core features.
 Send /starmap to get a star map pdf at the location set.
 Send /astrodata to get a list of astronomical data at the location set.
-Send /sun to view a series of sun images in various wavelengths.
+Send /sun to view a series of sun photos in various wavelengths.
 Send /weather to get a weather report at the location set.
 Send /iss to get the live location of the International Space Station.
 Send /myinfo to view the data associate with you stored on the server.
@@ -19,7 +19,6 @@ Send /cancel to halt any operations.
 
 # TODO API request async, star map features toggles, astronomy news rss, subscriber (send info actively to subscribed users)
 import misc, userinfo, starmap, astrodata, weather, sun, iss, constants, callback_queries
-
 import logging
 import firebase_admin
 from firebase_admin import credentials
@@ -48,6 +47,9 @@ def main() -> None:
     # Create the Application and pass it your bot's token.
     application = Application.builder().token(constants.BOT_TOKEN).build()
 
+    # Adding a callback function to the job queue
+    application.job_queue.run_repeating(sun.fetch_sun_photos, interval=900, first=2) # 900s = 15 mins, do almost immediately
+
     # Register command handlers
     application.add_handler(CommandHandler("start", misc.bot_tutorial))
     application.add_handler(CommandHandler("credits", misc.show_credits))
@@ -55,7 +57,7 @@ def main() -> None:
     application.add_handler(CommandHandler("myinfo", userinfo.show_user_info))
     application.add_handler(CommandHandler("astrodata", astrodata.show_astro_data))
     application.add_handler(CommandHandler("weather", weather.show_weather_data))
-    application.add_handler(CommandHandler("sun", sun.send_sun_pic, block=False))
+    application.add_handler(CommandHandler("sun", sun.send_sun_photo))
     application.add_handler(CommandHandler("iss", iss.iss_live_location, block=False))
 
     application.add_handler(ConversationHandler(

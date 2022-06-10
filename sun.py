@@ -1,20 +1,20 @@
 """
-sun is a module that consists of functions fetching and displaying near-real-time sun images from NASA.
+sun is a module that consists of functions fetching and displaying near-real-time sun photos from NASA.
 
 Usage:
-Command /sun is defined by send_sun_pic
+Command /sun is defined by send_sun_photo
 
-TODO Fetch images periodically (every 15 mins) for faster access, separate out sun data to a new file
+TODO separate out sun data to a new file
 """
 
 import helpers
-import time
+import time, requests
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto, error
 from telegram.ext import CallbackContext
 from telegram.constants import ParseMode
 
 
-SUN_PIC_URLS = [  # 19 images, indices from 0..18
+SUN_PHOTO_URLS = [  # 19 photos, indices from 0..18
     "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0193.jpg",          # AIA 193 Å
     "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0304.jpg",          # AIA 304 Å
     "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0171.jpg",          # AIA 171 Å
@@ -36,7 +36,7 @@ SUN_PIC_URLS = [  # 19 images, indices from 0..18
     "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMID.jpg"           # HMI Dopplergram
 ]
 
-SUN_PIC_NAMES = [
+SUN_PHOTO_NAMES = [
     "AIA 193 Å",
     "AIA 304 Å",
     "AIA 171 Å",
@@ -58,7 +58,7 @@ SUN_PIC_NAMES = [
     "HMI Dopplergram",
 ]
 
-SUN_PIC_DESCRIPTIONS = [
+SUN_PHOTO_DESCRIPTIONS = [
     # 193
     "This channel highlights the outer atmosphere of the Sun - called the corona - as well as hot flare plasma. Hot active regions, solar flares, and coronal mass ejections will appear bright here. The dark areas - called coronal holes - are places where very little radiation is emitted, yet are the main source of solar wind particles.\n\n<strong>Where:</strong> Corona and hot flare plasma\n<strong>Wavelength:</strong>  193 angstroms (0.0000000193 m) = Extreme Ultraviolet\n<strong>Primary ions seen:</strong> 11 times ionized iron (Fe XII)\n<strong>Characteristic temperature:</strong> 1.25 million K (2.25 million F)",
     # 304
@@ -100,17 +100,30 @@ SUN_PIC_DESCRIPTIONS = [
 ]
 
 
-async def send_sun_pic(update: Update, context: CallbackContext) -> None:
-    """Send a picture of the current sun."""
+async def fetch_sun_photos(context: CallbackContext) -> None: # Possibility to switch to asynchronous?
+    """Fetch all the sun photos from the server. This is run every 15 mins."""
 
-    current_date_time = helpers.get_current_date_time_string(0) # UTC time
-    default_starting_point = 15
+    for i in range(len(SUN_PHOTO_URLS)):
+        img_data = requests.get(SUN_PHOTO_URLS[i], stream=True).content
+        with open(f"assets/sun/{i}.jpg", "wb") as f:
+            f.write(img_data)
+
+    with open("assets/sun/log.txt", "w") as txt:
+        txt.write(f"{helpers.get_current_date_time_string(0)} UTC")   # UTC time
+
+
+async def send_sun_photo(update: Update, context: CallbackContext) -> None:
+    """Send a photo of the current sun."""
+
+    with open("assets/sun/log.txt", 'r') as txt:
+        last_fetched = txt.read()
+    default_starting_point = 0
 
     await update.message.reply_photo(
-        photo = SUN_PIC_URLS[default_starting_point] + f"?a={int(time.time()/900)}",  # new url in ~ every 15 mins
-        caption = (f"🌞 Live Sun Pics \n"
-                    f"{SUN_PIC_NAMES[default_starting_point]} \n"
-                    f"({current_date_time} UTC)"),
+        photo = open(f"assets/sun/{default_starting_point}.jpg", "rb"),
+        caption = (f"🌞 Live Photos of the Sun \n"
+                    f"{SUN_PHOTO_NAMES[default_starting_point]} \n"
+                    f"({last_fetched})"),
         reply_markup = InlineKeyboardMarkup([
                             [InlineKeyboardButton("<<", callback_data=f"SUN_{(default_starting_point - 1) % 19}"), InlineKeyboardButton("↻", callback_data=f"SUN_{default_starting_point}"), InlineKeyboardButton(">>", callback_data=f"SUN_{(default_starting_point + 1) % 19}")],
                             [InlineKeyboardButton("⇣ Show description", callback_data=f"SHOW_{default_starting_point}")]
@@ -124,11 +137,13 @@ async def show_description(update: Update, context: CallbackContext) -> str:
     Returns:
         str: status
     """
+
     sun_number = int(update.callback_query.data[5:])
+
     await update.callback_query.message.edit_caption(
         caption = (f"{update.callback_query.message.caption} \n"
                     "************************************ \n"
-                    f"{SUN_PIC_DESCRIPTIONS[sun_number]}"),
+                    f"{SUN_PHOTO_DESCRIPTIONS[sun_number]}"),
         parse_mode = ParseMode.HTML,
         reply_markup = InlineKeyboardMarkup([
                             [InlineKeyboardButton("<<", callback_data=f"SUN_{(sun_number - 1) % 19}"), InlineKeyboardButton("↻", callback_data=f"SUN_{sun_number}"), InlineKeyboardButton(">>", callback_data=f"SUN_{(sun_number + 1) % 19}")],
@@ -144,7 +159,9 @@ async def hide_description(update: Update, context: CallbackContext) -> str:
     Returns:
         str: status
     """
+
     sun_number = int(update.callback_query.data[5:])
+
     await update.callback_query.message.edit_caption(
         caption = (f"{update.callback_query.message.caption[:update.callback_query.message.caption.find('*')]}"),
         reply_markup = InlineKeyboardMarkup([
@@ -152,36 +169,34 @@ async def hide_description(update: Update, context: CallbackContext) -> str:
                             [InlineKeyboardButton("⇣ Show description", callback_data=f"SHOW_{sun_number}")]
                         ])
     )
-    return "Description hided"
+    return "Description hidden"
 
 
-async def update_sun_pic(update: Update, context: CallbackContext) -> str:
-    """Cycle through the sun picture list or refresh the current one.
+async def update_sun_photo(update: Update, context: CallbackContext) -> str:
+    """Cycle through the sun photo list or refresh the current one.
 
     Returns:
         str: status
     """
 
     sun_number = int(update.callback_query.data[4:])
-
-    current_date_time = helpers.get_current_date_time_string(0) # UTC time
+    with open("assets/sun/log.txt", 'r') as txt:
+        last_fetched = txt.read()
 
     try:
         await update.callback_query.message.edit_media(
             media = InputMediaPhoto(
-                media = (SUN_PIC_URLS[sun_number] + f"?a={int(time.time()/900)}"),
-                caption = (f"🌞 Live Sun Pics \n"
-                        f"{SUN_PIC_NAMES[sun_number]} \n"
-                        f"({current_date_time} UTC)")
+                media = open(f"assets/sun/{sun_number}.jpg", "rb"),
+                caption = (f"🌞 Live Photos of the Sun \n"
+                            f"{SUN_PHOTO_NAMES[sun_number]} \n"
+                            f"({last_fetched})")
             ),
             reply_markup = InlineKeyboardMarkup([
                                 [InlineKeyboardButton("<<", callback_data=f"SUN_{(sun_number - 1) % 19}"), InlineKeyboardButton("↻", callback_data=f"SUN_{sun_number}"), InlineKeyboardButton(">>", callback_data=f"SUN_{(sun_number + 1) % 19}")],
                                 [InlineKeyboardButton("⇣ Show description", callback_data=f"SHOW_{sun_number}")]
                             ])
         )
-    except error.TimedOut:
-        return "Request timeout. Please try again."
     except error.BadRequest:
-        return "Bad request. Please try again."
+        return "The photo is up-to-date. Please try again later."
     else:
-        return "Sun pic refreshed"
+        return "Sun photo refreshed"

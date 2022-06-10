@@ -26,7 +26,7 @@ async def callback(update: Update, context: CallbackContext) -> None:
         await query.answer(text=status)
 
     elif "SUN" in query.data:
-        status = await sun.update_sun_pic(update, context)
+        status = await sun.update_sun_photo(update, context)
         await query.answer(text=status)
 
     elif "SHOW" in query.data:
