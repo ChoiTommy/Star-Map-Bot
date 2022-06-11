@@ -1,24 +1,18 @@
 """
-weather is a module that consists of functions fetching and displaying weather data relevant to stargazing.
+A module consists of functions fetching and displaying weather data relevant to stargazing
 
 Usage:
 Command /weather is defined by show_weather_data
 """
 
-import constants, helpers
+from helpers import get_current_date_time_string
+from constants import WEATHER_API_KEY, WEATHER_API_BASE_URL, REFRESH_WEATHER_BUTTON
 import requests
 from firebase_admin import db
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto
 from telegram.ext import CallbackContext
 from telegram.constants import ParseMode
 from tabulate import tabulate
-
-
-WEATHER_API_BASE_URL = "https://api.weatherapi.com/v1/current.json"
-
-REFRESH_WEATHER_BUTTON = InlineKeyboardMarkup([
-                            [InlineKeyboardButton("Refresh", callback_data=constants.REFRESH_WEATHER_CALLBACK_DATA)]
-                        ])
 
 
 async def show_weather_data(update: Update, context: CallbackContext) -> None:
@@ -33,7 +27,7 @@ async def show_weather_data(update: Update, context: CallbackContext) -> None:
         longi = data["longitude"]
 
         tble, current_condition_icon_url, current_condition_text = fetch_weather_data(lat, longi)
-        current_date_time = helpers.get_current_date_time_string(data["utcOffset"]/1000)
+        current_date_time = get_current_date_time_string(data["utcOffset"]/1000)
 
         await update.message.reply_photo(
             photo = f"https:{current_condition_icon_url}",
@@ -67,7 +61,7 @@ async def update_weather_data(update: Update, context: CallbackContext) -> str:
         longi = data["longitude"]
 
         tble, current_condition_icon_url, current_condition_text = fetch_weather_data(lat, longi)
-        current_date_time = helpers.get_current_date_time_string(data["utcOffset"]/1000)
+        current_date_time = get_current_date_time_string(data["utcOffset"]/1000)
 
         await update.callback_query.message.edit_media(
             media = InputMediaPhoto(
@@ -104,7 +98,7 @@ def fetch_weather_data(latitude, longitude):
     """
 
     params_inject = {
-        "key": constants.WEATHER_API_KEY,
+        "key": WEATHER_API_KEY,
         "q": [latitude, longitude]
     }
 

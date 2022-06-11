@@ -1,4 +1,6 @@
 *.pdf
+assets/sun/*.jpg
+assets/sun/log.txt
 .env
 *.json
 __pycache__

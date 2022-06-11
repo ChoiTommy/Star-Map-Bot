@@ -1,5 +1,5 @@
 """
-userinfo is a module that consists of functions regarding displaying, setting up, and deleting user's info.
+A module consists of functions regarding displaying, setting up, and deleting user's info
 
 Usage:
 Command /myinfo is defined by show_user_info
@@ -8,13 +8,12 @@ Command /cancel is defined by cancel_location_setup or cancel_deletion
 """
 
 import helpers
+from constants import NOMINATIM_REVERSE_API_BASE_URL
 import requests
 from firebase_admin import db
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import CallbackContext, ConversationHandler
 
-
-NOMINATIM_REVERSE_API_BASE_URL = "https://nominatim.openstreetmap.org/reverse"
 
 async def show_user_info(update: Update, context: CallbackContext) -> None:
     """Display user info when the command /myinfo is called. User info consists of latitude, longitude, address and timezone."""
@@ -85,13 +84,13 @@ async def update_location(update: Update, context: CallbackContext) -> int:
     response = requests.get(NOMINATIM_REVERSE_API_BASE_URL, params=params_inject)
     address_data = response.json()
 
-    if "error" in address_data: # Safeguarding, "Unable to geocode"
+    if "error" in address_data:     # Safeguarding, "Unable to geocode"
         await update.message.reply_text("You are in the middle of nowhere, my man. Send me a new location of a less remote place, please.")
-        return 0 # ask for a new location until user has given a valid one
+        return 0                    # ask for a new location until user has given a valid one
 
     else:
-        address_string = address_data["display_name"] # from nominatim
-        utcOffset = int(helpers.get_offset(lat, longi) * 1000) # in ms
+        address_string = address_data["display_name"]           # from nominatim
+        utcOffset = int(helpers.get_offset(lat, longi) * 1000)  # in ms
 
         ref = db.reference(f"/Users/{user_id}")
         data = ref.get()
@@ -104,7 +103,7 @@ async def update_location(update: Update, context: CallbackContext) -> int:
                 "longitude": longi,
                 "address": address_string,
                 "utcOffset": utcOffset,
-                "creation_timestamp": helpers.get_current_date_time_string()  # UTC time
+                "creation_timestamp": helpers.get_current_date_time_string()    # UTC time
             })
         else:
             ref.update({
@@ -112,7 +111,7 @@ async def update_location(update: Update, context: CallbackContext) -> int:
                 "longitude" : longi,
                 "address" : address_string,
                 "utcOffset" : utcOffset,
-                "update_timestamp": helpers.get_current_date_time_string()  # UTC time
+                "update_timestamp": helpers.get_current_date_time_string()      # UTC time
             })
 
         await update.message.reply_text(f"All set! Your new location is {lat}, {longi} ({address_string}).")

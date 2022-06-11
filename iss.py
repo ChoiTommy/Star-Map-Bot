@@ -1,16 +1,14 @@
 """
-iss is a module that consists of functions fetching and displaying live location of the International Space Station.
+A module consists of functions fetching and displaying live location of the International Space Station
 
 Usage:
 Command /iss is defined by iss_live_location
 """
 
+from constants import ISS_LOCATION_URL
 import requests, asyncio
 from telegram import Update, Location
 from telegram.ext import CallbackContext
-
-
-ISS_LOCATION_URL = "http://api.open-notify.org/iss-now.json"
 
 
 async def iss_live_location(update: Update, context: CallbackContext) -> None:

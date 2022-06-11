@@ -1,5 +1,5 @@
 """
-callback_queries is a module for handling callback queries.
+A module handles callback queries
 
 """
 import weather, astrodata, starmap, sun, constants
@@ -25,15 +25,15 @@ async def callback(update: Update, context: CallbackContext) -> None:
         status = await starmap.update_star_map(update, context)
         await query.answer(text=status)
 
-    elif "SUN" in query.data:
+    elif constants.UPDATE_SUN_PHOTO in query.data:
         status = await sun.update_sun_photo(update, context)
         await query.answer(text=status)
 
-    elif "SHOW" in query.data:
+    elif constants.SHOW_SUN_DESCRIPTION in query.data:
         status = await sun.show_description(update, context)
         await query.answer(text=status)
 
-    elif "HIDE" in query.data:
+    elif constants.HIDE_SUN_DESCRIPTION in query.data:
         status = await sun.hide_description(update, context)
         await query.answer(text=status)
 

@@ -1,11 +1,12 @@
 """
-starmap is a module that consists of functions fetching and forwarding a star map (sky chart) to user.
+A module consists of functions fetching and forwarding a star map (sky chart) to user
 
 Usage:
 Command /starmap is defined by send_star_map
 """
 
-import constants, helpers
+from helpers import get_current_date_time_string
+from constants import STAR_MAP_BASE_URL, REST_OF_THE_STAR_MAP_PARAM, REFRESH_STARMAP_BUTTON
 import time
 import requests
 from firebase_admin import db
@@ -13,25 +14,6 @@ from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, InputMe
 from telegram.ext import CallbackContext
 from telegram.constants import ParseMode
 import fitz
-
-
-STAR_MAP_BASE_URL = "https://www.heavens-above.com/SkyAndTelescope/StSkyChartPDF.ashx"
-# params to be injected: time, latitude, longitude, location, utcOffset(in ms)
-REST_OF_THE_PARAM = {
-    "showEquator": False,
-    "showEcliptic": True,
-    "showStarNames": False,
-    "showPlanetNames": True,
-    "showConsNames": True,
-    "showConsLines": True,
-    "showConsBoundaries": False,
-    "showSpecials": False,
-    "use24hClock": True
-}
-
-REFRESH_STARMAP_BUTTON = InlineKeyboardMarkup([
-                            [InlineKeyboardButton("Refresh", callback_data=constants.REFRESH_STARMAP_CALLBACK_DATA)]
-                        ])
 
 
 async def send_star_map(update: Update, context: CallbackContext) -> None:
@@ -49,7 +31,7 @@ async def send_star_map(update: Update, context: CallbackContext) -> None:
         address = data["address"]
         utcOffset = str(data["utcOffset"])
 
-        current_date_time = helpers.get_current_date_time_string(data["utcOffset"]/1000)
+        current_date_time = get_current_date_time_string(data["utcOffset"]/1000)
 
         pix = fetch_star_map(lat, longi, address, utcOffset)
 
@@ -84,7 +66,7 @@ async def update_star_map(update: Update, context: CallbackContext) -> str:
         address = data["address"]
         utcOffset = str(data["utcOffset"])
 
-        current_date_time = helpers.get_current_date_time_string(data["utcOffset"]/1000)
+        current_date_time = get_current_date_time_string(data["utcOffset"]/1000)
 
         pix = fetch_star_map(lat, longi, address, utcOffset)
 
@@ -124,7 +106,7 @@ def fetch_star_map(latitude, longitude, address, utcOffset):
         "utcOffset": utcOffset
     }
 
-    response = requests.get(STAR_MAP_BASE_URL, params=params_inject|REST_OF_THE_PARAM) # | to merge two dictionaries
+    response = requests.get(STAR_MAP_BASE_URL, params=params_inject|REST_OF_THE_STAR_MAP_PARAM) # | to merge two dictionaries
     doc = fitz.open(stream=response.content)
     page = doc.load_page(0)  # number of page
     pix = page.get_pixmap(
