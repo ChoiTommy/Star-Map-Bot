@@ -3,8 +3,6 @@ A module that consists of functions fetching and displaying near-real-time sun p
 
 Usage:
 Command /sun is defined by send_sun_photo
-
-TODO separate out sun data to a new file
 """
 
 from helpers import get_current_date_time_string

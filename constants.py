@@ -37,7 +37,7 @@ REST_OF_THE_STAR_MAP_PARAM = { # params to be injected: time, latitude, longitud
     "use24hClock": True
 }
 REFRESH_STARMAP_BUTTON = InlineKeyboardMarkup([
-                            [InlineKeyboardButton("Refresh", callback_data=REFRESH_STARMAP_CALLBACK_DATA)]
+                            [InlineKeyboardButton("↻ Refresh", callback_data=REFRESH_STARMAP_CALLBACK_DATA)]
                         ])
 
 
@@ -54,7 +54,7 @@ MOON_PHASE_DICT = {             # dict for getting the corresponding moon phase 
     "Waning Crescent" : "🌘"
 }
 REFRESH_ASTRODATA_BUTTON = InlineKeyboardMarkup([
-                            [InlineKeyboardButton("Refresh", callback_data=REFRESH_ASTRODATA_CALLBACK_DATA)]
+                            [InlineKeyboardButton("↻ Refresh", callback_data=REFRESH_ASTRODATA_CALLBACK_DATA)]
                         ])
 
 
@@ -62,7 +62,7 @@ REFRESH_ASTRODATA_BUTTON = InlineKeyboardMarkup([
 WEATHER_API_KEY = os.getenv("WEATHER_API_KEY")
 WEATHER_API_BASE_URL = "https://api.weatherapi.com/v1/current.json"
 REFRESH_WEATHER_BUTTON = InlineKeyboardMarkup([
-                            [InlineKeyboardButton("Refresh", callback_data=REFRESH_WEATHER_CALLBACK_DATA)]
+                            [InlineKeyboardButton("↻ Refresh", callback_data=REFRESH_WEATHER_CALLBACK_DATA)]
                         ])
 
 
