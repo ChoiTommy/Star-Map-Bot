@@ -1,24 +1,18 @@
 """
-astrodata is a module that consists of functions fetching and displaying astronomical data.
+A module consists of functions fetching and displaying astronomical data
 
 Usage:
 Command /astrodata is defined by show_astro_data
 """
 
-import constants, helpers
+from helpers import get_current_date_time_string
+from constants import WEATHER_API_KEY, ASTRODATA_API_BASE_URL, REFRESH_ASTRODATA_BUTTON, MOON_PHASE_DICT
 import requests
 from firebase_admin import db
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, error
 from telegram.ext import CallbackContext
 from telegram.constants import ParseMode
 from tabulate import tabulate
-
-
-WEATHER_API_BASE_URL = "https://api.weatherapi.com/v1/astronomy.json"
-
-REFRESH_ASTRODATA_BUTTON = InlineKeyboardMarkup([
-                            [InlineKeyboardButton("Refresh", callback_data=constants.REFRESH_ASTRODATA_CALLBACK_DATA)]
-                        ])
 
 
 async def show_astro_data(update: Update, context: CallbackContext) -> None:
@@ -33,7 +27,7 @@ async def show_astro_data(update: Update, context: CallbackContext) -> None:
         longi = data["longitude"]
 
         tble = fetch_astro_data(lat, longi)
-        current_date_time = helpers.get_current_date_time_string(data["utcOffset"]/1000)
+        current_date_time = get_current_date_time_string(data["utcOffset"]/1000)
 
         await update.message.reply_html(
             text = ("🌠 <b>Astronomical data</b>: \n"
@@ -63,7 +57,7 @@ async def update_astro_data(update: Update, context: CallbackContext) -> str:
         longi = data["longitude"]
 
         tble = fetch_astro_data(lat, longi)
-        current_date_time = helpers.get_current_date_time_string(data["utcOffset"]/1000)
+        current_date_time = get_current_date_time_string(data["utcOffset"]/1000)
 
         new_text = ("🌠 <b>Astronomical data</b>: \n"
                     f"<code>{tabulate(tble, tablefmt='simple')}</code> \n"
@@ -95,11 +89,11 @@ def fetch_astro_data(latitude, longitude):
     """
 
     params_inject = {
-        "key": constants.WEATHER_API_KEY,
+        "key": WEATHER_API_KEY,
         "q": [latitude, longitude]
     }
 
-    response = requests.get(WEATHER_API_BASE_URL, params=params_inject)
+    response = requests.get(ASTRODATA_API_BASE_URL, params=params_inject)
     astro_data = response.json()
 
     sunrise = astro_data["astronomy"]["astro"]["sunrise"]
@@ -118,6 +112,6 @@ def fetch_astro_data(latitude, longitude):
         ['🌝', 'Moon'],
         ["Rise", moonrise],
         ["Set", moonset],
-        ["Phase", f"{moon_phase} {constants.MOON_PHASE_DICT[moon_phase]}"],
+        ["Phase", f"{moon_phase} {MOON_PHASE_DICT[moon_phase]}"],
         ["Illum.", f"{moon_illumination}%"]
     ]

@@ -18,9 +18,10 @@ Send /cancel to halt any operations.
 """
 
 # TODO API request async, star map features toggles, astronomy news rss, subscriber (send info actively to subscribed users)
-import misc, userinfo, starmap, astrodata, weather, sun, iss, constants, callback_queries
+import misc, userinfo, starmap, astrodata, weather, sun, iss, callback_queries
 import logging
 import firebase_admin
+from constants import BOT_TOKEN, DATABASE_URL, GOOGLE_APPLICATION_CREDENTIALS
 from firebase_admin import credentials
 from telegram import Update
 from telegram.ext import Application, ContextTypes, CommandHandler, ConversationHandler, MessageHandler, CallbackQueryHandler, filters
@@ -36,16 +37,16 @@ logger = logging.getLogger(__name__)
 def main() -> None:
     """Entry point of the script."""
 
-    cred = credentials.Certificate(constants.GOOGLE_APPLICATION_CREDENTIALS)
+    cred = credentials.Certificate(GOOGLE_APPLICATION_CREDENTIALS)
     firebase_admin.initialize_app(
         credential = cred,
         options = {
-            "databaseURL" : constants.DATABASE_URL
+            "databaseURL" : DATABASE_URL
         }
     )
 
     # Create the Application and pass it your bot's token.
-    application = Application.builder().token(constants.BOT_TOKEN).build()
+    application = Application.builder().token(BOT_TOKEN).build()
 
     # Adding a callback function to the job queue
     application.job_queue.run_repeating(sun.fetch_sun_photos, interval=900, first=2) # 900s = 15 mins, do almost immediately

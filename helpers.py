@@ -1,5 +1,5 @@
 """
-helpers is a module that consists of all the helper functions used in this bot.
+A module consists of all the helper functions used in this bot
 
 """
 
