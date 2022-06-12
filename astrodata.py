@@ -15,7 +15,7 @@ from telegram.constants import ParseMode
 from tabulate import tabulate
 
 
-async def show_astro_data(update: Update, context: CallbackContext) -> None:
+async def show_astro_data(update: Update, context: CallbackContext) -> None: # TODO switch to depending on context only
     """Send a list of astronomical data to the user."""
 
     user_id = str(update.effective_user.id)

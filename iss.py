@@ -11,7 +11,7 @@ from telegram import Update, Location
 from telegram.ext import CallbackContext
 
 
-async def iss_live_location(update: Update, context: CallbackContext) -> None:
+async def iss_live_location(update: Update, context: CallbackContext) -> None: # TODO switch to depending on context only
 
     title = await update.message.reply_text("🛰 ISS Live Location:")
 

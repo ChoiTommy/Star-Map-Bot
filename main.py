@@ -18,7 +18,7 @@ Send /cancel to halt any operations.
 """
 
 # TODO API request async, star map features toggles, astronomy news rss, subscriber (send info actively to subscribed users)
-import misc, userinfo, starmap, astrodata, weather, sun, iss, callback_queries
+import misc, userinfo, starmap, astrodata, weather, sun, iss, subscription, callback_queries
 import logging
 import firebase_admin
 from constants import BOT_TOKEN, DATABASE_URL, GOOGLE_APPLICATION_CREDENTIALS
@@ -49,7 +49,7 @@ def main() -> None:
     application = Application.builder().token(BOT_TOKEN).build()
 
     # Adding a callback function to the job queue
-    application.job_queue.run_repeating(sun.fetch_sun_photos, interval=900, first=2) # 900s = 15 mins, do almost immediately
+    # application.job_queue.run_repeating(sun.fetch_sun_photos, interval=900, first=2) # 900s = 15 mins, do almost immediately
 
     # Register command handlers
     application.add_handler(CommandHandler("start", misc.bot_tutorial))
@@ -60,6 +60,8 @@ def main() -> None:
     application.add_handler(CommandHandler("weather", weather.show_weather_data))
     application.add_handler(CommandHandler("sun", sun.send_sun_photo))
     application.add_handler(CommandHandler("iss", iss.iss_live_location, block=False))
+    application.add_handler(CommandHandler("subscribe", subscription.subscribe))
+    # application.add_handler(CommandHandler("unsubscribe", subscription.unsubscribe))
 
     application.add_handler(ConversationHandler(
         entry_points = [CommandHandler("setlocation", userinfo.set_location)],

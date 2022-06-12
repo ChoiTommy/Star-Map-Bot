@@ -9,11 +9,11 @@ without 2/1 arguments: show subscription information only
 Database
 "Subscription": {
         "user_id": {
-            "starmap": {"enabled": bool, "time": str},
-            "astrodata": {"enabled": bool, "time": str},
-            "weather": {"enabled": bool, "time": str},
-            "iss": {"enabled": bool, "time": str},
-            "sun": {"enabled": bool, "time": str},
+            "starmap": {"enabled": bool, "timing": {"hour": int, "minute": int}},
+            "astrodata": {"enabled": bool, "timing": {"hour": int, "minute": int}},
+            "weather": {"enabled": bool, "timing": {"hour": int, "minute": int}},
+            "iss": {"enabled": bool, "timing": {"hour": int, "minute": int}},
+            "sun": {"enabled": bool, "timing": {"hour": int, "minute": int}},
         }, ...
 }
 
@@ -54,16 +54,16 @@ def are_timings_valid(li: list[str]) -> (bool, list[int], list[int]):
         timing = l.split(':')
         if len(timing) != 2:
             return False, [], []
-        if int(timing[0]) not in range(25):
+        if int(timing[0]) not in range(24):
             return False, [], []
         if int(timing[1]) not in range(60):
             return False, [], []
-        hour.append(timing[0])
-        minute.append(timing[1])
+        hour.append(int(timing[0]))
+        minute.append(int(timing[1]))
     return True, hour, minute
 
 
-def are_features_valid(li: List[str]) -> bool:
+def are_features_valid(li: list[str]) -> bool:
     for l in li:
         if l not in DEFAULT_FEATURES:
             return False
@@ -72,31 +72,33 @@ def are_features_valid(li: List[str]) -> bool:
 
 async def subscribe(update: Update, context: CallbackContext) -> None:
 
-    f, t = context.args[0], context.args[1]
+    args = context.args
 
-    if f is not None and t is not None:
+    if len(args) == 2:
+        f, t = context.args[0], context.args[1]
+
         features = [f.lower() for f in f.split(',')]
         timings = t.split(',')
 
         if len(features) != len(timings):
             # number of features is not equal to number of timings
-            update.message.reply_markdown_v2(text="The number of features must be equal to that of the timings. Please set again.")
+            await update.message.reply_text(text="The number of features must be equal to that of the timings. Please set again.")
+            return
+
+        if not are_features_valid(features):
+            # some features are invalid
+            await update.message.reply_text(text="Make sure the features are of the 5 only. Please set again.")
             return
 
         valid_time, hour, minute = are_timings_valid(timings)
         if not valid_time:
             # timings do not follow the format
-            update.message.reply_markdown_v2(text="Please follow the format for timings `<hour:minute>`. Please set again.")
-            return
-
-        if not are_features_valid(features):
-            # some features are invalid
-            update.message.reply_markdown_v2(text="Make sure the features are of the 5 only. Please set again.")
+            await update.message.reply_text(text="Please follow the format for timings `<hour:minute>`. Please set again.")
             return
 
     else:
         # not providing enough arguments
-        update.message.reply_markdown_v2(text="Arguments missing. Please set again.")
+        await update.message.reply_text(text="Arguments missing. Please set again.")
         return
 
     user_id = str(update.effective_user.id)
@@ -111,8 +113,8 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
         user_data[features[i]]["timing"]["hour"] = hour[i]
         user_data[features[i]]["timing"]["minute"] = minute[i]
 
-        time = time(hour=hour[i], minute=minute[i])
-        context.job_queue.run_daily(DEFAULT_FEATURES[features[i]], time=time, name=f"{user_id}_{features[i]}")
+        t = time(hour=hour[i], minute=minute[i])
+        context.job_queue.run_daily(DEFAULT_FEATURES[features[i]], time=t, name=f"{user_id}_{features[i]}")
 
     ref.set(user_data)
 

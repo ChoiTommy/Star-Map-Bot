@@ -34,7 +34,7 @@ async def fetch_sun_photos(context: CallbackContext) -> None: # Possibility to s
         txt.write(f"{get_current_date_time_string(0)} UTC")   # UTC time
 
 
-async def send_sun_photo(update: Update, context: CallbackContext) -> None:
+async def send_sun_photo(update: Update, context: CallbackContext) -> None: # TODO switch to depending on context only
     """Send a photo of the current sun."""
 
     with open(f"{SUN_PHOTO_PATH}log.txt", 'r') as txt:

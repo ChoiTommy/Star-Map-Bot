@@ -16,7 +16,7 @@ from telegram.constants import ParseMode
 import fitz
 
 
-async def send_star_map(update: Update, context: CallbackContext) -> None:
+async def send_star_map(update: Update, context: CallbackContext) -> None: # TODO switch to depending on context only
     """Forward a star map to user based on the set location and the current time."""
 
     user_id = str(update.effective_user.id)
