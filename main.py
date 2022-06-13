@@ -18,7 +18,7 @@ Send /cancel to halt any operations.
 """
 
 # TODO API request async, star map features toggles, astronomy news rss, subscriber (send info actively to subscribed users)
-import misc, userinfo, starmap, astrodata, weather, sun, iss, subscription, callback_queries
+import misc, userinfo, starmap, astro_data, weather, sun, iss, subscription, callback_queries
 import logging
 import firebase_admin
 from constants import BOT_TOKEN, DATABASE_URL, GOOGLE_APPLICATION_CREDENTIALS
@@ -56,7 +56,7 @@ def main() -> None:
     application.add_handler(CommandHandler("credits", misc.show_credits))
     application.add_handler(CommandHandler("starmap", starmap.send_star_map))
     application.add_handler(CommandHandler("myinfo", userinfo.show_user_info))
-    application.add_handler(CommandHandler("astrodata", astrodata.show_astro_data))
+    application.add_handler(CommandHandler("astrodata", astro_data.show_astro_data))
     application.add_handler(CommandHandler("weather", weather.show_weather_data))
     application.add_handler(CommandHandler("sun", sun.send_sun_photo))
     application.add_handler(CommandHandler("iss", iss.iss_live_location, block=False))

@@ -15,10 +15,20 @@ from telegram.constants import ParseMode
 from tabulate import tabulate
 
 
-async def show_astro_data(update: Update, context: CallbackContext) -> None: # TODO switch to depending on context only
+async def astro_data_subscription(context: CallbackContext) -> None:
+    await show_astro_data(update=None, context=context)
+
+
+async def show_astro_data(update: Update, context: CallbackContext) -> None:
     """Send a list of astronomical data to the user."""
 
-    user_id = str(update.effective_user.id)
+    if update is None:
+        user_id = context.job.user_id
+        chat_id = context.job.chat_id
+    else:
+        user_id = str(update.effective_user.id)
+        chat_id = update.effective_chat.id
+
     ref = db.reference(f"/Users/{user_id}")
     data = ref.get()
 
@@ -29,11 +39,13 @@ async def show_astro_data(update: Update, context: CallbackContext) -> None: # T
         tble = fetch_astro_data(lat, longi)
         current_date_time = get_current_date_time_string(data["utcOffset"]/1000)
 
-        await update.message.reply_html(
+        await context.bot.send_message(
+            chat_id = chat_id,
             text = ("🌠 <b>Astronomical data</b>: \n"
                     f"<code>{tabulate(tble, tablefmt='simple')}</code> \n"
 
                     f"({current_date_time}) \n"),
+            parse_mode = ParseMode.HTML,
             reply_markup = REFRESH_ASTRODATA_BUTTON
         )
 

@@ -19,11 +19,11 @@ Database
 
 Syntax: /unsubscribe [starmap|astrodata|weather|iss|sun]
 '''
-from starmap import send_star_map
-from astrodata import show_astro_data
-from weather import show_weather_data
-from iss import iss_live_location
-from sun import send_sun_photo
+from starmap import star_map_subscription
+from astro_data import astro_data_subscription
+from weather import weather_subscription
+from iss import iss_subscription
+from sun import sun_subscription
 
 from datetime import time
 from firebase_admin import db
@@ -31,11 +31,11 @@ from telegram import Update
 from telegram.ext import CallbackContext
 
 DEFAULT_FEATURES = {
-    "starmap": send_star_map,
-    "astrodata": show_astro_data,
-    "weather": show_weather_data,
-    "iss": iss_live_location,
-    "sun": send_sun_photo
+    "starmap": star_map_subscription,
+    "astrodata": astro_data_subscription,
+    "weather": weather_subscription,
+    "iss": iss_subscription,
+    "sun": sun_subscription
 }
 
 DEFAULT_DB = {
@@ -71,6 +71,8 @@ def are_features_valid(li: list[str]) -> bool:
 
 
 async def subscribe(update: Update, context: CallbackContext) -> None:
+
+    # TODO check if user location exists
 
     args = context.args
 
@@ -114,9 +116,18 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
         user_data[features[i]]["timing"]["minute"] = minute[i]
 
         t = time(hour=hour[i], minute=minute[i])
-        context.job_queue.run_daily(DEFAULT_FEATURES[features[i]], time=t, name=f"{user_id}_{features[i]}")
+        context.job_queue.run_daily(
+            callback=DEFAULT_FEATURES[features[i]],
+            time=t,
+            name=f"{user_id}_{features[i]}",
+            user_id=update.effective_user.id,
+            chat_id=update.effective_chat.id
+        )
 
     ref.set(user_data)
 
 
 # async def unsubscribe(update: Update, context: CallbackContext) -> None:
+
+
+# def push_jobs_into_jobqueue(): # during startup

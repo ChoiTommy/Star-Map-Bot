@@ -15,10 +15,20 @@ from telegram.constants import ParseMode
 from tabulate import tabulate
 
 
-async def show_weather_data(update: Update, context: CallbackContext) -> None: # TODO switch to depending on context only
+async def weather_subscription(context: CallbackContext) -> None:
+    await show_weather_data(update=None, context=context)
+
+
+async def show_weather_data(update: Update, context: CallbackContext) -> None:
     """Send a simple weather report showing weather data necessary for stargazing."""
 
-    user_id = str(update.effective_user.id)
+    if update is None:
+        user_id = context.job.user_id
+        chat_id = context.job.chat_id
+    else:
+        user_id = str(update.effective_user.id)
+        chat_id = update.effective_chat.id
+
     ref = db.reference(f"/Users/{user_id}")
     data = ref.get()
 
@@ -29,7 +39,8 @@ async def show_weather_data(update: Update, context: CallbackContext) -> None: #
         tble, current_condition_icon_url, current_condition_text = fetch_weather_data(lat, longi)
         current_date_time = get_current_date_time_string(data["utcOffset"]/1000)
 
-        await update.message.reply_photo(
+        await context.bot.send_photo(
+            chat_id = chat_id,
             photo = f"https:{current_condition_icon_url}",
             caption = (f"Weather now is: <b>{current_condition_text}</b> \n"
 

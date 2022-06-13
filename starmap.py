@@ -16,10 +16,19 @@ from telegram.constants import ParseMode
 import fitz
 
 
-async def send_star_map(update: Update, context: CallbackContext) -> None: # TODO switch to depending on context only
+async def star_map_subscription(context: CallbackContext) -> None:
+    await send_star_map(update=None, context=context)
+
+
+async def send_star_map(update: Update, context: CallbackContext) -> None:
     """Forward a star map to user based on the set location and the current time."""
 
-    user_id = str(update.effective_user.id)
+    if update is None:
+        user_id = context.job.user_id
+        chat_id = context.job.chat_id
+    else:
+        user_id = str(update.effective_user.id)
+        chat_id = update.effective_chat.id
 
     ref = db.reference(f"/Users/{user_id}")
     data = ref.get()
@@ -36,7 +45,8 @@ async def send_star_map(update: Update, context: CallbackContext) -> None: # TOD
         pix = fetch_star_map(lat, longi, address, utcOffset)
 
         # update.message.reply_document(document = fetch_target) # pdf
-        await update.message.reply_document(
+        await context.bot.send_document(
+            chat_id = chat_id,
             document = pix.tobytes(),
             filename = f"Star_Map_{current_date_time.replace(' ', '_').replace(':', '_')}.png",
             caption = f"Enjoy the stunning stars! Be considerate and leave no trace while stargazing! \n ({current_date_time})",

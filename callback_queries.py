@@ -2,7 +2,7 @@
 A module handles callback queries
 
 """
-import weather, astrodata, starmap, sun, constants
+import weather, astro_data, starmap, sun, constants
 
 from telegram import Update
 from telegram.ext import CallbackContext
@@ -18,7 +18,7 @@ async def callback(update: Update, context: CallbackContext) -> None:
         await query.answer(text=status)
 
     elif query.data == constants.REFRESH_ASTRODATA_CALLBACK_DATA:
-        status = await astrodata.update_astro_data(update, context)
+        status = await astro_data.update_astro_data(update, context)
         await query.answer(text=status)
 
     elif query.data == constants.REFRESH_STARMAP_CALLBACK_DATA:
