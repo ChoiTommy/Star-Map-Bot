@@ -9,7 +9,25 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/choitommy/star-map-bot/badge)](https://www.codefactor.io/repository/github/choitommy/star-map-bot)
 [![Telegram Bot](https://img.shields.io/badge/Telegram-bot-blue?logo=telegram)](https://t.me/star_map_bot)
 
-# Database Structure
+## Introduction
+WIP
+
+## Features
+| Command         | Function |
+|-----------------|----------|
+| `/start`        |          |
+| `/starmap`      |          |
+| `/astrodata`    |          |
+| `/weather`      |          |
+| `/sun`          |          |
+| `/iss`          |          |
+| `/myinfo`       |          |
+| `/deletemyinfo` |          |
+| `/setlocation`  |          |
+| `/cancel`       |          |
+| `/credits`      |          |
+
+## Database Structure
 
 ```json
 {
@@ -29,7 +47,7 @@
 }
 ```
 
-# Credits
+## Credits
 - [Skyandtelescope](https://skyandtelescope.org)
 - [WeatherAPI](https://www.weatherapi.com)
 - [NASA SDO Data](https://sdo.gsfc.nasa.gov/data/)
