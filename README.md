@@ -13,19 +13,20 @@
 WIP
 
 ## Features
-| Command         | Function |
-|-----------------|----------|
-| `/start`        |          |
-| `/starmap`      |          |
-| `/astrodata`    |          |
-| `/weather`      |          |
-| `/sun`          |          |
-| `/iss`          |          |
-| `/myinfo`       |          |
-| `/deletemyinfo` |          |
-| `/setlocation`  |          |
-| `/cancel`       |          |
-| `/credits`      |          |
+
+| Command         	| Function 	|
+|-----------------	|----------	|
+| `/start`        	| -        	|
+| `/starmap`      	| -        	|
+| `/astrodata`    	| -        	|
+| `/weather`      	| -        	|
+| `/sun`          	| -        	|
+| `/iss`          	| -        	|
+| `/myinfo`       	| -        	|
+| `/deletemyinfo` 	| -        	|
+| `/setlocation`  	| -        	|
+| `/cancel`       	| -        	|
+| `/credits`      	| -        	|
 
 ## Database Structure
 
