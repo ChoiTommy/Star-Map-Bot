@@ -77,7 +77,7 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
     args = context.args
 
     if len(args) == 2:
-        f, t = context.args[0], context.args[1]
+        f, t = context.args
 
         features = [f.lower() for f in f.split(',')]
         timings = t.split(',')
@@ -110,16 +110,16 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
 
 
     # add to user_data for pushing to the db & add to job queue
-    for i in range(len(features)):
-        user_data[features[i]]["enabled"] = True
-        user_data[features[i]]["timing"]["hour"] = hour[i]
-        user_data[features[i]]["timing"]["minute"] = minute[i]
+    for feature, h, m in zip(features, hour, minute):
+        user_data[feature]["enabled"] = True
+        user_data[feature]["timing"]["hour"] = h
+        user_data[feature]["timing"]["minute"] = m
 
-        t = time(hour=hour[i], minute=minute[i])
+        t = time(hour=h, minute=m)
         context.job_queue.run_daily(
-            callback=DEFAULT_FEATURES[features[i]],
+            callback=DEFAULT_FEATURES[feature],
             time=t,
-            name=f"{user_id}_{features[i]}",
+            name=f"{user_id}_{feature}",
             user_id=update.effective_user.id,
             chat_id=update.effective_chat.id
         )

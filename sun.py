@@ -25,8 +25,8 @@ from telegram.constants import ParseMode
 async def fetch_sun_photos(context: CallbackContext) -> None: # Possibility to switch to asynchronous?
     """Fetch all the sun photos from the server. This is run every 15 mins."""
 
-    for i in range(len(SUN_PHOTO_URLS)):
-        img_data = requests.get(SUN_PHOTO_URLS[i], stream=True).content
+    for i, url in enumerate(SUN_PHOTO_URLS):
+        img_data = requests.get(url, stream=True).content
         with open(f"{SUN_PHOTO_PATH}{i}.jpg", "wb") as f:
             f.write(img_data)
 
