@@ -6,7 +6,7 @@ Command /credits is defined by show_credits
 Command /start is defined by bot_tutorial
 """
 
-from constants import TUTORIAL_TEXT
+from starmapbot.constants import TUTORIAL_TEXT
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 

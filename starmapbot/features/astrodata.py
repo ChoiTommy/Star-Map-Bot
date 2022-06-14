@@ -5,8 +5,8 @@ Usage:
 Command /astrodata is defined by show_astro_data
 """
 
-from helpers import get_current_date_time_string
-from constants import WEATHER_API_KEY, ASTRODATA_API_BASE_URL, REFRESH_ASTRODATA_BUTTON, MOON_PHASE_DICT
+from starmapbot.helpers import get_current_date_time_string
+from starmapbot.constants import WEATHER_API_KEY, ASTRODATA_API_BASE_URL, REFRESH_ASTRODATA_BUTTON, MOON_PHASE_DICT
 import requests
 from firebase_admin import db
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, error

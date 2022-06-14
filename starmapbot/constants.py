@@ -2,6 +2,7 @@
 A module consists of all the constants used in this bot
 
 """
+
 import os
 # from dotenv import load_dotenv
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup

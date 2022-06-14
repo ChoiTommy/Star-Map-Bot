@@ -5,8 +5,8 @@ Usage:
 Command /starmap is defined by send_star_map
 """
 
-from helpers import get_current_date_time_string
-from constants import STAR_MAP_BASE_URL, REST_OF_THE_STAR_MAP_PARAM, REFRESH_STARMAP_BUTTON
+from starmapbot.helpers import get_current_date_time_string
+from starmapbot.constants import STAR_MAP_BASE_URL, REST_OF_THE_STAR_MAP_PARAM, REFRESH_STARMAP_BUTTON
 import time
 import requests
 from firebase_admin import db

@@ -5,8 +5,8 @@ Usage:
 Command /sun is defined by send_sun_photo
 """
 
-from helpers import get_current_date_time_string
-from constants import (
+from starmapbot.helpers import get_current_date_time_string
+from starmapbot.constants import (
     UPDATE_SUN_PHOTO,
     SHOW_SUN_DESCRIPTION,
     HIDE_SUN_DESCRIPTION,

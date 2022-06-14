@@ -5,7 +5,7 @@ Usage:
 Command /iss is defined by iss_live_location
 """
 
-from constants import ISS_LOCATION_URL
+from starmapbot.constants import ISS_LOCATION_URL
 import requests, asyncio
 from telegram import Update, Location
 from telegram.ext import CallbackContext
