@@ -19,12 +19,11 @@ Database
 
 Syntax: /unsubscribe [starmap|astrodata|weather|iss|sun]
 '''
-from starmap import star_map_subscription
-from astro_data import astro_data_subscription
-from weather import weather_subscription
-from iss import iss_subscription
-from sun import sun_subscription
-
+from starmapbot.features.starmap import star_map_subscription
+from starmapbot.features.astro_data import astro_data_subscription
+from starmapbot.features.weather import weather_subscription
+from starmapbot.features.iss import iss_subscription
+from starmapbot.features.sun import sun_subscription
 from datetime import time
 from firebase_admin import db
 from telegram import Update
