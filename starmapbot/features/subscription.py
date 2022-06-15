@@ -8,13 +8,15 @@ without 2/1 arguments: show subscription information only
 
 Database
 "Subscription": {
-        "user_id": {
+    "user_id": {
+        "chat_id": {
             "starmap": {"enabled": bool, "timing": {"hour": int, "minute": int}},
             "astrodata": {"enabled": bool, "timing": {"hour": int, "minute": int}},
             "weather": {"enabled": bool, "timing": {"hour": int, "minute": int}},
             "iss": {"enabled": bool, "timing": {"hour": int, "minute": int}},
-            "sun": {"enabled": bool, "timing": {"hour": int, "minute": int}},
-        }, ...
+            "sun": {"enabled": bool, "timing": {"hour": int, "minute": int}}
+        }
+    }
 }
 
 Syntax: /unsubscribe [starmap|astrodata|weather|iss|sun]
@@ -102,8 +104,10 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
         await update.message.reply_text(text="Arguments missing. Please set again.")
         return
 
-    user_id = str(update.effective_user.id)
-    ref = db.reference(f"/Subscriptions/{user_id}")
+    user_id = update.effective_user.id
+    chat_id = update.effective_chat.id
+
+    ref = db.reference(f"/Subscriptions/{user_id}/{chat_id}")
 
     user_data = DEFAULT_DB # reset every time user set a new sub
 
@@ -116,11 +120,11 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
 
         t = time(hour=h, minute=m)
         context.job_queue.run_daily(
-            callback=DEFAULT_FEATURES[feature],
-            time=t,
-            name=f"{user_id}_{feature}",
-            user_id=update.effective_user.id,
-            chat_id=update.effective_chat.id
+            callback = DEFAULT_FEATURES[feature],
+            time = t,
+            name = f"{user_id}_{chat_id}_{feature}",
+            user_id = user_id,
+            chat_id = chat_id
         )
 
     ref.set(user_data)
@@ -129,4 +133,26 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
 # async def unsubscribe(update: Update, context: CallbackContext) -> None:
 
 
-# def push_jobs_into_jobqueue(): # during startup
+def load_jobs_into_jobqueue(application): # during startup
+
+    ref = db.reference(f"/Subscriptions")
+    user_sub_data = ref.get()
+
+    if user_sub_data is not None:
+        for user_id, chat_info in user_sub_data.items():
+            for chat_id, feature_info in chat_info.items():
+                for feature_name, sub_info in feature_info.items():
+                    if sub_info["enabled"]:
+                        t = time(hour=sub_info["timing"]["hour"], minute=sub_info["timing"]["minute"])
+                        application.job_queue.run_daily(
+                            callback = DEFAULT_FEATURES[feature_name],
+                            time = t,
+                            name = f"{user_id}_{chat_id}_{feature_name}",
+                            user_id = user_id,
+                            chat_id = chat_id
+                        )
+
+
+def get_user_subscription_info(user_id, chat_id) -> dict:
+    ref = db.reference(f"/Subscriptions/{user_id}/{chat_id}")
+    return ref.get()
