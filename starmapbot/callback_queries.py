@@ -2,8 +2,14 @@
 A module handles callback queries
 
 """
-import weather, astro_data, starmap, sun, constants
 
+from starmapbot import constants
+from starmapbot.features import (
+    weather,
+    astro_data,
+    starmap,
+    sun
+)
 from telegram import Update
 from telegram.ext import CallbackContext
 

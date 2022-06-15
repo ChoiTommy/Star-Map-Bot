@@ -18,10 +18,18 @@ Send /cancel to halt any operations.
 """
 
 # TODO API request async, star map features toggles, astronomy news rss, subscriber (send info actively to subscribed users)
-import misc, userinfo, starmap, astro_data, weather, sun, iss, subscription, callback_queries
+from starmapbot import misc, userinfo, callback_queries
+from starmapbot.constants import BOT_TOKEN, DATABASE_URL, GOOGLE_APPLICATION_CREDENTIALS
+from starmapbot.features import (
+    starmap,
+    astro_data,
+    weather,
+    sun,
+    iss,
+    subscription
+)
 import logging
 import firebase_admin
-from constants import BOT_TOKEN, DATABASE_URL, GOOGLE_APPLICATION_CREDENTIALS
 from firebase_admin import credentials
 from telegram import Update
 from telegram.ext import Application, ContextTypes, CommandHandler, ConversationHandler, MessageHandler, CallbackQueryHandler, filters
