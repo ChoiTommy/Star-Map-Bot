@@ -5,7 +5,7 @@ Usage:
 Command /iss is defined by iss_live_location
 """
 
-from starmapbot.constants import ISS_LOCATION_URL
+from starmapbot.constants import ISS
 import requests, asyncio
 from telegram import Update, Location
 from telegram.ext import CallbackContext
@@ -17,7 +17,7 @@ async def iss_live_location(update: Update, context: CallbackContext) -> None:
 
     for i in range(20):
 
-        response = requests.get(ISS_LOCATION_URL)
+        response = requests.get(ISS.API_BASE_URL)
         iss_location_data = response.json()
 
         lat = iss_location_data["iss_position"]["latitude"]

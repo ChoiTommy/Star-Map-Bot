@@ -6,7 +6,7 @@ Command /starmap is defined by send_star_map
 """
 
 from starmapbot.helpers import get_current_date_time_string
-from starmapbot.constants import STAR_MAP_BASE_URL, REST_OF_THE_STAR_MAP_PARAM, REFRESH_STARMAP_BUTTON
+from starmapbot.constants import Starmap
 import time
 import requests
 from firebase_admin import db
@@ -40,7 +40,7 @@ async def send_star_map(update: Update, context: CallbackContext) -> None:
             document = pix.tobytes(),
             filename = f"Star_Map_{current_date_time.replace(' ', '_').replace(':', '_')}.png",
             caption = f"Enjoy the stunning stars! Be considerate and leave no trace while stargazing! \n ({current_date_time})",
-            reply_markup = REFRESH_STARMAP_BUTTON
+            reply_markup = Starmap.REFRESH_BUTTON
         )
 
     else:
@@ -76,7 +76,7 @@ async def update_star_map(update: Update, context: CallbackContext) -> str:
                 filename = f"Star_Map_{current_date_time.replace(' ', '_').replace(':', '_')}.png",
                 caption = f"Enjoy the stunning stars! Be considerate and leave no trace while stargazing! \n ({current_date_time})"
             ),
-            reply_markup = REFRESH_STARMAP_BUTTON
+            reply_markup = Starmap.REFRESH_BUTTON
         )
 
         return "Star map updated"
@@ -106,7 +106,7 @@ def fetch_star_map(latitude, longitude, address, utcOffset):
         "utcOffset": utcOffset
     }
 
-    response = requests.get(STAR_MAP_BASE_URL, params=params_inject|REST_OF_THE_STAR_MAP_PARAM) # | to merge two dictionaries
+    response = requests.get(Starmap.STAR_MAP_BASE_URL, params=params_inject|Starmap.REST_OF_THE_STAR_MAP_PARAM) # | to merge two dictionaries
     doc = fitz.open(stream=response.content)
     page = doc.load_page(0)  # number of page
     pix = page.get_pixmap(
