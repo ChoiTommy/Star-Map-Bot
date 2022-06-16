@@ -7,19 +7,22 @@ Command /sun is defined by send_sun_photo
 
 from starmapbot.helpers import get_current_date_time_string
 from starmapbot.constants import Sun
-import time, requests
+import time, httpx, asyncio
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto, error
 from telegram.ext import CallbackContext
 from telegram.constants import ParseMode
 
 
-async def fetch_sun_photos(context: CallbackContext) -> None: # Possibility to switch to asynchronous?
-    """Fetch all the sun photos from the server. This is run every 15 mins."""
+async def fetch_sun_photos(context: CallbackContext) -> None:
+    """Fetch all the sun photos from the server every 15 mins."""
 
-    for i in range(len(Sun.PHOTO_URLS)):
-        img_data = requests.get(Sun.PHOTO_URLS[i], stream=True).content
+    async with httpx.AsyncClient() as client:
+        tasks = (client.get(url) for url in Sun.PHOTO_URLS)
+        reqs = await asyncio.gather(*tasks)
+
+    for i, r in enumerate(reqs):
         with open(f"{Sun.PHOTO_PATH}{i}.jpg", "wb") as f:
-            f.write(img_data)
+            f.write(r.content)
 
     with open(f"{Sun.PHOTO_PATH}log.txt", "w") as txt:
         txt.write(f"{get_current_date_time_string(0)} UTC")   # UTC time
