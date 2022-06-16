@@ -1,6 +1,7 @@
 '''
 Syntax: /subscribe [starmap|astrodata|weather|iss|sun] [timings]
-timings: time on a day, scheduled daily, UTC time for now
+timings: time on a day, scheduled daily, UTC time for now # TODO support timezones
+one subscription per feature, old sub timings will get replaced by the new one
 
 e.g. /subscribe weather,starmap,sun 20:00,22:30,12:00
 
@@ -31,6 +32,7 @@ from firebase_admin import db
 from telegram import Update
 from telegram.ext import CallbackContext
 
+
 DEFAULT_FEATURES = {
     "starmap": star_map_subscription,
     "astrodata": astro_data_subscription,
@@ -40,13 +42,15 @@ DEFAULT_FEATURES = {
 }
 
 DEFAULT_DB = {
-            "starmap": {"enabled": False, "timing": {"hour": 0, "minute": 0}},
-            "astrodata": {"enabled": False, "timing": {"hour": 0, "minute": 0}},
-            "weather": {"enabled": False, "timing": {"hour": 0, "minute": 0}},
-            "iss": {"enabled": False, "timing": {"hour": 0, "minute": 0}},
-            "sun": {"enabled": False, "timing": {"hour": 0, "minute": 0}},
+    key: {
+        "enabled": False,
+        "timing": {
+            "hour": -1,
+            "minute": -1
+        }
+    }
+    for key in DEFAULT_FEATURES
 }
-
 
 def are_timings_valid(li: list[str]) -> (bool, list[int], list[int]):
     # check colon, check ranges
@@ -109,11 +113,15 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
 
     ref = db.reference(f"/Subscriptions/{user_id}/{chat_id}")
 
-    user_data = DEFAULT_DB # reset every time user set a new sub
-
+    user_data = DEFAULT_DB if ref.get() is None else ref.get()
 
     # add to user_data for pushing to the db & add to job queue
     for feature, h, m in zip(features, hour, minute):
+        if user_data[feature]["enabled"]:
+            jobs_list = context.job_queue.get_jobs_by_name(f"{user_id}_{chat_id}_{feature}")
+            for job in jobs_list:
+                job.schedule_removal()
+
         user_data[feature]["enabled"] = True
         user_data[feature]["timing"]["hour"] = h
         user_data[feature]["timing"]["minute"] = m
@@ -127,7 +135,7 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
             chat_id = chat_id
         )
 
-    ref.set(user_data)
+    ref.update(user_data)
 
 
 # async def unsubscribe(update: Update, context: CallbackContext) -> None:
