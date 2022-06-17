@@ -6,7 +6,7 @@ A module handles callback queries
 from starmapbot import constants
 from starmapbot.features import (
     weather,
-    astro_data,
+    astrodata,
     starmap,
     sun
 )
@@ -24,7 +24,7 @@ async def callback(update: Update, context: CallbackContext) -> None:
         await query.answer(text=status)
 
     elif query.data == constants.REFRESH_ASTRODATA_CALLBACK_DATA:
-        status = await astro_data.update_astro_data(update, context)
+        status = await astrodata.update_astro_data(update, context)
         await query.answer(text=status)
 
     elif query.data == constants.REFRESH_STARMAP_CALLBACK_DATA:

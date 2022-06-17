@@ -23,7 +23,7 @@ Database
 Syntax: /unsubscribe [starmap|astrodata|weather|iss|sun]
 '''
 from starmapbot.features.starmap import star_map_subscription
-from starmapbot.features.astro_data import astro_data_subscription
+from starmapbot.features.astrodata import astro_data_subscription
 from starmapbot.features.weather import weather_subscription
 from starmapbot.features.iss import iss_subscription
 from starmapbot.features.sun import sun_subscription
@@ -136,9 +136,52 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
         )
 
     ref.update(user_data)
+    # update message
 
 
-# async def unsubscribe(update: Update, context: CallbackContext) -> None:
+async def unsubscribe(update: Update, context: CallbackContext) -> None:
+
+    user_id = update.effective_user.id
+    chat_id = update.effective_chat.id
+
+    ref = db.reference(f"/Subscriptions/{user_id}/{chat_id}")
+
+    if ref.get() is None:
+        update.message.reply_text(text="You have yet to subscribe to any features. Nothing has been unsubscribed.")
+        return
+    else:
+        user_data = ref.get()
+
+        args = context.args
+
+        if len(args) == 1:
+            f = context.args[0]
+
+            features = [f.lower() for f in f.split(',')]
+
+            if not are_features_valid(features):
+                # some features are invalid
+                await update.message.reply_text(text="Make sure the features are of the 5 only. Please set again.")
+                return
+
+        else:
+            # not providing enough arguments
+            await update.message.reply_text(text="Arguments missing. Please set again.")
+            return
+
+        for feature in features:
+            if user_data[feature]["enabled"]:
+                jobs_list = context.job_queue.get_jobs_by_name(f"{user_id}_{chat_id}_{feature}")
+                for job in jobs_list:
+                    job.schedule_removal()
+
+            user_data[feature]["enabled"] = False
+            user_data[feature]["timing"]["hour"] = -1
+            user_data[feature]["timing"]["minute"] = -1
+
+        ref.update(user_data)
+        # update message
+
 
 
 def load_jobs_into_jobqueue(application): # during startup

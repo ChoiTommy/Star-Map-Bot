@@ -22,7 +22,7 @@ from starmapbot import misc, userinfo, callback_queries
 from starmapbot.constants import BOT_TOKEN, DATABASE_URL, GOOGLE_APPLICATION_CREDENTIALS
 from starmapbot.features import (
     starmap,
-    astro_data,
+    astrodata,
     weather,
     sun,
     iss,
@@ -65,12 +65,12 @@ def main() -> None:
     application.add_handler(CommandHandler("credits", misc.show_credits))
     application.add_handler(CommandHandler("starmap", starmap.send_star_map))
     application.add_handler(CommandHandler("myinfo", userinfo.show_user_info))
-    application.add_handler(CommandHandler("astrodata", astro_data.show_astro_data))
+    application.add_handler(CommandHandler("astrodata", astrodata.show_astro_data))
     application.add_handler(CommandHandler("weather", weather.show_weather_data))
     application.add_handler(CommandHandler("sun", sun.send_sun_photo))
     application.add_handler(CommandHandler("iss", iss.iss_live_location, block=False))
     application.add_handler(CommandHandler("subscribe", subscription.subscribe))
-    # application.add_handler(CommandHandler("unsubscribe", subscription.unsubscribe))
+    application.add_handler(CommandHandler("unsubscribe", subscription.unsubscribe))
 
     application.add_handler(ConversationHandler(
         entry_points = [CommandHandler("setlocation", userinfo.set_location)],
