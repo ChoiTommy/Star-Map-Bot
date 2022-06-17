@@ -22,7 +22,7 @@ async def show_astro_data(update: Update, context: CallbackContext) -> None:
     ref = db.reference(f"/Users/{user_id}")
     data = ref.get()
 
-    if data != None:
+    if data is not None:
         lat = data["latitude"]
         longi = data["longitude"]
 
@@ -52,7 +52,7 @@ async def update_astro_data(update: Update, context: CallbackContext) -> str:
     ref = db.reference(f"/Users/{user_id}")
     data = ref.get()
 
-    if data != None:
+    if data is not None:
         lat = data["latitude"]
         longi = data["longitude"]
 

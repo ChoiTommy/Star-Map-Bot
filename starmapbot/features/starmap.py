@@ -24,7 +24,7 @@ async def send_star_map(update: Update, context: CallbackContext) -> None:
     ref = db.reference(f"/Users/{user_id}")
     data = ref.get()
 
-    if data != None:
+    if data is not None:
 
         lat = str(data["latitude"])
         longi = str(data["longitude"])
@@ -59,7 +59,7 @@ async def update_star_map(update: Update, context: CallbackContext) -> str:
     ref = db.reference(f"/Users/{user_id}")
     data = ref.get()
 
-    if data != None:
+    if data is not None:
 
         lat = str(data["latitude"])
         longi = str(data["longitude"])
