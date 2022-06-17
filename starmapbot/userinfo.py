@@ -22,7 +22,7 @@ async def show_user_info(update: Update, context: CallbackContext) -> None:
     ref = db.reference(f"/Users/{user_id}")
     data = ref.get()
 
-    if data != None:
+    if data is not None:
         msg = await update.message.reply_location(latitude=data["latitude"], longitude=data["longitude"])
         await update.message.reply_html(
             text = (f'Hi {update.effective_user.mention_html()}, \n'
@@ -51,7 +51,7 @@ async def set_location(update: Update, context: CallbackContext) -> int:
     ref = db.reference(f"/Users/{user_id}")
     data = ref.get()
 
-    if data != None:
+    if data is not None:
         await update.message.reply_text(f"Your location is {data['latitude']}, {data['longitude']} ({data['address']}).")
         await update.message.reply_markdown_v2("Send your new location \(Telegram location or a string in `lat, lon` format\) if you wish to change\. \n/cancel to keep the current setting\.")
     else:
@@ -67,7 +67,7 @@ async def update_location(update: Update, context: CallbackContext) -> int:
 
     user_id = str(update.effective_user.id)
 
-    if update.message.location != None:
+    if update.message.location is not None:
         lat, longi = update.message.location.latitude, update.message.location.longitude
     else:
         lat = float(update.message.text[:update.message.text.find(',')])
@@ -95,7 +95,7 @@ async def update_location(update: Update, context: CallbackContext) -> int:
         ref = db.reference(f"/Users/{user_id}")
         data = ref.get()
 
-        if data == None:
+        if data is None:
             username = update.effective_user.username
             ref.set({
                 "username": username if username is not None else "None",
@@ -132,7 +132,7 @@ async def deletion_confirmation(update: Update, context: CallbackContext) -> int
     ref = db.reference(f"/Users/{user_id}")
     data = ref.get()
 
-    if data == None:
+    if data is None:
         await update.message.reply_text(
             text = ("Hi new user, rest assured we have not collected any data from you, so nothing has been erased. "
                     "Perhaps you can try /setlocation and give me something to delete afterwards?")

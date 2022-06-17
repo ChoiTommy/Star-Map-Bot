@@ -6,7 +6,7 @@ Command /weather is defined by show_weather_data
 """
 
 from starmapbot.helpers import get_current_date_time_string
-from starmapbot.constants import WEATHER_API_KEY, WEATHER_API_BASE_URL, REFRESH_WEATHER_BUTTON
+from starmapbot.constants import Weather
 import requests
 from firebase_admin import db
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto
@@ -32,7 +32,7 @@ async def show_weather_data(update: Update, context: CallbackContext) -> None:
     ref = db.reference(f"/Users/{user_id}")
     data = ref.get()
 
-    if data != None:
+    if data is not None:
         lat = data["latitude"]
         longi = data["longitude"]
 
@@ -49,7 +49,7 @@ async def show_weather_data(update: Update, context: CallbackContext) -> None:
 
                         "Be prepared before setting out for stargazing!"),
             parse_mode = ParseMode.HTML,
-            reply_markup = REFRESH_WEATHER_BUTTON
+            reply_markup = Weather.REFRESH_BUTTON
         )
 
     else:
@@ -67,7 +67,7 @@ async def update_weather_data(update: Update, context: CallbackContext) -> str:
     ref = db.reference(f"/Users/{user_id}")
     data = ref.get()
 
-    if data != None:
+    if data is not None:
         lat = data["latitude"]
         longi = data["longitude"]
 
@@ -85,7 +85,7 @@ async def update_weather_data(update: Update, context: CallbackContext) -> str:
                             "Be prepared before setting out for stargazing!"),
                 parse_mode = ParseMode.HTML
             ),
-            reply_markup = REFRESH_WEATHER_BUTTON
+            reply_markup = Weather.REFRESH_BUTTON
         )
 
         return "Weather refreshed"
@@ -109,11 +109,11 @@ def fetch_weather_data(latitude, longitude):
     """
 
     params_inject = {
-        "key": WEATHER_API_KEY,
+        "key": Weather.API_KEY,
         "q": [latitude, longitude]
     }
 
-    response = requests.get(WEATHER_API_BASE_URL, params=params_inject)
+    response = requests.get(Weather.API_BASE_URL, params=params_inject)
     weather_data = response.json()
 
     current_condition_text = weather_data["current"]["condition"]["text"]
