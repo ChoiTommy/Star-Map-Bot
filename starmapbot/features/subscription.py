@@ -28,7 +28,8 @@ from starmapbot.features.astrodata import astro_data_subscription
 from starmapbot.features.weather import weather_subscription
 from starmapbot.features.iss import iss_subscription
 from starmapbot.features.sun import sun_subscription
-from datetime import time
+from starmapbot.helpers import utcOffset_to_hours_and_minutes
+from datetime import datetime, date, time
 from firebase_admin import db
 from telegram import Update
 from telegram.ext import CallbackContext
@@ -103,7 +104,7 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
         valid_time, hour, minute = are_timings_valid(timings)
         if not valid_time:
             # timings do not follow the format
-            await update.message.reply_text(text="Please follow the format for timings `<hour:minute>`. Please set again.")
+            await update.message.reply_markdown_v2(text="Please follow the format for timings `<hour:minute>`\.")
             return
 
     else:
@@ -116,6 +117,9 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
                     f"`{tabulate(tble, tablefmt='fancy_grid', headers=['Feature', 'Daily Time'])}`")
         )
         return
+
+    ref = db.reference(f"/Users/{user_id}")
+    utcOffset = ref.get()["utcOffset"] if ref.get() is not None else 0
 
     ref = db.reference(f"/Subscriptions/{user_id}/{chat_id}")
     user_data = DEFAULT_DB if ref.get() is None else ref.get()
@@ -132,14 +136,21 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
         else:
             display_text.append([feature, timing])
 
+        t = time(hour=int(h), minute=int(m))        # Time in accordance to user's timezone set with /setlocation
+        hour_offset, minute_offset = utcOffset_to_hours_and_minutes(utcOffset)
+        offset = time(hour=hour_offset, minute=minute_offset)
+
+        dateTimeA = datetime.combine(date.today(), t)
+        dateTimeB = datetime.combine(date.today(), offset)
+        dateTimeDifference = dateTimeA - dateTimeB
+
         user_data[feature]["enabled"] = True
-        user_data[feature]["timing"]["hour"] = h
+        user_data[feature]["timing"]["hour"] = h    # Store the raw timing provided by users
         user_data[feature]["timing"]["minute"] = m
 
-        t = time(hour=int(h), minute=int(m))
         context.job_queue.run_daily(
             callback = DEFAULT_FEATURES[feature],
-            time = t,
+            time = (datetime.min + dateTimeDifference).time(),      # UTC time for scheduled job
             name = f"{user_id}_{chat_id}_{feature}",
             user_id = user_id,
             chat_id = chat_id
@@ -214,10 +225,20 @@ def load_jobs_into_jobqueue(application): # during startup
             for chat_id, feature_info in chat_info.items():
                 for feature_name, sub_info in feature_info.items():
                     if sub_info["enabled"]:
+                        ref = db.reference(f"/Users/{user_id}")
+                        utcOffset = ref.get()["utcOffset"]
+                        hour_offset, minute_offset = utcOffset_to_hours_and_minutes(utcOffset)
+
                         t = time(hour=int(sub_info["timing"]["hour"]), minute=int(sub_info["timing"]["minute"]))
+                        offset = time(hour=hour_offset, minute=minute_offset)
+
+                        dateTimeA = datetime.combine(date.today(), t)
+                        dateTimeB = datetime.combine(date.today(), offset)
+                        dateTimeDifference = dateTimeA - dateTimeB
+
                         application.job_queue.run_daily(
                             callback = DEFAULT_FEATURES[feature_name],
-                            time = t,
+                            time = (datetime.min + dateTimeDifference).time(),
                             name = f"{user_id}_{chat_id}_{feature_name}",
                             user_id = user_id,
                             chat_id = chat_id

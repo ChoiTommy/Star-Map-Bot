@@ -57,7 +57,7 @@ def main() -> None:
     application = Application.builder().token(BOT_TOKEN).build()
 
     # Adding a callback function to the job queue
-    # application.job_queue.run_repeating(sun.fetch_sun_photos, interval=900, first=2) # 900s = 15 mins, do almost immediately
+    application.job_queue.run_repeating(sun.fetch_sun_photos, interval=900, first=2) # 900s = 15 mins, do almost immediately
     subscription.load_jobs_into_jobqueue(application)
 
     # Register command handlers
