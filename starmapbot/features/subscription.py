@@ -29,7 +29,7 @@ from starmapbot.features.weather import weather_subscription
 from starmapbot.features.iss import iss_subscription
 from starmapbot.features.sun import sun_subscription
 from starmapbot.helpers import utcOffset_to_hours_and_minutes
-from datetime import datetime, date, time
+from datetime import datetime, date, time, timedelta
 from firebase_admin import db
 from telegram import Update
 from telegram.ext import CallbackContext
@@ -137,11 +137,12 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
             display_text.append([feature, timing])
 
         t = time(hour=int(h), minute=int(m))        # Time in accordance to user's timezone set with /setlocation
-        hour_offset, minute_offset = utcOffset_to_hours_and_minutes(utcOffset)
-        offset = time(hour=hour_offset, minute=minute_offset)
+        offset = time(*utcOffset_to_hours_and_minutes(utcOffset))
 
         dateTimeA = datetime.combine(date.today(), t)
         dateTimeB = datetime.combine(date.today(), offset)
+
+        dateTimeA = dateTimeA + timedelta(hours=24) if dateTimeA < dateTimeB else dateTimeA
         dateTimeDifference = dateTimeA - dateTimeB
 
         user_data[feature]["enabled"] = True
@@ -201,8 +202,8 @@ async def unsubscribe(update: Update, context: CallbackContext) -> None:
                     job.schedule_removal()
 
                 user_data[feature]["enabled"] = False
-                user_data[feature]["timing"]["hour"] = -1
-                user_data[feature]["timing"]["minute"] = -1
+                user_data[feature]["timing"]["hour"] = "-1"
+                user_data[feature]["timing"]["minute"] = "-1"
                 display_text.append([feature])
             else:
                 display_text.append([f"{feature} (already disabled)"])
@@ -211,7 +212,7 @@ async def unsubscribe(update: Update, context: CallbackContext) -> None:
 
         await update.message.reply_markdown_v2(
             text = ("You have been successfully unsubscribed from \n"
-                    f"`{tabulate(display_text, tablefmt='pretty', headers=['Feature'])}`")
+                    f"`{tabulate(display_text, tablefmt='grid', headers=['Feature'])}`")
         )
 
 
@@ -227,13 +228,14 @@ def load_jobs_into_jobqueue(application): # during startup
                     if sub_info["enabled"]:
                         ref = db.reference(f"/Users/{user_id}")
                         utcOffset = ref.get()["utcOffset"]
-                        hour_offset, minute_offset = utcOffset_to_hours_and_minutes(utcOffset)
 
                         t = time(hour=int(sub_info["timing"]["hour"]), minute=int(sub_info["timing"]["minute"]))
-                        offset = time(hour=hour_offset, minute=minute_offset)
+                        offset = time(*utcOffset_to_hours_and_minutes(utcOffset))
 
                         dateTimeA = datetime.combine(date.today(), t)
                         dateTimeB = datetime.combine(date.today(), offset)
+
+                        dateTimeA = dateTimeA + timedelta(hours=24) if dateTimeA < dateTimeB else dateTimeA
                         dateTimeDifference = dateTimeA - dateTimeB
 
                         application.job_queue.run_daily(
