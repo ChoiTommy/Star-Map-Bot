@@ -44,17 +44,6 @@ DEFAULT_FEATURES = {
     "sun": sun_subscription
 }
 
-DEFAULT_DB = {
-    key: {
-        "enabled": False,
-        "timing": {
-            "hour": "-1",
-            "minute": "-1"
-        }
-    }
-    for key in DEFAULT_FEATURES
-}
-
 def are_timings_valid(li: list[str]) -> (bool, list[str], list[str]):
     # check colon, check ranges
     hour, minute = [], []
@@ -66,8 +55,8 @@ def are_timings_valid(li: list[str]) -> (bool, list[str], list[str]):
             return False, [], []
         if int(timing[1]) not in range(60):
             return False, [], []
-        hour.append(timing[0])
-        minute.append(timing[1])
+        hour.append(f"{'' if len(timing[0]) == 2 else '0'}{timing[0]}")
+        minute.append(f"{'' if len(timing[1]) == 2 else '0'}{timing[1]}")
     return True, hour, minute
 
 
@@ -82,6 +71,17 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
 
     user_id = update.effective_user.id
     chat_id = update.effective_chat.id
+
+    DEFAULT_DB = {
+        key: {
+            "enabled": False,
+            "timing": {
+                "hour": "-1",
+                "minute": "-1"
+            }
+        }
+        for key in DEFAULT_FEATURES
+    }
 
     args = context.args
 
@@ -142,7 +142,7 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
         dateTimeA = datetime.combine(date.today(), t)
         dateTimeB = datetime.combine(date.today(), offset)
 
-        dateTimeA = dateTimeA + timedelta(hours=24) if dateTimeA < dateTimeB else dateTimeA
+        dateTimeA = dateTimeA + timedelta(hours=24) if dateTimeA < dateTimeB else dateTimeA # TODO still bugged
         dateTimeDifference = dateTimeA - dateTimeB
 
         user_data[feature]["enabled"] = True
@@ -161,7 +161,7 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
 
     await update.message.reply_markdown_v2(
         text = ("Newly subscribed/modified daily notifications: \n"
-                f"`{tabulate(display_text, tablefmt='fancy_grid', headers=['Feature', 'Daily Time'])}`")
+                f"`{tabulate(display_text, tablefmt='fancy_grid', headers=['Subscribed', 'Daily Time'])}`")
     )
 
 
@@ -173,7 +173,7 @@ async def unsubscribe(update: Update, context: CallbackContext) -> None:
     ref = db.reference(f"/Subscriptions/{user_id}/{chat_id}")
 
     if ref.get() is None:
-        update.message.reply_text(text="You have yet to subscribe to any features. Nothing has been unsubscribed.")
+        await update.message.reply_text(text="You have yet to subscribe to any features. Nothing has been unsubscribed.")
 
     else:
         user_data = ref.get()
@@ -204,15 +204,15 @@ async def unsubscribe(update: Update, context: CallbackContext) -> None:
                 user_data[feature]["enabled"] = False
                 user_data[feature]["timing"]["hour"] = "-1"
                 user_data[feature]["timing"]["minute"] = "-1"
-                display_text.append([feature])
+                display_text.append([f"{feature}"])
             else:
-                display_text.append([f"{feature} (already disabled)"])
+                display_text.append([f"{feature} (disabled already)"])
 
         ref.update(user_data)
 
         await update.message.reply_markdown_v2(
             text = ("You have been successfully unsubscribed from \n"
-                    f"`{tabulate(display_text, tablefmt='grid', headers=['Feature'])}`")
+                    f"`{tabulate(display_text, tablefmt='fancy_grid', headers=['Subscriptions removed'])}`")
         )
 
 
@@ -248,6 +248,16 @@ def load_jobs_into_jobqueue(application): # during startup
 
 
 def get_user_subscription_info(user_id, chat_id) -> list[list[str]]:
+    DEFAULT_DB = {
+        key: {
+            "enabled": False,
+            "timing": {
+                "hour": "-1",
+                "minute": "-1"
+            }
+        }
+        for key in DEFAULT_FEATURES
+    }
     ref = db.reference(f"/Subscriptions/{user_id}/{chat_id}")
     display_text = []
     user_data = ref.get() if ref.get() is not None else DEFAULT_DB
