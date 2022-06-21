@@ -28,7 +28,6 @@ from starmapbot.features.astrodata import astro_data_subscription
 from starmapbot.features.weather import weather_subscription
 from starmapbot.features.iss import iss_subscription
 from starmapbot.features.sun import sun_subscription
-from starmapbot.helpers import utcOffset_to_hours_and_minutes
 from datetime import time, timedelta, timezone
 from firebase_admin import db
 from telegram import Update
@@ -188,7 +187,10 @@ async def unsubscribe(update: Update, context: CallbackContext) -> None:
 
         else:
             # not providing enough arguments
-            await update.message.reply_text(text="Arguments missing. Please set again.")
+            await update.message.reply_markdown_v2(
+                text = ("Arguments missing\. \n"
+                        "Syntax: `/unsubscribe [starmap|astrodata|weather|iss|sun]`")
+            )
             return
 
         display_text = []
