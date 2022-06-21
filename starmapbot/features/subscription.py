@@ -1,7 +1,7 @@
 '''
 TODO better onboarding
 Syntax: /subscribe [starmap|astrodata|weather|iss|sun] [timings]
-timings: time on a day, scheduled daily, UTC time for now # TODO support timezones
+timings: time on a day, scheduled daily
 one subscription per feature, old sub timings will get replaced by the new one
 
 e.g. /subscribe weather,starmap,sun 20:00,22:30,12:00
@@ -29,7 +29,7 @@ from starmapbot.features.weather import weather_subscription
 from starmapbot.features.iss import iss_subscription
 from starmapbot.features.sun import sun_subscription
 from starmapbot.helpers import utcOffset_to_hours_and_minutes
-from datetime import datetime, date, time, timedelta
+from datetime import time, timedelta, timezone
 from firebase_admin import db
 from telegram import Update
 from telegram.ext import CallbackContext
@@ -43,6 +43,7 @@ DEFAULT_FEATURES = {
     "iss": iss_subscription,
     "sun": sun_subscription
 }
+
 
 def are_timings_valid(li: list[str]) -> (bool, list[str], list[str]):
     # check colon, check ranges
@@ -136,14 +137,11 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
         else:
             display_text.append([feature, timing])
 
-        t = time(hour=int(h), minute=int(m))        # Time in accordance to user's timezone set with /setlocation
-        offset = time(*utcOffset_to_hours_and_minutes(utcOffset))
-
-        dateTimeA = datetime.combine(date.today(), t)
-        dateTimeB = datetime.combine(date.today(), offset)
-
-        dateTimeA = dateTimeA + timedelta(hours=24) if dateTimeA < dateTimeB else dateTimeA # TODO still bugged
-        dateTimeDifference = dateTimeA - dateTimeB
+        t = time(
+            hour = int(h),
+            minute = int(m),
+            tzinfo = timezone(offset=timedelta(seconds=utcOffset/1000))
+        )        # Time in accordance to user's timezone set with /setlocation
 
         user_data[feature]["enabled"] = True
         user_data[feature]["timing"]["hour"] = h    # Store the raw timing provided by users
@@ -151,7 +149,7 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
 
         context.job_queue.run_daily(
             callback = DEFAULT_FEATURES[feature],
-            time = (datetime.min + dateTimeDifference).time(),      # UTC time for scheduled job
+            time = t,
             name = f"{user_id}_{chat_id}_{feature}",
             user_id = user_id,
             chat_id = chat_id
@@ -229,18 +227,15 @@ def load_jobs_into_jobqueue(application): # during startup
                         ref = db.reference(f"/Users/{user_id}")
                         utcOffset = ref.get()["utcOffset"]
 
-                        t = time(hour=int(sub_info["timing"]["hour"]), minute=int(sub_info["timing"]["minute"]))
-                        offset = time(*utcOffset_to_hours_and_minutes(utcOffset))
-
-                        dateTimeA = datetime.combine(date.today(), t)
-                        dateTimeB = datetime.combine(date.today(), offset)
-
-                        dateTimeA = dateTimeA + timedelta(hours=24) if dateTimeA < dateTimeB else dateTimeA
-                        dateTimeDifference = dateTimeA - dateTimeB
+                        t = time(
+                            hour = int(sub_info["timing"]["hour"]),
+                            minute = int(sub_info["timing"]["minute"]),
+                            tzinfo = timezone(offset=timedelta(seconds=utcOffset/1000))
+                        )
 
                         application.job_queue.run_daily(
                             callback = DEFAULT_FEATURES[feature_name],
-                            time = (datetime.min + dateTimeDifference).time(),
+                            time = t,
                             name = f"{user_id}_{chat_id}_{feature_name}",
                             user_id = user_id,
                             chat_id = chat_id

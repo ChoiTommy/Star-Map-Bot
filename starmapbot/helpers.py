@@ -50,13 +50,6 @@ def utcOffset_to_tzstring(offset=0) -> str:
         return f"UTC{tz_hour}:{tz_minutes if tz_minutes>=10 else '0'+str(tz_minutes)}"
 
 
-def utcOffset_to_hours_and_minutes(offset=0) -> (int, int):
-    offset /= 3600000 # 3600000 ms -> no. of hours
-    tz_hour = int(offset)
-    tz_minutes = int((abs(offset) - abs(tz_hour)) * 60)
-    return tz_hour, tz_minutes
-
-
 def get_current_date_time_string(utcOffset=0) -> str:
     """Get a string of current date and time. e.g. 2022-05-26 00:00:00. Default is UTC time.
 
