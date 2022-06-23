@@ -39,8 +39,8 @@ DEFAULT_FEATURES = {
     "starmap": star_map_subscription,
     "astrodata": astro_data_subscription,
     "weather": weather_subscription,
-    "iss": iss_subscription,
-    "sun": sun_subscription
+    "sun": sun_subscription,
+    "iss": iss_subscription
 }
 
 
@@ -93,7 +93,7 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
 
         if len(features) != len(timings):
             # number of features is not equal to number of timings
-            await update.message.reply_text(text="The number of features must be equal to that of the timings. Please set again.")
+            await update.message.reply_text(text="The number of features must be equal to that of the timings. Please try again.")
             return
 
         if not are_features_valid(features):
@@ -139,7 +139,7 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
         t = time(
             hour = int(h),
             minute = int(m),
-            tzinfo = timezone(offset=timedelta(seconds=utcOffset/1000))
+            tzinfo = timezone(offset=timedelta(seconds=utcOffset))
         )        # Time in accordance to user's timezone set with /setlocation
 
         user_data[feature]["enabled"] = True
@@ -157,7 +157,7 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
     ref.update(user_data)
 
     await update.message.reply_markdown_v2(
-        text = ("Newly subscribed/modified daily notifications: \n"
+        text = ("Newly subscribed/modified notifications: \n"
                 f"`{tabulate(display_text, tablefmt='fancy_grid', headers=['Subscribed', 'Daily Time'])}`")
     )
 
@@ -212,7 +212,7 @@ async def unsubscribe(update: Update, context: CallbackContext) -> None:
 
         await update.message.reply_markdown_v2(
             text = ("You have been successfully unsubscribed from \n"
-                    f"`{tabulate(display_text, tablefmt='fancy_grid', headers=['Subscriptions removed'])}`")
+                    f"`{tabulate(display_text, tablefmt='fancy_grid', headers=['Removed subscriptions'])}`")
         )
 
 
@@ -232,7 +232,7 @@ def load_jobs_into_jobqueue(application): # during startup
                         t = time(
                             hour = int(sub_info["timing"]["hour"]),
                             minute = int(sub_info["timing"]["minute"]),
-                            tzinfo = timezone(offset=timedelta(seconds=utcOffset/1000))
+                            tzinfo = timezone(offset=timedelta(seconds=utcOffset))
                         )
 
                         application.job_queue.run_daily(

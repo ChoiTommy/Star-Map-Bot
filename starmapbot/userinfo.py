@@ -24,7 +24,7 @@ async def show_user_info(update: Update, context: CallbackContext) -> None:
     data = ref.get()
 
     if data is not None:
-        tz = timezone(offset=timedelta(seconds=data["utcOffset"]/1000))
+        tz = timezone(offset=timedelta(seconds=data["utcOffset"]))
         msg = await update.message.reply_location(latitude=data["latitude"], longitude=data["longitude"])
         await update.message.reply_html(
             text = (f'Hi {update.effective_user.mention_html()}, \n'
@@ -92,7 +92,7 @@ async def update_location(update: Update, context: CallbackContext) -> int:
 
     else:
         address_string = address_data["display_name"]           # from nominatim
-        utcOffset = int(helpers.get_offset(lat, longi) * 1000)  # in ms
+        utcOffset = int(helpers.get_offset(lat, longi))         # in seconds
 
         ref = db.reference(f"/Users/{user_id}")
         data = ref.get()

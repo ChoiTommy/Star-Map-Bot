@@ -37,7 +37,7 @@ async def show_astro_data(update: Update, context: CallbackContext) -> None:
         longi = data["longitude"]
 
         tble = fetch_astro_data(lat, longi)
-        current_date_time = get_current_date_time_string(data["utcOffset"]/1000)
+        current_date_time = get_current_date_time_string(data["utcOffset"])
 
         await context.bot.send_message(
             chat_id = chat_id,
@@ -69,7 +69,7 @@ async def update_astro_data(update: Update, context: CallbackContext) -> str:
         longi = data["longitude"]
 
         tble = fetch_astro_data(lat, longi)
-        current_date_time = get_current_date_time_string(data["utcOffset"]/1000)
+        current_date_time = get_current_date_time_string(data["utcOffset"])
 
         new_text = ("🌠 <b>Astronomical data</b>: \n"
                     f"<code>{tabulate(tble, tablefmt='simple')}</code> \n"

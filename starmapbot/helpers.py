@@ -35,13 +35,13 @@ def utcOffset_to_tzstring(offset=0) -> str:
     """This function generates a timezone string (e.g. UTC+9:00) from a UTC offset in integer.
 
     Args:
-        offset (int): UTC offset in milliseconds
+        offset (int): UTC offset in seconds
 
     Returns:
         str: Timezone string like 'UTC+9:00' or 'UTC-10:30'
     """
 
-    offset /= 3600000 # 3600000 ms
+    offset /= 3600 # 3600000 ms
     tz_hour = int(offset)
     tz_minutes = int((abs(offset) - abs(tz_hour)) * 60)
     if tz_hour >= 0:

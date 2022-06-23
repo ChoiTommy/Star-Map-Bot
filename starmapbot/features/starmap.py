@@ -38,9 +38,9 @@ async def send_star_map(update: Update, context: CallbackContext) -> None:
         lat = str(data["latitude"])
         longi = str(data["longitude"])
         address = data["address"]
-        utcOffset = str(data["utcOffset"])
+        utcOffset = data["utcOffset"]
 
-        current_date_time = get_current_date_time_string(data["utcOffset"]/1000)
+        current_date_time = get_current_date_time_string(utcOffset)
 
         pix = fetch_star_map(lat, longi, address, utcOffset)
 
@@ -74,9 +74,9 @@ async def update_star_map(update: Update, context: CallbackContext) -> str:
         lat = str(data["latitude"])
         longi = str(data["longitude"])
         address = data["address"]
-        utcOffset = str(data["utcOffset"])
+        utcOffset = data["utcOffset"]
 
-        current_date_time = get_current_date_time_string(data["utcOffset"]/1000)
+        current_date_time = get_current_date_time_string(utcOffset)
 
         pix = fetch_star_map(lat, longi, address, utcOffset)
 
@@ -102,7 +102,7 @@ def fetch_star_map(latitude, longitude, address, utcOffset):
         latitude (str): latitude of the location
         longitude (str): longitude of the location
         address (str): address text of the above location
-        utcOffset (str): UTC offset in ms
+        utcOffset (int): UTC offset in seconds
 
     Returns:
         fitz.Pixmap: plane rectangular sets of pixels
@@ -113,7 +113,7 @@ def fetch_star_map(latitude, longitude, address, utcOffset):
         "latitude": latitude,
         "longitude": longitude,
         "location": address,
-        "utcOffset": utcOffset
+        "utcOffset": utcOffset * 1000
     }
 
     response = requests.get(Starmap.STAR_MAP_BASE_URL, params=params_inject|Starmap.REST_OF_THE_STAR_MAP_PARAM) # | to merge two dictionaries
