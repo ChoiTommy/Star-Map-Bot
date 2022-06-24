@@ -14,19 +14,21 @@ WIP
 
 ## Features
 
-| Command         	| Function 	|
-|-----------------	|----------	|
-| `/start`        	| -        	|
-| `/starmap`      	| -        	|
-| `/astrodata`    	| -        	|
-| `/weather`      	| -        	|
-| `/sun`          	| -        	|
-| `/iss`          	| -        	|
-| `/myinfo`       	| -        	|
-| `/deletemyinfo` 	| -        	|
-| `/setlocation`  	| -        	|
-| `/cancel`       	| -        	|
-| `/credits`      	| -        	|
+| Command         	            | Function 	|
+|---------------------------	|----------	|
+| `/start`                  	| -        	|
+| `/starmap`                	| -        	|
+| `/astrodata`              	| -        	|
+| `/weather`            	    | -        	|
+| `/sun`                 	    | -        	|
+| `/iss`                	    | -        	|
+| `/subscribe` (or `/sub`)      | -        	|
+| `/unsubscribe` (or `/unsub`)  | -        	|
+| `/myinfo`             	    | -        	|
+| `/deletemyinfo`       	    | -        	|
+| `/setlocation`        	    | -        	|
+| `/cancel`             	    | -        	|
+| `/credits`            	    | -        	|
 
 ## Database Structure
 
@@ -42,9 +44,48 @@ WIP
             "creation_timestamp": "1970-01-01 00:00:00",
             "update_timestamp": "1970-01-01 00:00:00",
         },
-        "telegram_user_id_1": {...},
-        ...
-    }
+    },
+    "Subscriptions": {
+        "telegram_user_id_0": {
+            "telegram_chat_id_0": {     // users can have different subscriptions in both bot's DM and groups
+                "astrodata": {
+                    "enabled": true, 
+                    "timing": {
+                        "hour": "19",   // in accordance with the `utcOffset` above, 
+                        "minute": "30"  // defaults to UTC time if not set up
+                    }
+                },
+                "iss": {
+                    "enabled": false, 
+                    "timing": {
+                        "hour": "-1", 
+                        "minute": "-1"
+                    }
+                },
+                "starmap": {
+                    "enabled": true, 
+                    "timing": {
+                        "hour": "00", 
+                        "minute": "05"
+                    }
+                },
+                "sun": {
+                    "enabled": false, 
+                    "timing": {
+                        "hour": "-1", 
+                        "minute": "-1"
+                    }
+                },
+                "weather": {
+                    "enabled": false, 
+                    "timing": {
+                        "hour": "-1", 
+                        "minute": "-1"
+                    }
+                },
+            },
+        },
+    },
 }
 ```
 

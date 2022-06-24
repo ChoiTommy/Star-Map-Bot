@@ -1,27 +1,16 @@
-'''
-Syntax: /subscribe [starmap|astrodata|weather|iss|sun] [timings]
-timings: time on a day, scheduled daily
-one subscription per feature, old sub timings will get replaced by the new one
+"""
+A module handling user subscriptions of daily notifications
 
-e.g. /subscribe weather,starmap,sun 20:00,22:30,12:00
+Usage: /sub(scribe) [starmap|astrodata|weather|iss|sun] [timings]
+timings:
+    schedule every day, separated by commas
+    one subscription per feature, old sub timings will be replaced by the new one
+Example: /sub astrodata,sun 22:00,12:00
 
-without 2/1 arguments: show subscription information only
+Usage: /unsub(scribe) [starmap|astrodata|weather|iss|sun]
+Example: /unsub starmap,astrodata,weather,iss,sun
+"""
 
-Database
-"Subscription": {
-    "user_id": {
-        "chat_id": {
-            "starmap": {"enabled": bool, "timing": {"hour": str, "minute": str}},
-            "astrodata": {"enabled": bool, "timing": {"hour": str, "minute": str}},
-            "weather": {"enabled": bool, "timing": {"hour": str, "minute": str}},
-            "iss": {"enabled": bool, "timing": {"hour": str, "minute": str}},
-            "sun": {"enabled": bool, "timing": {"hour": str, "minute": str}}
-        }
-    }
-}
-
-Syntax: /unsubscribe [starmap|astrodata|weather|iss|sun]
-'''
 from starmapbot.features.starmap import star_map_subscription
 from starmapbot.features.astrodata import astro_data_subscription
 from starmapbot.features.weather import weather_subscription
@@ -44,15 +33,21 @@ DEFAULT_FEATURES = {
 
 
 def are_timings_valid(li: list[str]) -> (bool, list[str], list[str]):
-    # check colon, check ranges
+    """Check the format and the ranges of the timing inputs
+
+    Args:
+        li (list[str]): a list of time strings like ['1:20', '14:30', '18:00']
+
+    Returns:
+        bool: True if all timings are valid
+        list[str]: a list of hour strings like ['01', '14', '18'] if valid
+        list[str]: a list of minute strings like ['20', '30', '00'] if valid
+    """
+
     hour, minute = [], []
     for l in li:
         timing = [int(time) for time in l.split(':')]
-        if len(timing) != 2:
-            return False, [], []
-        if timing[0] not in range(24):
-            return False, [], []
-        if timing[1] not in range(60):
+        if (len(timing) != 2) or (timing[0] not in range(24)) or (timing[1] not in range(60)):
             return False, [], []
         hour.append(f"{timing[0]:02d}")
         minute.append(f"{timing[1]:02d}")
@@ -60,6 +55,15 @@ def are_timings_valid(li: list[str]) -> (bool, list[str], list[str]):
 
 
 def are_features_valid(li: list[str]) -> bool:
+    """Check if the feature inputs are valid
+
+    Args:
+        li (list[str]): a list of features that users would like to subscribe
+
+    Returns:
+        bool: True if all fall into the 5 presets [starmap|astrodata|weather|iss|sun]
+    """
+
     for l in li:
         if l not in DEFAULT_FEATURES:
             return False
@@ -67,6 +71,7 @@ def are_features_valid(li: list[str]) -> bool:
 
 
 async def subscribe(update: Update, context: CallbackContext) -> None:
+    """Handle subscription requests. Possible improvements: cleaner input error handling"""
 
     user_id = update.effective_user.id
     chat_id = update.effective_chat.id
@@ -150,7 +155,7 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
             hour = int(h),
             minute = int(m),
             tzinfo = timezone(offset=timedelta(seconds=utcOffset))
-        )        # Time in accordance to user's timezone set with /setlocation
+        )        # Time in accordance with user's timezone set with /setlocation
 
         user_data[feature]["enabled"] = True
         user_data[feature]["timing"]["hour"] = h    # Store the raw timing provided by users
@@ -174,6 +179,7 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
 
 
 async def unsubscribe(update: Update, context: CallbackContext) -> None:
+    """Handle unsubscribing requests"""
 
     user_id = update.effective_user.id
     chat_id = update.effective_chat.id
@@ -235,7 +241,8 @@ async def unsubscribe(update: Update, context: CallbackContext) -> None:
         )
 
 
-def load_jobs_into_jobqueue(application): # during startup
+def load_jobs_into_jobqueue(application):
+    """Load subscriptions into jobqueue while starting up the bot"""
 
     ref = db.reference(f"/Subscriptions")
     user_sub_data = ref.get()
@@ -264,6 +271,16 @@ def load_jobs_into_jobqueue(application): # during startup
 
 
 def get_user_subscription_info(user_id, chat_id) -> list[list[str]]:
+    """_summary_
+
+    Args:
+        user_id (int): Telegram user ID
+        chat_id (int): Telegram chat ID (same as user_id if the chat is a DM to the bot)
+
+    Returns:
+        list[list[str]]: a complicated thing to generate a beautiful table with `tabulate.tabulate`
+    """
+
     DEFAULT_DB = {
         key: {
             "enabled": False,
@@ -287,6 +304,15 @@ def get_user_subscription_info(user_id, chat_id) -> list[list[str]]:
 
 
 def count_no_of_subs(user_data) -> int:
+    """Count the number of active subscriptions of a user
+
+    Args:
+        user_data (dict): user subscription dict
+
+    Returns:
+        int: number of active subscriptions
+    """
+
     n = 0
     for item in user_data.values():
         if item["enabled"]:
