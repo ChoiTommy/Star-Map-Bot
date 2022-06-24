@@ -1,5 +1,4 @@
 '''
-TODO better onboarding
 Syntax: /subscribe [starmap|astrodata|weather|iss|sun] [timings]
 timings: time on a day, scheduled daily
 one subscription per feature, old sub timings will get replaced by the new one
@@ -48,15 +47,15 @@ def are_timings_valid(li: list[str]) -> (bool, list[str], list[str]):
     # check colon, check ranges
     hour, minute = [], []
     for l in li:
-        timing = l.split(':')
+        timing = [int(time) for time in l.split(':')]
         if len(timing) != 2:
             return False, [], []
-        if int(timing[0]) not in range(24):
+        if timing[0] not in range(24):
             return False, [], []
-        if int(timing[1]) not in range(60):
+        if timing[1] not in range(60):
             return False, [], []
-        hour.append(f"{'' if len(timing[0]) == 2 else '0'}{timing[0]}")
-        minute.append(f"{'' if len(timing[1]) == 2 else '0'}{timing[1]}")
+        hour.append(f"{timing[0]:02d}")
+        minute.append(f"{timing[1]:02d}")
     return True, hour, minute
 
 
@@ -93,18 +92,26 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
 
         if len(features) != len(timings):
             # number of features is not equal to number of timings
-            await update.message.reply_text(text="The number of features must be equal to that of the timings. Please try again.")
+            await update.message.reply_markdown_v2(
+                text = ("The number of features must be equal to that of the timings\. Please try again\. \n"
+                        "e\.g\. `/sub astrodata,sun 22:00,12:00`")
+            )
             return
 
         if not are_features_valid(features):
             # some features are invalid
-            await update.message.reply_text(text="Make sure the features are of the 5 presets only. Please set again.")
+            await update.message.reply_markdown_v2(
+                text = ("Make sure the features are of the 5 presets only: `starmap|astrodata|weather|sun|iss` \n"
+                        "Please try again\.")
+            )
             return
 
         valid_time, hour, minute = are_timings_valid(timings)
         if not valid_time:
             # timings do not follow the format
-            await update.message.reply_markdown_v2(text="Please follow the format for timings `<hour:minute>`\.")
+            await update.message.reply_markdown_v2(
+                text = "Please put the timings in the format of `hour:minute` \(24\-hr\) "
+            )
             return
 
     else:
@@ -112,9 +119,12 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
         tble = get_user_subscription_info(user_id, chat_id)
         await update.message.reply_markdown_v2(
             text = ("Arguments missing\. \n"
-                    "Syntax: `/subscribe [starmap|astrodata|weather|iss|sun] [timings]` \n"
+                    "Syntax: `/sub [starmap|astrodata|weather|iss|sun] [timings]` \n"
+                    "Separate features/timings with commas \n"
+                    "e\.g\. `/sub astrodata,sun 22:00,12:00` \n\n"
+
                     "Here are your current subscriptions: \n"
-                    f"`{tabulate(tble, tablefmt='fancy_grid', headers=['Feature', 'Daily Time'])}`")
+                    f"`{tabulate(tble, tablefmt='fancy_grid', headers=['Subs', 'Daily Time'])}`")
         )
         return
 
@@ -127,14 +137,14 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
     display_text = []
 
     # add to user_data for pushing to the db & add to job queue
-    for feature, h, m, timing in zip(features, hour, minute, timings):
+    for feature, h, m in zip(features, hour, minute):
         if user_data[feature]["enabled"]:
             jobs_list = context.job_queue.get_jobs_by_name(f"{user_id}_{chat_id}_{feature}")
             for job in jobs_list:
                 job.schedule_removal()
-            display_text.append([feature, f"{user_data[feature]['timing']['hour']}:{user_data[feature]['timing']['minute']} -> {timing}"])
+            display_text.append([feature, f"{user_data[feature]['timing']['hour']}:{user_data[feature]['timing']['minute']} -> {h}:{m}"])
         else:
-            display_text.append([feature, timing])
+            display_text.append([feature, f"{h}:{m}"])
 
         t = time(
             hour = int(h),
@@ -157,8 +167,9 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
     ref.update(user_data)
 
     await update.message.reply_markdown_v2(
-        text = ("Newly subscribed/modified notifications: \n"
-                f"`{tabulate(display_text, tablefmt='fancy_grid', headers=['Subscribed', 'Daily Time'])}`")
+        text = (f'Congrats {update.effective_user.mention_markdown_v2()}, \n'
+                "Your newly subscribed/modified subscriptions: \n"
+                f"`{tabulate(display_text, tablefmt='fancy_grid', headers=['Subs', 'Daily Time'])}`")
     )
 
 
@@ -182,14 +193,19 @@ async def unsubscribe(update: Update, context: CallbackContext) -> None:
 
             if not are_features_valid(features):
                 # some features are invalid
-                await update.message.reply_text(text="Make sure the features are of the 5 presets only.")
+                await update.message.reply_text(
+                    text = ("Make sure the features are of the 5 presets only: `starmap|astrodata|weather|sun|iss` \n"
+                            "Please try again\.")
+                )
                 return
 
         else:
             # not providing enough arguments
             await update.message.reply_markdown_v2(
                 text = ("Arguments missing\. \n"
-                        "Syntax: `/unsubscribe [starmap|astrodata|weather|iss|sun]`")
+                        "Syntax: `/unsub [starmap|astrodata|weather|iss|sun]` \n"
+                        "Separate multiple features with commas\. \n"
+                        "e\.g\. `/unsub starmap,weather,astrodata,iss,sun`")
             )
             return
 
@@ -208,7 +224,10 @@ async def unsubscribe(update: Update, context: CallbackContext) -> None:
             else:
                 display_text.append([f"{feature} (disabled already)"])
 
-        ref.update(user_data)
+        if count_no_of_subs(user_data) == 0:
+            ref.set({})     # deletion
+        else:
+            ref.update(user_data)
 
         await update.message.reply_markdown_v2(
             text = ("You have been successfully unsubscribed from \n"
@@ -265,3 +284,11 @@ def get_user_subscription_info(user_id, chat_id) -> list[list[str]]:
             display_text.append([feature, "Not subscribed"])
 
     return display_text
+
+
+def count_no_of_subs(user_data) -> int:
+    n = 0
+    for item in user_data.values():
+        if item["enabled"]:
+            n += 1
+    return n
