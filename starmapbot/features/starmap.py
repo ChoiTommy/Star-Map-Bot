@@ -16,10 +16,19 @@ from telegram.constants import ParseMode
 import fitz
 
 
+async def star_map_subscription(context: CallbackContext) -> None:
+    await send_star_map(update=None, context=context)
+
+
 async def send_star_map(update: Update, context: CallbackContext) -> None:
     """Forward a star map to user based on the set location and the current time."""
 
-    user_id = str(update.effective_user.id)
+    if update is None:
+        user_id = context.job.user_id
+        chat_id = context.job.chat_id
+    else:
+        user_id = str(update.effective_user.id)
+        chat_id = update.effective_chat.id
 
     ref = db.reference(f"/Users/{user_id}")
     data = ref.get()
@@ -29,14 +38,15 @@ async def send_star_map(update: Update, context: CallbackContext) -> None:
         lat = str(data["latitude"])
         longi = str(data["longitude"])
         address = data["address"]
-        utcOffset = str(data["utcOffset"])
+        utcOffset = data["utcOffset"]
 
-        current_date_time = get_current_date_time_string(data["utcOffset"]/1000)
+        current_date_time = get_current_date_time_string(utcOffset)
 
         pix = fetch_star_map(lat, longi, address, utcOffset)
 
         # update.message.reply_document(document = fetch_target) # pdf
-        await update.message.reply_document(
+        await context.bot.send_document(
+            chat_id = chat_id,
             document = pix.tobytes(),
             filename = f"Star_Map_{current_date_time.replace(' ', '_').replace(':', '_')}.png",
             caption = f"Enjoy the stunning stars! Be considerate and leave no trace while stargazing! \n ({current_date_time})",
@@ -64,9 +74,9 @@ async def update_star_map(update: Update, context: CallbackContext) -> str:
         lat = str(data["latitude"])
         longi = str(data["longitude"])
         address = data["address"]
-        utcOffset = str(data["utcOffset"])
+        utcOffset = data["utcOffset"]
 
-        current_date_time = get_current_date_time_string(data["utcOffset"]/1000)
+        current_date_time = get_current_date_time_string(utcOffset)
 
         pix = fetch_star_map(lat, longi, address, utcOffset)
 
@@ -92,7 +102,7 @@ def fetch_star_map(latitude, longitude, address, utcOffset):
         latitude (str): latitude of the location
         longitude (str): longitude of the location
         address (str): address text of the above location
-        utcOffset (str): UTC offset in ms
+        utcOffset (int): UTC offset in seconds
 
     Returns:
         fitz.Pixmap: plane rectangular sets of pixels
@@ -103,7 +113,7 @@ def fetch_star_map(latitude, longitude, address, utcOffset):
         "latitude": latitude,
         "longitude": longitude,
         "location": address,
-        "utcOffset": utcOffset
+        "utcOffset": utcOffset * 1000
     }
 
     response = requests.get(Starmap.STAR_MAP_BASE_URL, params=params_inject|Starmap.REST_OF_THE_STAR_MAP_PARAM) # | to merge two dictionaries

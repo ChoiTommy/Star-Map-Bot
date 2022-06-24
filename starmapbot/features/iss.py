@@ -11,9 +11,15 @@ from telegram import Update, Location
 from telegram.ext import CallbackContext
 
 
-async def iss_live_location(update: Update, context: CallbackContext) -> None:
+async def iss_subscription(context: CallbackContext) -> None:
+    await iss_live_location(update=None, context=context)
 
-    title = await update.message.reply_text("🛰 ISS Live Location:")
+
+async def iss_live_location(update: Update, context: CallbackContext) -> None: # TODO switch to depending on context only
+
+    chat_id = context.job.chat_id if update is None else update.effective_chat.id
+
+    title = await context.bot.send_message(chat_id=chat_id, text="🛰 ISS Live Location:")
 
     for i in range(20):
 
@@ -26,7 +32,8 @@ async def iss_live_location(update: Update, context: CallbackContext) -> None:
         loc = Location(longitude=lon, latitude=lat)
 
         if i == 0:
-            msg = await update.message.reply_location(
+            msg = await context.bot.send_location(
+                chat_id = chat_id,
                 location = loc,
                 live_period = 120,        # in seconds
                 reply_to_message_id = title.message_id

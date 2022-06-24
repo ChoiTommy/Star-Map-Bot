@@ -10,6 +10,7 @@ Command /cancel is defined by cancel_location_setup or cancel_deletion
 from starmapbot import helpers
 from starmapbot.constants import NOMINATIM_REVERSE_API_BASE_URL
 import requests
+from datetime import timezone, timedelta
 from firebase_admin import db
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import CallbackContext, ConversationHandler
@@ -23,6 +24,7 @@ async def show_user_info(update: Update, context: CallbackContext) -> None:
     data = ref.get()
 
     if data is not None:
+        tz = timezone(offset=timedelta(seconds=data["utcOffset"]))
         msg = await update.message.reply_location(latitude=data["latitude"], longitude=data["longitude"])
         await update.message.reply_html(
             text = (f'Hi {update.effective_user.mention_html()}, \n'
@@ -30,7 +32,7 @@ async def show_user_info(update: Update, context: CallbackContext) -> None:
                     f'Latitude: {data["latitude"]} \n'
                     f'Longitude: {data["longitude"]} \n'
                     f'Location: <i>{data["address"]}</i> \n'
-                    f'Timezone: {helpers.utcOffset_to_tzstring(data["utcOffset"])} \n\n'
+                    f'Timezone: {tz.tzname(None)} \n\n'
 
                     '/setlocation to modify. /deletemyinfo to delete your data. \n'),
             reply_to_message_id = msg.message_id
@@ -90,7 +92,7 @@ async def update_location(update: Update, context: CallbackContext) -> int:
 
     else:
         address_string = address_data["display_name"]           # from nominatim
-        utcOffset = int(helpers.get_offset(lat, longi) * 1000)  # in ms
+        utcOffset = int(helpers.get_offset(lat, longi))         # in seconds
 
         ref = db.reference(f"/Users/{user_id}")
         data = ref.get()
@@ -152,7 +154,9 @@ async def delete_user_info(update: Update, context: CallbackContext) -> int:
     if update.message.text == "Yes":
         user_id = str(update.effective_user.id)
         ref = db.reference(f"/Users/{user_id}")
-        ref.set({})     # delete the record
+        ref.set({})     # delete user data
+        ref = db.reference(f"/Subscriptions/{user_id}")
+        ref.set({})     # delete subscription info
 
         await update.message.reply_text(
             text = ("Voilà! I have erased your existence. Keep it up and leave no trace in the cyber world! \n"

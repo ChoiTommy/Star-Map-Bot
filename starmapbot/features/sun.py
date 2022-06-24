@@ -28,14 +28,21 @@ async def fetch_sun_photos(context: CallbackContext) -> None:
         txt.write(f"{get_current_date_time_string(0)} UTC")   # UTC time
 
 
+async def sun_subscription(context: CallbackContext) -> None:
+    await send_sun_photo(update=None, context=context)
+
+
 async def send_sun_photo(update: Update, context: CallbackContext) -> None:
     """Send a photo of the current sun."""
+
+    chat_id = context.job.chat_id if update is None else update.effective_chat.id
 
     with open(f"{Sun.PHOTO_PATH}log.txt", 'r') as txt:
         last_fetched = txt.read()
     default_starting_point = 0
 
-    await update.message.reply_photo(
+    await context.bot.send_photo(
+        chat_id = chat_id,
         photo = open(f"{Sun.PHOTO_PATH}{default_starting_point}.jpg", "rb"),
         caption = (f"🌞 Live Photos of the Sun \n"
                     f"{Sun.PHOTO_NAMES[default_starting_point]} \n"

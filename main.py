@@ -25,7 +25,8 @@ from starmapbot.features import (
     astrodata,
     weather,
     sun,
-    iss
+    iss,
+    subscription
 )
 import logging
 import firebase_admin
@@ -57,6 +58,7 @@ def main() -> None:
 
     # Adding a callback function to the job queue
     application.job_queue.run_repeating(sun.fetch_sun_photos, interval=900, first=2) # 900s = 15 mins, do almost immediately
+    subscription.load_jobs_into_jobqueue(application)
 
     # Register command handlers
     application.add_handler(CommandHandler("start", misc.bot_tutorial))
@@ -67,6 +69,8 @@ def main() -> None:
     application.add_handler(CommandHandler("weather", weather.show_weather_data))
     application.add_handler(CommandHandler("sun", sun.send_sun_photo))
     application.add_handler(CommandHandler("iss", iss.iss_live_location, block=False))
+    application.add_handler(CommandHandler(["subscribe", "sub"], subscription.subscribe))
+    application.add_handler(CommandHandler(["unsubscribe", "unsub"], subscription.unsubscribe))
 
     application.add_handler(ConversationHandler(
         entry_points = [CommandHandler("setlocation", userinfo.set_location)],
