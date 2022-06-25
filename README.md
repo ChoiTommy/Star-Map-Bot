@@ -1,6 +1,6 @@
 <div align="center">
 	<img src="assets/icon.png" alt="Icon" width="150"/>
-    <h1><code>astro* bot;</code></h1>
+    <h1><span style="font-family: monospace;">astro* bot;</span></h1>
     <p>
     	A simple and easy-to-use telegram bot that provides you with stargazing and astronomical information.
     </p>
