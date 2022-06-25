@@ -56,9 +56,9 @@ def main() -> None:
     # Create the Application and pass it your bot's token.
     application = Application.builder().token(BOT_TOKEN).build()
 
-    # Adding a callback function to the job queue
-    application.job_queue.run_repeating(sun.fetch_sun_photos, interval=900, first=2) # 900s = 15 mins, do almost immediately
+    # Pushing jobs into the job queue
     subscription.load_jobs_into_jobqueue(application)
+    application.job_queue.run_repeating(sun.fetch_sun_photos, interval=900, first=2) # 900s = 15 mins, do almost immediately
 
     # Register command handlers
     application.add_handler(CommandHandler("start", misc.bot_tutorial))
