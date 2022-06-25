@@ -11,11 +11,11 @@ Usage: /unsub(scribe) [starmap|astrodata|weather|iss|sun]
 Example: /unsub starmap,astrodata,weather,iss,sun
 """
 
-from starmapbot.features.starmap import star_map_subscription
-from starmapbot.features.astrodata import astro_data_subscription
-from starmapbot.features.weather import weather_subscription
-from starmapbot.features.iss import iss_subscription
-from starmapbot.features.sun import sun_subscription
+from astro_pointer.features.starmap import star_map_subscription
+from astro_pointer.features.astrodata import astro_data_subscription
+from astro_pointer.features.weather import weather_subscription
+from astro_pointer.features.iss import iss_subscription
+from astro_pointer.features.sun import sun_subscription
 from datetime import time, timedelta, timezone
 from firebase_admin import db
 from telegram import Update
@@ -271,7 +271,7 @@ def load_jobs_into_jobqueue(application):
 
 
 def get_user_subscription_info(user_id, chat_id) -> list[list[str]]:
-    """_summary_
+    """Get user subscription information
 
     Args:
         user_id (int): Telegram user ID

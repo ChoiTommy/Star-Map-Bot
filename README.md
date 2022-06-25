@@ -1,13 +1,13 @@
 <div align="center">
 	<img src="assets/icon.png" alt="Icon" width="150"/>
-    <h1>Star Map Bot</h1>
+    <h1><code>astro* bot;</code></h1>
     <p>
     	A simple and easy-to-use telegram bot that provides you with stargazing and astronomical information.
     </p>
 </div>
 
-[![CodeFactor](https://www.codefactor.io/repository/github/choitommy/star-map-bot/badge)](https://www.codefactor.io/repository/github/choitommy/star-map-bot)
-[![Telegram Bot](https://img.shields.io/badge/Telegram-bot-blue?logo=telegram)](https://t.me/star_map_bot)
+[![CodeFactor](https://www.codefactor.io/repository/github/choitommy/astro-pointer-bot/badge)](https://www.codefactor.io/repository/github/choitommy/astro-pointer-bot)
+[![Telegram Bot](https://img.shields.io/badge/Telegram-bot-blue?logo=telegram)](https://t.me/AstroPointerBot)
 
 ## Introduction
 WIP

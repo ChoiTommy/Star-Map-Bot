@@ -170,9 +170,9 @@ NOMINATIM_REVERSE_API_BASE_URL = "https://nominatim.openstreetmap.org/reverse"
 
 # Misc
 TUTORIAL_TEXT = f"""
-@star_map_bot is designed with mobile devices in mind.
+<code>astro* bot;</code> is designed with mobile devices in mind.
 
-@star_map_bot is an easy-to-use stargazing bot that provides you with all the necessary stargazing information including star maps (sky charts), weather and astronomical data, etc.
+<code>astro* bot;</code> is an easy-to-use astronomical bot that provides you with all the necessary stargazing information including star maps (sky charts), weather and astronomical data, etc.
 
 To get the most out of this bot, you are required to set a location (/setlocation). This location data is used for generating star maps, displaying weather and astronomical data at that specific location only. Users can delete their data at any time with the command /deletemyinfo.
 

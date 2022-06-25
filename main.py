@@ -1,5 +1,5 @@
 """
-@star_map_bot is an easy-to-use stargazing bot that provides you with
+@AstroPointerBot is an easy-to-use astronomical bot that provides you with
 all the necessary stargazing information including star maps (sky
 charts), weather and astronomical data, etc.
 
@@ -17,10 +17,10 @@ Send /credits to view the data sources of all the information this bot provides.
 Send /cancel to halt any operations.
 """
 
-# TODO API request async, star map features toggles, astronomy news rss, subscriber (send info actively to subscribed users)
-from starmapbot import misc, userinfo, callback_queries
-from starmapbot.constants import BOT_TOKEN, DATABASE_URL, GOOGLE_APPLICATION_CREDENTIALS
-from starmapbot.features import (
+# TODO API request async, star map features toggles, astronomy news rss
+from astro_pointer import misc, userinfo, callback_queries
+from astro_pointer.constants import BOT_TOKEN, DATABASE_URL, GOOGLE_APPLICATION_CREDENTIALS
+from astro_pointer.features import (
     starmap,
     astrodata,
     weather,

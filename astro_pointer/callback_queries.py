@@ -3,13 +3,13 @@ A module handles callback queries
 
 """
 
-from starmapbot.features import (
+from astro_pointer.features import (
     weather,
     astrodata,
     starmap,
     sun
 )
-from starmapbot.constants import Weather, Astrodata, Starmap, Sun
+from astro_pointer.constants import Weather, Astrodata, Starmap, Sun
 from telegram import Update
 from telegram.ext import CallbackContext
 

@@ -7,8 +7,8 @@ Command /deletemyinfo is defined by deletion_confirmation and delete_user_info
 Command /cancel is defined by cancel_location_setup or cancel_deletion
 """
 
-from starmapbot import helpers
-from starmapbot.constants import NOMINATIM_REVERSE_API_BASE_URL
+from astro_pointer import helpers
+from astro_pointer.constants import NOMINATIM_REVERSE_API_BASE_URL
 import requests
 from datetime import timezone, timedelta
 from firebase_admin import db

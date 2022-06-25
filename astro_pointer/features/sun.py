@@ -5,8 +5,8 @@ Usage:
 Command /sun is defined by send_sun_photo
 """
 
-from starmapbot.helpers import get_current_date_time_string
-from starmapbot.constants import Sun
+from astro_pointer.helpers import get_current_date_time_string
+from astro_pointer.constants import Sun
 import time, httpx, asyncio
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto, error
 from telegram.ext import CallbackContext

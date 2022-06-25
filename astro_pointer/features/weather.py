@@ -5,8 +5,8 @@ Usage:
 Command /weather is defined by show_weather_data
 """
 
-from starmapbot.helpers import get_current_date_time_string
-from starmapbot.constants import Weather
+from astro_pointer.helpers import get_current_date_time_string
+from astro_pointer.constants import Weather
 import requests
 from firebase_admin import db
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto
