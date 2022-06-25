@@ -47,12 +47,12 @@ WIP
     },
     "Subscriptions": {
         "telegram_user_id_0": {
-            "telegram_chat_id_0": {     // users can have different subscriptions in both bot's DM and groups
+            "telegram_chat_id_0": {     
                 "astrodata": {
                     "enabled": true, 
                     "timing": {
-                        "hour": "19",   // in accordance with the `utcOffset` above, 
-                        "minute": "30"  // defaults to UTC time if not set up
+                        "hour": "19",
+                        "minute": "30"
                     }
                 },
                 "iss": {
@@ -88,7 +88,7 @@ WIP
     },
 }
 ```
-
+Users can have different subscriptions in both bot's DM and groups. Subscription timings will default to UTC time if not set up.
 ## Credits
 - [Skyandtelescope](https://skyandtelescope.org)
 - [WeatherAPI](https://www.weatherapi.com)

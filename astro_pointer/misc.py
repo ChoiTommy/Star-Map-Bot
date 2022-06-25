@@ -9,6 +9,7 @@ Command /start is defined by bot_tutorial
 from astro_pointer.constants import TUTORIAL_TEXT
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
+from telegram.constants import ParseMode
 
 async def show_credits(update: Update, context: CallbackContext) -> None:
     """Display the data source of the star map and a link to this GitHub repo."""
@@ -27,6 +28,8 @@ async def show_credits(update: Update, context: CallbackContext) -> None:
 async def bot_tutorial(update: Update, context: CallbackContext) -> None: # TODO: privacy policy
     """Act as a welcome message and tutorial to anyone who starts the bot"""
 
-    await update.message.reply_html(
-        text = TUTORIAL_TEXT
+    await update.message.reply_photo(
+        photo = open(f"assets/description_pic.png", "rb"),
+        caption = TUTORIAL_TEXT,
+        parse_mode = ParseMode.HTML
     )
