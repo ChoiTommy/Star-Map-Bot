@@ -32,11 +32,11 @@ DEFAULT_FEATURES = {
 }
 
 
-def are_timings_valid(li: list[str]) -> (bool, list[str], list[str]):
+def are_timings_valid(timings_list: list[str]) -> (bool, list[str], list[str]):
     """Check the format and the ranges of the timing inputs
 
     Args:
-        li (list[str]): a list of time strings like ['1:20', '14:30', '18:00']
+        timing_list (list[str]): a list of time strings like ['1:20', '14:30', '18:00']
 
     Returns:
         bool: True if all timings are valid
@@ -45,27 +45,29 @@ def are_timings_valid(li: list[str]) -> (bool, list[str], list[str]):
     """
 
     hour, minute = [], []
-    for l in li:
-        timing = [int(time) for time in l.split(':')]
-        if (len(timing) != 2) or (timing[0] not in range(24)) or (timing[1] not in range(60)):
+    for hours_n_minutes in timings_list:
+        timing = [time for time in hours_n_minutes.split(':')]
+        if not (timing[0].isdigit() and timing[1].isdigit()):
             return False, [], []
-        hour.append(f"{timing[0]:02d}")
-        minute.append(f"{timing[1]:02d}")
+        if (len(timing) != 2) or not (int(timing[0]) in range(24) and (int(timing[1]) in range(60))):
+            return False, [], []
+        hour.append(f"{int(timing[0]):02d}")
+        minute.append(f"{int(timing[1]):02d}")
     return True, hour, minute
 
 
-def are_features_valid(li: list[str]) -> bool:
+def are_features_valid(features_list: list[str]) -> bool:
     """Check if the feature inputs are valid
 
     Args:
-        li (list[str]): a list of features that users would like to subscribe
+        features_list (list[str]): a list of features that users would like to subscribe
 
     Returns:
         bool: True if all fall into the 5 presets [starmap|astrodata|weather|iss|sun]
     """
 
-    for l in li:
-        if l not in DEFAULT_FEATURES:
+    for feature in features_list:
+        if feature not in DEFAULT_FEATURES:
             return False
     return True
 

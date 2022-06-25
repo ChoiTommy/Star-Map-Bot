@@ -20,7 +20,7 @@ async def show_credits(update: Update, context: CallbackContext) -> None:
                 "Courtesy of NASA/SDO and the AIA, EVE, and HMI science teams for the near-real-time (NRT) images. \n"),
         reply_markup = InlineKeyboardMarkup([
             [InlineKeyboardButton("Visit skyandtelescope.org", url="https://skyandtelescope.org/")],
-            [InlineKeyboardButton("Follow this project on GitHub", url="https://github.com/ChoiTommy/Star-Map-Bot")]
+            [InlineKeyboardButton("Follow this project on GitHub", url="https://github.com/ChoiTommy/astro-pointer-bot")]
         ])
     )
 
