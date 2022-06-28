@@ -243,7 +243,7 @@ async def unsubscribe(update: Update, context: CallbackContext) -> None:
         )
 
 
-def load_jobs_into_jobqueue(application):
+async def load_jobs_into_jobqueue(context: CallbackContext) -> None:
     """Load subscriptions into jobqueue while starting up the bot"""
 
     ref = db.reference(f"/Subscriptions")
@@ -263,7 +263,7 @@ def load_jobs_into_jobqueue(application):
                             tzinfo = timezone(offset=timedelta(seconds=utcOffset))
                         )
 
-                        application.job_queue.run_daily(
+                        context.job_queue.run_daily(
                             callback = DEFAULT_FEATURES[feature_name],
                             time = t,
                             name = f"{user_id}_{chat_id}_{feature_name}",
