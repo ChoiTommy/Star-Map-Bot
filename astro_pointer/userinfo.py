@@ -105,7 +105,18 @@ async def update_location(update: Update, context: CallbackContext) -> int:
                 "longitude": longi,
                 "address": address_string,
                 "utcOffset": utcOffset,
-                "creation_timestamp": helpers.get_current_date_time_string()    # UTC time
+                "creation_timestamp": helpers.get_current_date_time_string(),    # UTC time
+                "starmap_preferences": {        # default preferences
+                    "showEquator": False,
+                    "showEcliptic": True,
+                    "showStarNames": False,
+                    "showPlanetNames": True,
+                    "showConsNames": True,
+                    "showConsLines": True,
+                    "showConsBoundaries": False,
+                    "showSpecials": False,
+                    "use24hClock": True         # NEVER change this to False, 24-hr gang
+                }
             })
         else:
             ref.update({

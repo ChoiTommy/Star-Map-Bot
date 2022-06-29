@@ -34,8 +34,15 @@ class Starmap:
     }
     REFRESH_CALLBACK_DATA = "REFRESH_STARMAP"
     REFRESH_BUTTON = InlineKeyboardMarkup([
-                                [InlineKeyboardButton("↻ Refresh", callback_data=REFRESH_CALLBACK_DATA)]
-                            ])
+        [InlineKeyboardButton("↻ Refresh", callback_data=REFRESH_CALLBACK_DATA)]
+    ])
+    PREFERENCE_BUTTONS = InlineKeyboardMarkup([
+        [InlineKeyboardButton("Equator"), InlineKeyboardButton("Ecliptic")],
+        [InlineKeyboardButton("Star Names"), InlineKeyboardButton("Planet Names")],
+        [InlineKeyboardButton("Constellation Names"), InlineKeyboardButton("Constellation Lines")],
+        [InlineKeyboardButton("Constellation Boundaries"), InlineKeyboardButton("Specials")],
+        [InlineKeyboardButton("Generate star map")]
+    ])
 
 
 # Astrodata
