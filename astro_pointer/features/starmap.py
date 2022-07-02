@@ -43,10 +43,10 @@ from telegram.constants import ParseMode
 import fitz
 
 
-def populate_preference_buttons():
+def populate_preference_buttons(user_preferences: dict) -> InlineKeyboardMarkup:
     """Populate the preference buttons for the star map."""
 
-    name_callbackdata = {
+    name_to_callbackdata = {
         "Equator": "PREF_STAR_MAP_EQUATOR",
         "Ecliptic": "PREF_STAR_MAP_ECLIPTIC",
         "Star Names": "PREF_STAR_MAP_STAR_NAMES",
@@ -57,61 +57,42 @@ def populate_preference_buttons():
         "Specials": "PREF_STAR_MAP_SPECIALS",
     }
 
-    ref = db.reference(f"/Users/{user_id}/starmap_preferences")
-    user_preferences = ref.get()
+    lookup_table = [
+        "showEquator",
+        "showEcliptic",
+        "showStarNames",
+        "showPlanetNames",
+        "showConsNames",
+        "showConsLines",
+        "showConsBoundaries",
+        "showSpecials"
+    ]
 
     buttons = []
 
-    # for i, name, callbackdata in enumerate(name_callbackdata.items()):
+    for i, name_n_callbackdata in enumerate(name_to_callbackdata.items()):
+        name = name_n_callbackdata[0]
+        callbackdata = name_n_callbackdata[1]
+        if (i+1) % 2 == 1:
+            buttons.append([InlineKeyboardButton(
+                text = f"{name} {'✔' if user_preferences[lookup_table[i]] else '❌'}",
+                callback_data = callbackdata
+            )])
+        else:
+            buttons[-1].append(InlineKeyboardButton(
+                text = f"{name} {'✔' if user_preferences[lookup_table[i]] else '❌'}",
+                callback_data = callbackdata
+            ))
 
-
-    buttons = [
-        [
-            InlineKeyboardButton(
-                text = "Equator",
-                callback_data = "showEquator"
-            ),
-            InlineKeyboardButton(
-                text = "Show Ecliptic",
-                callback_data = "showEcliptic"
-            )
-        ],
-        [
-            InlineKeyboardButton(
-                text = "Show Star Names",
-                callback_data = "showStarNames"
-            ),
-            InlineKeyboardButton(
-                text = "Show Planet Names",
-                callback_data = "showPlanetNames"
-            )
-        ],
-        [
-            InlineKeyboardButton(
-                text = "Show Constellation Names",
-                callback_data = "showConsNames"
-            ),
-            InlineKeyboardButton(
-                text = "Show Constellation Lines",
-                callback_data = "showConsLines"
-            )
-        ],
-        [
-            InlineKeyboardButton(
-                text = "Show Constellation Boundaries",
-                callback_data = "showConsBoundaries"
-            ),
-            InlineKeyboardButton(
-                text = "Show Specials",
-                callback_data = "showSpecials"
-            )
-        ],
-    ]
+    buttons.append([InlineKeyboardButton(
+        text = "Generate Star Map",
+        callback_data = Starmap.GENERATE_CALLBACK_DATA
+    )])
 
     return InlineKeyboardMarkup(buttons)
 
 
-async def set_star_map_preferences(update: Update, context: CallbackContext) -> None:
+async def set_preferences(update: Update, context: CallbackContext) -> None:
     """Set the star map preferences of the user."""
 
     user_id = str(update.effective_user.id)
@@ -122,16 +103,40 @@ async def set_star_map_preferences(update: Update, context: CallbackContext) -> 
     if data is not None:
         await update.message.reply_text(
             text = "Set your star map preferences:",
-            reply_markup = Starmap.PREFERENCE_BUTTONS   # write a function to populate this
+            reply_markup = populate_preference_buttons(data["starmap_preferences"])
         )
 
     else:
         await update.message.reply_text("Please set your location with /setlocation first!")
 
 
-# async def update_star_map_preferences(update: Update, context: CallbackContext) -> str:
+async def update_preference(update: Update, context: CallbackContext) -> str:
+    """Update preferences on the Firebase database."""
 
+    callbackdata_to_db_keys = {
+        "PREF_STAR_MAP_EQUATOR": "showEquator",
+        "PREF_STAR_MAP_ECLIPTIC": "showEcliptic",
+        "PREF_STAR_MAP_STAR_NAMES": "showStarNames",
+        "PREF_STAR_MAP_PLANET_NAMES": "showPlanetNames",
+        "PREF_STAR_MAP_CONS_NAMES": "showConsNames",
+        "PREF_STAR_MAP_CONS_LINES": "showConsLines",
+        "PREF_STAR_MAP_CONS_BOUNDARIES": "showConsBoundaries",
+        "PREF_STAR_MAP_SPECIALS": "showSpecials",
+    }
+    db_key = callbackdata_to_db_keys[update.callback_query.data]
 
+    user_id = str(update.effective_user.id)
+    ref = db.reference(f"/Users/{user_id}/starmap_preferences")
+    user_preferences = ref.get()
+
+    user_preferences[db_key] = not user_preferences[db_key]
+    ref.update(user_preferences)
+
+    await update.callback_query.message.edit_reply_markup(
+        reply_markup = populate_preference_buttons(user_preferences)
+    )
+
+    return f"{db_key} is now set to {user_preferences[db_key]}"
 
 
 async def star_map_subscription(context: CallbackContext) -> None:

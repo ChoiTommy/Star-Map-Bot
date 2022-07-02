@@ -63,7 +63,7 @@ def main() -> None:
     # Register command handlers
     application.add_handler(CommandHandler("start", misc.bot_tutorial))
     application.add_handler(CommandHandler("credits", misc.show_credits))
-    application.add_handler(CommandHandler("starmap", starmap.send_star_map))
+    application.add_handler(CommandHandler("starmap", starmap.set_preferences))
     application.add_handler(CommandHandler("myinfo", userinfo.show_user_info))
     application.add_handler(CommandHandler("astrodata", astrodata.show_astro_data))
     application.add_handler(CommandHandler("weather", weather.show_weather_data))
