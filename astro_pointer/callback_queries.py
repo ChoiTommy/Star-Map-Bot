@@ -47,15 +47,14 @@ async def callback(update: Update, context: CallbackContext) -> None:
         status = await sun.hide_description(update, context)
         await query.answer(text=status)
 
-    # Star map preferences
+    # Star map preference update
     elif Starmap.PREFERENCE_CALLBACK_DATA in query.data:
         status = await starmap.update_preference(update, context)
         await query.answer(text=status)
 
     # Star map generation
     elif query.data == Starmap.GENERATE_CALLBACK_DATA:
-        await starmap.send_star_map(update, context)
-        await query.message.delete()
+        _ = await starmap.update_star_map(update, context)
         await query.answer(text="Star map generated")
 
     else:

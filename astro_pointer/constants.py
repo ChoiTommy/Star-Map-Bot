@@ -20,24 +20,33 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Star Map
 class Starmap:
-    STAR_MAP_BASE_URL = "https://www.heavens-above.com/SkyAndTelescope/StSkyChartPDF.ashx"
-    REST_OF_THE_STAR_MAP_PARAM = { # params to be injected: time, latitude, longitude, location, utcOffset(in ms)
-        "showEquator": False,
-        "showEcliptic": True,
-        "showStarNames": False,
-        "showPlanetNames": True,
-        "showConsNames": True,
-        "showConsLines": True,
-        "showConsBoundaries": False,
-        "showSpecials": False,
-        "use24hClock": True
-    }
+    STAR_MAP_BASE_URL = "https://www.heavens-above.com/SkyAndTelescope/StSkyChartPDF.ashx"  # params to be injected: time, latitude, longitude, location, utcOffset(in ms)
     REFRESH_CALLBACK_DATA = "REFRESH_STARMAP"
     REFRESH_BUTTON = InlineKeyboardMarkup([
         [InlineKeyboardButton("↻ Refresh", callback_data=REFRESH_CALLBACK_DATA)]
     ])
-    PREFERENCE_CALLBACK_DATA = "PREF_STAR_MAP"
+    PREFERENCE_CALLBACK_DATA = "PREF_STAR_MAP"      # in the form of "PREF_STAR_MAP_PARAM_NAME"
     GENERATE_CALLBACK_DATA = "GENERATE_STAR_MAP"
+    NAME_TO_CALLBACK_DATA = {
+        "Equator": "PREF_STAR_MAP_EQUATOR",
+        "Ecliptic": "PREF_STAR_MAP_ECLIPTIC",
+        "Star Names": "PREF_STAR_MAP_STAR_NAMES",
+        "Planet Names": "PREF_STAR_MAP_PLANET_NAMES",
+        "Constellation Names": "PREF_STAR_MAP_CONS_NAMES",
+        "Constellation Lines": "PREF_STAR_MAP_CONS_LINES",
+        "Constellation Boundaries": "PREF_STAR_MAP_CONS_BOUNDARIES",
+        "Specials": "PREF_STAR_MAP_SPECIALS",
+    }
+    CALLBACK_DATA_TO_DB_KEYS = {
+        "PREF_STAR_MAP_EQUATOR": "showEquator",
+        "PREF_STAR_MAP_ECLIPTIC": "showEcliptic",
+        "PREF_STAR_MAP_STAR_NAMES": "showStarNames",
+        "PREF_STAR_MAP_PLANET_NAMES": "showPlanetNames",
+        "PREF_STAR_MAP_CONS_NAMES": "showConsNames",
+        "PREF_STAR_MAP_CONS_LINES": "showConsLines",
+        "PREF_STAR_MAP_CONS_BOUNDARIES": "showConsBoundaries",
+        "PREF_STAR_MAP_SPECIALS": "showSpecials",
+    }
 
 
 # Astrodata

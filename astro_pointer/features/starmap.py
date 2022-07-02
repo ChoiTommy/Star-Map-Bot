@@ -46,54 +46,35 @@ import fitz
 def populate_preference_buttons(user_preferences: dict) -> InlineKeyboardMarkup:
     """Populate the preference buttons for the star map."""
 
-    name_to_callbackdata = {
-        "Equator": "PREF_STAR_MAP_EQUATOR",
-        "Ecliptic": "PREF_STAR_MAP_ECLIPTIC",
-        "Star Names": "PREF_STAR_MAP_STAR_NAMES",
-        "Planet Names": "PREF_STAR_MAP_PLANET_NAMES",
-        "Constellation Names": "PREF_STAR_MAP_CONS_NAMES",
-        "Constellation Lines": "PREF_STAR_MAP_CONS_LINES",
-        "Constellation Boundaries": "PREF_STAR_MAP_CONS_BOUNDARIES",
-        "Specials": "PREF_STAR_MAP_SPECIALS",
-    }
-
-    lookup_table = [
-        "showEquator",
-        "showEcliptic",
-        "showStarNames",
-        "showPlanetNames",
-        "showConsNames",
-        "showConsLines",
-        "showConsBoundaries",
-        "showSpecials"
-    ]
-
     buttons = []
 
-    for i, name_n_callbackdata in enumerate(name_to_callbackdata.items()):
+    for i, name_n_callbackdata in enumerate(Starmap.NAME_TO_CALLBACK_DATA.items()):
         name = name_n_callbackdata[0]
         callbackdata = name_n_callbackdata[1]
+
+        db_key = Starmap.CALLBACK_DATA_TO_DB_KEYS[callbackdata]
+
         if (i+1) % 2 == 1:
             buttons.append([InlineKeyboardButton(
-                text = f"{name} {'✔' if user_preferences[lookup_table[i]] else '❌'}",
+                text = f"{name} {'✔' if user_preferences[db_key] else '❌'}",
                 callback_data = callbackdata
             )])
         else:
             buttons[-1].append(InlineKeyboardButton(
-                text = f"{name} {'✔' if user_preferences[lookup_table[i]] else '❌'}",
+                text = f"{name} {'✔' if user_preferences[db_key] else '❌'}",
                 callback_data = callbackdata
             ))
 
     buttons.append([InlineKeyboardButton(
-        text = "Generate Star Map",
+        text = "Generate Star Map →",
         callback_data = Starmap.GENERATE_CALLBACK_DATA
     )])
 
     return InlineKeyboardMarkup(buttons)
 
 
-async def set_preferences(update: Update, context: CallbackContext) -> None:
-    """Set the star map preferences of the user."""
+async def preference_message(update: Update, context: CallbackContext) -> None:
+    """Send a message with the current preferences of the user."""
 
     user_id = str(update.effective_user.id)
 
@@ -101,8 +82,9 @@ async def set_preferences(update: Update, context: CallbackContext) -> None:
     data = ref.get()
 
     if data is not None:
-        await update.message.reply_text(
-            text = "Set your star map preferences:",
+        await update.message.reply_photo(
+            photo = open("assets/description_pic.png", "rb"),       # todo replace with an instructional image
+            caption = "Set your star map preferences below:",
             reply_markup = populate_preference_buttons(data["starmap_preferences"])
         )
 
@@ -113,17 +95,7 @@ async def set_preferences(update: Update, context: CallbackContext) -> None:
 async def update_preference(update: Update, context: CallbackContext) -> str:
     """Update preferences on the Firebase database."""
 
-    callbackdata_to_db_keys = {
-        "PREF_STAR_MAP_EQUATOR": "showEquator",
-        "PREF_STAR_MAP_ECLIPTIC": "showEcliptic",
-        "PREF_STAR_MAP_STAR_NAMES": "showStarNames",
-        "PREF_STAR_MAP_PLANET_NAMES": "showPlanetNames",
-        "PREF_STAR_MAP_CONS_NAMES": "showConsNames",
-        "PREF_STAR_MAP_CONS_LINES": "showConsLines",
-        "PREF_STAR_MAP_CONS_BOUNDARIES": "showConsBoundaries",
-        "PREF_STAR_MAP_SPECIALS": "showSpecials",
-    }
-    db_key = callbackdata_to_db_keys[update.callback_query.data]
+    db_key = Starmap.CALLBACK_DATA_TO_DB_KEYS[update.callback_query.data]
 
     user_id = str(update.effective_user.id)
     ref = db.reference(f"/Users/{user_id}/starmap_preferences")
@@ -178,7 +150,10 @@ async def send_star_map(update: Update, context: CallbackContext) -> None:
         )
 
     else:
-        await update.message.reply_text("Please set your location with /setlocation first!")
+        await context.bot.send_message(
+            chat_id = chat_id,
+            text = "Please set your location with /setlocation first!"      # todo better user instructions
+        )
 
 
 async def update_star_map(update: Update, context: CallbackContext) -> str:
