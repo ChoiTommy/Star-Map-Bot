@@ -19,7 +19,7 @@ from telegram.ext import CallbackContext, ConversationHandler
 async def show_user_info(update: Update, context: CallbackContext) -> None:
     """Display user info when the command /myinfo is called. User info consists of latitude, longitude, address and timezone."""
 
-    user_id = str(update.effective_user.id)
+    user_id = update.effective_user.id
     ref = db.reference(f"/Users/{user_id}")
     data = ref.get()
 
@@ -48,7 +48,7 @@ async def show_user_info(update: Update, context: CallbackContext) -> None:
 async def set_location(update: Update, context: CallbackContext) -> int:
     """If their record exists, ask users if they want to update their location. Return 0 to proceed to update_location."""
 
-    user_id = str(update.effective_user.id)
+    user_id = update.effective_user.id
 
     ref = db.reference(f"/Users/{user_id}")
     data = ref.get()
@@ -67,7 +67,7 @@ async def set_location(update: Update, context: CallbackContext) -> int:
 async def update_location(update: Update, context: CallbackContext) -> int:
     """Read in a location from the user. Fetch the address string from nominatim reverse API. Save/Update the record. Return ConversationHandler.END."""
 
-    user_id = str(update.effective_user.id)
+    user_id = update.effective_user.id
 
     if update.message.location is not None:
         lat, longi = update.message.location.latitude, update.message.location.longitude
@@ -130,7 +130,7 @@ async def cancel_location_setup(update: Update, context: CallbackContext) -> int
 async def deletion_confirmation(update: Update, context: CallbackContext) -> int:
     """Ask for confirmation to delete the user info from the server. Return Conversation.END if user has no data on the server, else returns 0."""
 
-    user_id = str(update.effective_user.id)
+    user_id = update.effective_user.id
     ref = db.reference(f"/Users/{user_id}")
     data = ref.get()
 
@@ -152,7 +152,7 @@ async def delete_user_info(update: Update, context: CallbackContext) -> int:
     """Perform deletion on users' data if 'Yes' is retrieved. Return ConversationHandler.END to halt the ConversationHandler."""
 
     if update.message.text == "Yes":
-        user_id = str(update.effective_user.id)
+        user_id = update.effective_user.id
         ref = db.reference(f"/Users/{user_id}")
         ref.set({})     # delete user data
         ref = db.reference(f"/Subscriptions/{user_id}")

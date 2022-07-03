@@ -27,7 +27,7 @@ async def send_star_map(update: Update, context: CallbackContext) -> None:
         user_id = context.job.user_id
         chat_id = context.job.chat_id
     else:
-        user_id = str(update.effective_user.id)
+        user_id = update.effective_user.id
         chat_id = update.effective_chat.id
 
     ref = db.reference(f"/Users/{user_id}")
@@ -42,19 +42,22 @@ async def send_star_map(update: Update, context: CallbackContext) -> None:
 
         current_date_time = get_current_date_time_string(utcOffset)
 
-        pix = fetch_star_map(lat, longi, address, utcOffset)
+        star_map_bytes = fetch_star_map(lat, longi, address, utcOffset)
 
         # update.message.reply_document(document = fetch_target) # pdf
         await context.bot.send_document(
             chat_id = chat_id,
-            document = pix.tobytes(),
+            document = star_map_bytes,
             filename = f"Star_Map_{current_date_time.replace(' ', '_').replace(':', '_')}.png",
             caption = f"Enjoy the stunning stars! Be considerate and leave no trace while stargazing! \n ({current_date_time})",
             reply_markup = Starmap.REFRESH_BUTTON
         )
 
     else:
-        await update.message.reply_text("Please set your location with /setlocation first!")
+        await context.bot.send_message(
+            chat_id = chat_id,
+            text = "To get a star map, you need to set a location with /setlocation first."
+        )
 
 
 async def update_star_map(update: Update, context: CallbackContext) -> str:
@@ -64,7 +67,7 @@ async def update_star_map(update: Update, context: CallbackContext) -> str:
         str: Output text to be shown to users
     """
 
-    user_id = str(update.effective_user.id)
+    user_id = update.effective_user.id
 
     ref = db.reference(f"/Users/{user_id}")
     data = ref.get()
@@ -78,11 +81,11 @@ async def update_star_map(update: Update, context: CallbackContext) -> str:
 
         current_date_time = get_current_date_time_string(utcOffset)
 
-        pix = fetch_star_map(lat, longi, address, utcOffset)
+        star_map_bytes = fetch_star_map(lat, longi, address, utcOffset)
 
         await update.callback_query.message.edit_media(
             media = InputMediaDocument(
-                media = pix.tobytes(),
+                media = star_map_bytes,
                 filename = f"Star_Map_{current_date_time.replace(' ', '_').replace(':', '_')}.png",
                 caption = f"Enjoy the stunning stars! Be considerate and leave no trace while stargazing! \n ({current_date_time})"
             ),
@@ -92,7 +95,7 @@ async def update_star_map(update: Update, context: CallbackContext) -> str:
         return "Star map updated"
     else:
         await update.callback_query.message.delete()
-        return "Please set your location first!"
+        return "To get a star map, set a location with /setlocation first."
 
 
 def fetch_star_map(latitude, longitude, address, utcOffset):
@@ -105,7 +108,7 @@ def fetch_star_map(latitude, longitude, address, utcOffset):
         utcOffset (int): UTC offset in seconds
 
     Returns:
-        fitz.Pixmap: plane rectangular sets of pixels
+        bytes: bytes object of a plane rectangular sets of pixels
     """
 
     params_inject = {
@@ -128,4 +131,4 @@ def fetch_star_map(latitude, longitude, address, utcOffset):
     pix.tint_with(black=-129010, white=0) # no idea on how these values work, just do trial and error
     doc.close()
 
-    return pix
+    return pix.tobytes()

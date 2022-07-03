@@ -26,7 +26,7 @@ async def show_astro_data(update: Update, context: CallbackContext) -> None:
         user_id = context.job.user_id
         chat_id = context.job.chat_id
     else:
-        user_id = str(update.effective_user.id)
+        user_id = update.effective_user.id
         chat_id = update.effective_chat.id
 
     ref = db.reference(f"/Users/{user_id}")
@@ -50,7 +50,10 @@ async def show_astro_data(update: Update, context: CallbackContext) -> None:
         )
 
     else:
-        await update.message.reply_text("Please set your location with /setlocation first!")
+        await context.bot.send_message(
+            chat_id = chat_id,
+            text = "I need your location to get the astronomical data. /setlocation to start off."
+        )
 
 
 async def update_astro_data(update: Update, context: CallbackContext) -> str:
@@ -60,7 +63,7 @@ async def update_astro_data(update: Update, context: CallbackContext) -> str:
         str: Output text to be shown to users
     """
 
-    user_id = str(update.effective_user.id)
+    user_id = update.effective_user.id
     ref = db.reference(f"/Users/{user_id}")
     data = ref.get()
 
@@ -85,7 +88,7 @@ async def update_astro_data(update: Update, context: CallbackContext) -> str:
 
     else:
         await update.callback_query.message.delete()
-        return "Please set your location first!"
+        return "I need your location to get the astronomical data."
 
 
 def fetch_astro_data(latitude, longitude):

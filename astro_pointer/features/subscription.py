@@ -127,7 +127,7 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
         await update.message.reply_markdown_v2(
             text = ("Arguments missing\. \n"
                     "Syntax: `/sub [starmap|astrodata|weather|iss|sun] [timings]` \n"
-                    "Separate features/timings with commas \n"
+                    "Separate features/timings with commas and no spaces in between\. \n"
                     "e\.g\. `/sub astrodata,sun 22:00,12:00` \n\n"
 
                     "Here are your current subscriptions: \n"
@@ -212,7 +212,7 @@ async def unsubscribe(update: Update, context: CallbackContext) -> None:
             await update.message.reply_markdown_v2(
                 text = ("Arguments missing\. \n"
                         "Syntax: `/unsub [starmap|astrodata|weather|iss|sun]` \n"
-                        "Separate multiple features with commas\. \n"
+                        "Separate multiple features with commas and no spaces in between\. \n"
                         "e\.g\. `/unsub starmap,weather,astrodata,iss,sun`")
             )
             return

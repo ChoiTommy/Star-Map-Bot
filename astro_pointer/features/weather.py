@@ -26,7 +26,7 @@ async def show_weather_data(update: Update, context: CallbackContext) -> None:
         user_id = context.job.user_id
         chat_id = context.job.chat_id
     else:
-        user_id = str(update.effective_user.id)
+        user_id = update.effective_user.id
         chat_id = update.effective_chat.id
 
     ref = db.reference(f"/Users/{user_id}")
@@ -53,7 +53,10 @@ async def show_weather_data(update: Update, context: CallbackContext) -> None:
         )
 
     else:
-        await update.message.reply_text("Please set your location with /setlocation first!")
+        await context.bot.send_message(
+            chat_id = chat_id,
+            text = "Tell me a location with /setlocation first to use this feature."
+        )
 
 
 async def update_weather_data(update: Update, context: CallbackContext) -> str:
@@ -63,7 +66,7 @@ async def update_weather_data(update: Update, context: CallbackContext) -> str:
         str: Output text to be shown to users
     """
 
-    user_id = str(update.effective_user.id)
+    user_id = update.effective_user.id
     ref = db.reference(f"/Users/{user_id}")
     data = ref.get()
 
@@ -91,7 +94,7 @@ async def update_weather_data(update: Update, context: CallbackContext) -> str:
         return "Weather refreshed"
     else:
         await update.callback_query.message.delete()
-        return "Please set your location first!"
+        return "Set a location first to use this feature."
 
 
 def fetch_weather_data(latitude, longitude):
