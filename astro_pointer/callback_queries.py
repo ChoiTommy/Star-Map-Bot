@@ -52,6 +52,10 @@ async def callback(update: Update, context: CallbackContext) -> None:
         status = await starmap.update_preference(update, context)
         await query.answer(text=status)
 
+    elif query.data == Starmap.RESET_TO_DEFAULT_CALLBACK_DATA:
+        status = await starmap.reset_to_default_preferences(update, context)
+        await query.answer(text=status)
+
     # Star map generation
     elif query.data == Starmap.GENERATE_CALLBACK_DATA:
         _ = await starmap.update_star_map(update, context)

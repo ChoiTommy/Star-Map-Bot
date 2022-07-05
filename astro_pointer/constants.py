@@ -25,18 +25,42 @@ class Starmap:
     REFRESH_BUTTON = InlineKeyboardMarkup([
         [InlineKeyboardButton("↻ Refresh", callback_data=REFRESH_CALLBACK_DATA)]
     ])
+    DEFAULT_PREFERENCES = {
+        "showEquator": False,
+        "showEcliptic": True,
+        "showStarNames": False,
+        "showPlanetNames": True,
+        "showConsNames": True,
+        "showConsLines": True,
+        "showConsBoundaries": False,
+        "showSpecials": False,
+        "use24hClock": True         # NEVER change this to False, 24-hr gang
+    }
     PREFERENCE_CALLBACK_DATA = "PREF_STAR_MAP"      # in the form of "PREF_STAR_MAP_PARAM_NAME"
     GENERATE_CALLBACK_DATA = "GENERATE_STAR_MAP"
+    RESET_TO_DEFAULT_CALLBACK_DATA = "RESET_TO_DEFAULT_STAR_MAP"
     NAME_TO_CALLBACK_DATA = {
         "Equator": "PREF_STAR_MAP_EQUATOR",
         "Ecliptic": "PREF_STAR_MAP_ECLIPTIC",
         "Star Names": "PREF_STAR_MAP_STAR_NAMES",
         "Planet Names": "PREF_STAR_MAP_PLANET_NAMES",
-        "Constellation Names": "PREF_STAR_MAP_CONS_NAMES",
-        "Constellation Lines": "PREF_STAR_MAP_CONS_LINES",
-        "Constellation Boundaries": "PREF_STAR_MAP_CONS_BOUNDARIES",
+        "Cons Names": "PREF_STAR_MAP_CONS_NAMES",
+        "Cons Lines": "PREF_STAR_MAP_CONS_LINES",
+        "Cons Bound": "PREF_STAR_MAP_CONS_BOUNDARIES",
         "Specials": "PREF_STAR_MAP_SPECIALS",
     }
+    '''
+PARAMETERS_DESCRIPTION = {
+    "Equator": "an imaginary line around the middle of the celestial sphere",
+    "Ecliptic": "the plane of Earth's orbit around the Sun",
+    "Star Names": "names of stars",
+    "Planet Names": "names of planets",
+    "Cons Names": "names of constellations",
+    "Cons Lines": "lines of constellations",
+    "Cons Bound": "boundaries of constellations",
+    "Specials": "special celestial objects",
+}
+    '''
     CALLBACK_DATA_TO_DB_KEYS = {
         "PREF_STAR_MAP_EQUATOR": "showEquator",
         "PREF_STAR_MAP_ECLIPTIC": "showEcliptic",

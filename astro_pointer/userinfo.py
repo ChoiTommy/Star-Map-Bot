@@ -8,7 +8,7 @@ Command /cancel is defined by cancel_location_setup or cancel_deletion
 """
 
 from astro_pointer import helpers
-from astro_pointer.constants import NOMINATIM_REVERSE_API_BASE_URL
+from astro_pointer.constants import NOMINATIM_REVERSE_API_BASE_URL, Starmap
 import requests
 from datetime import timezone, timedelta
 from firebase_admin import db
@@ -54,7 +54,7 @@ async def set_location(update: Update, context: CallbackContext) -> int:
     data = ref.get()
 
     if data is not None:
-        await update.message.reply_text(f"Your location is {data['latitude']}, {data['longitude']} ({data['address']}).")
+        await update.message.reply_html(f"Your location is {data['latitude']}, {data['longitude']} (<i>{data['address']}</i>).")
         await update.message.reply_markdown_v2("Send your new location \(Telegram location or a string in `lat, lon` format\) if you wish to change\. \n/cancel to keep the current setting\.")
     else:
         await update.message.reply_markdown_v2(
@@ -106,17 +106,8 @@ async def update_location(update: Update, context: CallbackContext) -> int:
                 "address": address_string,
                 "utcOffset": utcOffset,
                 "creation_timestamp": helpers.get_current_date_time_string(),    # UTC time
-                "starmap_preferences": {        # default preferences
-                    "showEquator": False,
-                    "showEcliptic": True,
-                    "showStarNames": False,
-                    "showPlanetNames": True,
-                    "showConsNames": True,
-                    "showConsLines": True,
-                    "showConsBoundaries": False,
-                    "showSpecials": False,
-                    "use24hClock": True         # NEVER change this to False, 24-hr gang
-                }
+            }|{
+                "starmap_preferences": Starmap.DEFAULT_PREFERENCES
             })
         else:
             ref.update({
@@ -127,7 +118,7 @@ async def update_location(update: Update, context: CallbackContext) -> int:
                 "update_timestamp": helpers.get_current_date_time_string()      # UTC time
             })
 
-        await update.message.reply_text(f"All set! Your new location is {lat}, {longi} ({address_string}).")
+        await update.message.reply_html(f"All set! Your new location is {lat}, {longi} (<i>{address_string}</i>).")
         return ConversationHandler.END
 
 

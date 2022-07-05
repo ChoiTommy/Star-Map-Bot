@@ -37,7 +37,7 @@ from astro_pointer.constants import Starmap
 import time
 import requests
 from firebase_admin import db
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaDocument
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaDocument, error
 from telegram.ext import CallbackContext
 from telegram.constants import ParseMode
 import fitz
@@ -66,6 +66,11 @@ def populate_preference_buttons(user_preferences: dict) -> InlineKeyboardMarkup:
             ))
 
     buttons.append([InlineKeyboardButton(
+        text = "Reset to default ↺",
+        callback_data = Starmap.RESET_TO_DEFAULT_CALLBACK_DATA)
+    ])
+
+    buttons.append([InlineKeyboardButton(
         text = "Generate Star Map →",
         callback_data = Starmap.GENERATE_CALLBACK_DATA
     )])
@@ -73,17 +78,17 @@ def populate_preference_buttons(user_preferences: dict) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(buttons)
 
 
-async def preference_message(update: Update, context: CallbackContext) -> None:
+async def preference_message(update: Update, context: CallbackContext) -> None:     # todo better name?
     """Send a message with the current preferences of the user."""
 
-    user_id = str(update.effective_user.id)
+    user_id = update.effective_user.id
 
     ref = db.reference(f"/Users/{user_id}")
     data = ref.get()
 
     if data is not None:
         await update.message.reply_photo(
-            photo = open("assets/description_pic.png", "rb"),       # todo replace with an instructional image
+            photo = open("assets/star_map_params.png", "rb"),
             caption = "Set your star map preferences below:",
             reply_markup = populate_preference_buttons(data["starmap_preferences"])
         )
@@ -97,18 +102,36 @@ async def update_preference(update: Update, context: CallbackContext) -> str:
 
     db_key = Starmap.CALLBACK_DATA_TO_DB_KEYS[update.callback_query.data]
 
-    user_id = str(update.effective_user.id)
+    user_id = update.effective_user.id
     ref = db.reference(f"/Users/{user_id}/starmap_preferences")
     user_preferences = ref.get()
 
     user_preferences[db_key] = not user_preferences[db_key]
-    ref.update(user_preferences)
+    # ref.update(user_preferences)
+    ref.update({db_key: user_preferences[db_key]})
 
     await update.callback_query.message.edit_reply_markup(
         reply_markup = populate_preference_buttons(user_preferences)
     )
 
     return f"{db_key} is now set to {user_preferences[db_key]}"
+
+
+async def reset_to_default_preferences(update: Update, context: CallbackContext) -> str:
+    """Reset the preferences to default."""
+
+    user_id = update.effective_user.id
+    ref = db.reference(f"/Users/{user_id}/starmap_preferences")
+
+    ref.update(Starmap.DEFAULT_PREFERENCES)
+    try:
+        await update.callback_query.message.edit_reply_markup(
+            reply_markup = populate_preference_buttons(Starmap.DEFAULT_PREFERENCES)
+        )
+    except error.BadRequest:
+        pass
+
+    return "Preferences reset to default"
 
 
 async def star_map_subscription(context: CallbackContext) -> None:
@@ -122,7 +145,7 @@ async def send_star_map(update: Update, context: CallbackContext) -> None:
         user_id = context.job.user_id
         chat_id = context.job.chat_id
     else:
-        user_id = str(update.effective_user.id)
+        user_id = update.effective_user.id
         chat_id = update.effective_chat.id
 
     ref = db.reference(f"/Users/{user_id}")
@@ -163,7 +186,7 @@ async def update_star_map(update: Update, context: CallbackContext) -> str:
         str: Output text to be shown to users
     """
 
-    user_id = str(update.effective_user.id)
+    user_id = update.effective_user.id
 
     ref = db.reference(f"/Users/{user_id}")
     data = ref.get()
