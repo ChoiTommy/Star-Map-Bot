@@ -89,8 +89,8 @@ class Astrodata:
     }
     REFRESH_CALLBACK_DATA = "REFRESH_ASTRODATA"
     REFRESH_BUTTON = InlineKeyboardMarkup([
-                                [InlineKeyboardButton("↻ Refresh", callback_data=REFRESH_CALLBACK_DATA)]
-                            ])
+        [InlineKeyboardButton("↻ Refresh", callback_data=REFRESH_CALLBACK_DATA)]
+    ])
 
 
 # Weather
@@ -99,8 +99,8 @@ class Weather:
     API_BASE_URL = "https://api.weatherapi.com/v1/current.json"
     REFRESH_CALLBACK_DATA = "REFRESH_WEATHER"
     REFRESH_BUTTON = InlineKeyboardMarkup([
-                                [InlineKeyboardButton("↻ Refresh", callback_data=REFRESH_CALLBACK_DATA)]
-                            ])
+        [InlineKeyboardButton("↻ Refresh", callback_data=REFRESH_CALLBACK_DATA)]
+    ])
 
 
 # Sun
@@ -204,7 +204,7 @@ NOMINATIM_REVERSE_API_BASE_URL = "https://nominatim.openstreetmap.org/reverse"
 
 
 # Misc
-TUTORIAL_TEXT = f"""
+TUTORIAL_TEXT = """
 <code>astro* bot;</code> is designed with mobile devices in mind.
 
 <code>astro* bot;</code> is an easy-to-use astronomical bot that provides you with all the necessary stargazing information including star maps (sky charts), weather and astronomical data, etc.

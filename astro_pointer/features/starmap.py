@@ -2,34 +2,7 @@
 A module consists of functions fetching and forwarding a star map (sky chart) to user
 
 Usage:
-Command /starmap is defined by send_star_map
-
-
-Database structure:
-
-"Users": {
-        "telegram_user_id_0": {
-            "latitude": 0,
-            "longitude": 0,
-            "address": "Your address",
-            "username": "telegram_username_0",
-            "utcOffset": 0,
-            "creation_timestamp": "1970-01-01 00:00:00",
-            "update_timestamp": "1970-01-01 00:00:00",
-            "starmap_preferences": {
-                "showEquator": False,
-                "showEcliptic": True,
-                "showStarNames": False,
-                "showPlanetNames": True,
-                "showConsNames": True,
-                "showConsLines": True,
-                "showConsBoundaries": False,
-                "showSpecials": False,
-                "use24hClock": True
-            }
-    },
-},
-
+Command /starmap is defined by preference_setting_message
 """
 
 from astro_pointer.helpers import get_current_date_time_string
@@ -39,12 +12,18 @@ import requests
 from firebase_admin import db
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaDocument, error
 from telegram.ext import CallbackContext
-from telegram.constants import ParseMode
 import fitz
 
 
 def populate_preference_buttons(user_preferences: dict) -> InlineKeyboardMarkup:
-    """Populate the preference buttons for the star map."""
+    """Populate the InlineKeyboardMarkup with the current preferences of the user.
+
+    Args:
+        user_preferences (dict): The current preferences of the user.
+
+    Returns:
+        InlineKeyboardMarkup: The InlineKeyboardMarkup with the current preferences of the user.
+    """
 
     buttons = []
 
@@ -78,7 +57,7 @@ def populate_preference_buttons(user_preferences: dict) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(buttons)
 
 
-async def preference_message(update: Update, context: CallbackContext) -> None:     # todo better name?
+async def preference_setting_message(update: Update, context: CallbackContext) -> None:
     """Send a message with the current preferences of the user."""
 
     user_id = update.effective_user.id
@@ -120,16 +99,16 @@ async def update_preference(update: Update, context: CallbackContext) -> str:
 async def reset_to_default_preferences(update: Update, context: CallbackContext) -> str:
     """Reset the preferences to default."""
 
-    user_id = update.effective_user.id
-    ref = db.reference(f"/Users/{user_id}/starmap_preferences")
-
-    ref.update(Starmap.DEFAULT_PREFERENCES)
     try:
         await update.callback_query.message.edit_reply_markup(
             reply_markup = populate_preference_buttons(Starmap.DEFAULT_PREFERENCES)
         )
     except error.BadRequest:
         pass
+    else:
+        user_id = update.effective_user.id
+        ref = db.reference(f"/Users/{user_id}/starmap_preferences")
+        ref.update(Starmap.DEFAULT_PREFERENCES)
 
     return "Preferences reset to default"
 
@@ -175,7 +154,7 @@ async def send_star_map(update: Update, context: CallbackContext) -> None:
     else:
         await context.bot.send_message(
             chat_id = chat_id,
-            text = "Please set your location with /setlocation first!"      # todo better user instructions
+            text = "Please set your location with /setlocation first!"
         )
 
 
