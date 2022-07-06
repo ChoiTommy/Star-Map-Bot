@@ -33,7 +33,7 @@ WIP
 
 ## Database Structure
 
-```json
+```jsonc
 {
     "Users": {
         "telegram_user_id_0": {
@@ -44,15 +44,27 @@ WIP
             "utcOffset": 0,
             "creation_timestamp": "1970-01-01 00:00:00",
             "update_timestamp": "1970-01-01 00:00:00",
+            "starmap_preferences": {    // default starmap preferences
+                "showEquator": false,
+                "showEcliptic": true,
+                "showStarNames": false,
+                "showPlanetNames": true,
+                "showConsNames": true,
+                "showConsLines": true,
+                "showConsBoundaries": false,
+                "showSpecials": false,
+                "use24hClock": true
+            },
         },
+        // ...
     },
     "Subscriptions": {
         "telegram_user_id_0": {
-            "telegram_chat_id_0": {     
+            "telegram_chat_id_0": {     // chat_id == user_id for private chats
                 "astrodata": {
                     "enabled": true, 
                     "timing": {
-                        "hour": "19",
+                        "hour": "19",   // default to UTC time if no location is set
                         "minute": "30"
                     }
                 },
@@ -86,10 +98,11 @@ WIP
                 },
             },
         },
+        // ...
     },
 }
 ```
-Users can have different subscriptions in both bot's DM and groups. Subscription timings will default to UTC time if not set up.
+
 ## Credits
 - [Skyandtelescope](https://skyandtelescope.org)
 - [WeatherAPI](https://www.weatherapi.com)

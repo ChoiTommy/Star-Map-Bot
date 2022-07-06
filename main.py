@@ -17,7 +17,7 @@ Send /credits to view the data sources of all the information this bot provides.
 Send /cancel to halt any operations.
 """
 
-# TODO API request async, star map features toggles, astronomy news rss
+# TODO API request async, astronomy news rss
 from astro_pointer import misc, userinfo, callback_queries
 from astro_pointer.constants import BOT_TOKEN, DATABASE_URL, GOOGLE_APPLICATION_CREDENTIALS
 from astro_pointer.features import (
@@ -31,8 +31,7 @@ from astro_pointer.features import (
 import logging
 import firebase_admin
 from firebase_admin import credentials
-from telegram import Update
-from telegram.ext import Application, ContextTypes, CommandHandler, ConversationHandler, MessageHandler, CallbackQueryHandler, filters
+from telegram.ext import Application, CommandHandler, ConversationHandler, MessageHandler, CallbackQueryHandler, filters
 
 
 # Enable logging
@@ -63,7 +62,7 @@ def main() -> None:
     # Register command handlers
     application.add_handler(CommandHandler("start", misc.bot_tutorial))
     application.add_handler(CommandHandler("credits", misc.show_credits))
-    application.add_handler(CommandHandler("starmap", starmap.send_star_map))
+    application.add_handler(CommandHandler("starmap", starmap.preference_setting_message))
     application.add_handler(CommandHandler("myinfo", userinfo.show_user_info))
     application.add_handler(CommandHandler("astrodata", astrodata.show_astro_data))
     application.add_handler(CommandHandler("weather", weather.show_weather_data))

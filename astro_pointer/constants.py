@@ -20,8 +20,12 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Star Map
 class Starmap:
-    STAR_MAP_BASE_URL = "https://www.heavens-above.com/SkyAndTelescope/StSkyChartPDF.ashx"
-    REST_OF_THE_STAR_MAP_PARAM = { # params to be injected: time, latitude, longitude, location, utcOffset(in ms)
+    STAR_MAP_BASE_URL = "https://www.heavens-above.com/SkyAndTelescope/StSkyChartPDF.ashx"  # params to be injected: time, latitude, longitude, location, utcOffset(in ms)
+    REFRESH_CALLBACK_DATA = "REFRESH_STARMAP"
+    REFRESH_BUTTON = InlineKeyboardMarkup([
+        [InlineKeyboardButton("↻ Refresh", callback_data=REFRESH_CALLBACK_DATA)]
+    ])
+    DEFAULT_PREFERENCES = {
         "showEquator": False,
         "showEcliptic": True,
         "showStarNames": False,
@@ -30,12 +34,43 @@ class Starmap:
         "showConsLines": True,
         "showConsBoundaries": False,
         "showSpecials": False,
-        "use24hClock": True
+        "use24hClock": True         # NEVER change this to False, 24-hr gang
     }
-    REFRESH_CALLBACK_DATA = "REFRESH_STARMAP"
-    REFRESH_BUTTON = InlineKeyboardMarkup([
-                                [InlineKeyboardButton("↻ Refresh", callback_data=REFRESH_CALLBACK_DATA)]
-                            ])
+    PREFERENCE_CALLBACK_DATA = "PREF_STAR_MAP"      # in the form of "PREF_STAR_MAP_PARAM_NAME"
+    GENERATE_CALLBACK_DATA = "GENERATE_STAR_MAP"
+    RESET_TO_DEFAULT_CALLBACK_DATA = "RESET_TO_DEFAULT_STAR_MAP"
+    NAME_TO_CALLBACK_DATA = {
+        "Equator": "PREF_STAR_MAP_EQUATOR",
+        "Ecliptic": "PREF_STAR_MAP_ECLIPTIC",
+        "Star Names": "PREF_STAR_MAP_STAR_NAMES",
+        "Planet Names": "PREF_STAR_MAP_PLANET_NAMES",
+        "Cons Names": "PREF_STAR_MAP_CONS_NAMES",
+        "Cons Lines": "PREF_STAR_MAP_CONS_LINES",
+        "Cons Bound": "PREF_STAR_MAP_CONS_BOUNDARIES",
+        "Specials": "PREF_STAR_MAP_SPECIALS",
+    }
+    '''
+PARAMETERS_DESCRIPTION = {
+    "Equator": "an imaginary line around the middle of the celestial sphere",
+    "Ecliptic": "the plane of Earth's orbit around the Sun",
+    "Star Names": "names of stars",
+    "Planet Names": "names of planets",
+    "Cons Names": "names of constellations",
+    "Cons Lines": "lines of constellations",
+    "Cons Bound": "boundaries of constellations",
+    "Specials": "special celestial objects",
+}
+    '''
+    CALLBACK_DATA_TO_DB_KEYS = {
+        "PREF_STAR_MAP_EQUATOR": "showEquator",
+        "PREF_STAR_MAP_ECLIPTIC": "showEcliptic",
+        "PREF_STAR_MAP_STAR_NAMES": "showStarNames",
+        "PREF_STAR_MAP_PLANET_NAMES": "showPlanetNames",
+        "PREF_STAR_MAP_CONS_NAMES": "showConsNames",
+        "PREF_STAR_MAP_CONS_LINES": "showConsLines",
+        "PREF_STAR_MAP_CONS_BOUNDARIES": "showConsBoundaries",
+        "PREF_STAR_MAP_SPECIALS": "showSpecials",
+    }
 
 
 # Astrodata
@@ -54,8 +89,8 @@ class Astrodata:
     }
     REFRESH_CALLBACK_DATA = "REFRESH_ASTRODATA"
     REFRESH_BUTTON = InlineKeyboardMarkup([
-                                [InlineKeyboardButton("↻ Refresh", callback_data=REFRESH_CALLBACK_DATA)]
-                            ])
+        [InlineKeyboardButton("↻ Refresh", callback_data=REFRESH_CALLBACK_DATA)]
+    ])
 
 
 # Weather
@@ -64,8 +99,8 @@ class Weather:
     API_BASE_URL = "https://api.weatherapi.com/v1/current.json"
     REFRESH_CALLBACK_DATA = "REFRESH_WEATHER"
     REFRESH_BUTTON = InlineKeyboardMarkup([
-                                [InlineKeyboardButton("↻ Refresh", callback_data=REFRESH_CALLBACK_DATA)]
-                            ])
+        [InlineKeyboardButton("↻ Refresh", callback_data=REFRESH_CALLBACK_DATA)]
+    ])
 
 
 # Sun
@@ -169,7 +204,7 @@ NOMINATIM_REVERSE_API_BASE_URL = "https://nominatim.openstreetmap.org/reverse"
 
 
 # Misc
-TUTORIAL_TEXT = f"""
+TUTORIAL_TEXT = """
 <code>astro* bot;</code> is designed with mobile devices in mind.
 
 <code>astro* bot;</code> is an easy-to-use astronomical bot that provides you with all the necessary stargazing information including star maps (sky charts), weather and astronomical data, etc.

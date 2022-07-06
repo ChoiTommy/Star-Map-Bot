@@ -2,7 +2,7 @@
 A module consists of functions fetching and forwarding a star map (sky chart) to user
 
 Usage:
-Command /starmap is defined by send_star_map
+Command /starmap is defined by preference_setting_message
 """
 
 from astro_pointer.helpers import get_current_date_time_string
@@ -10,10 +10,107 @@ from astro_pointer.constants import Starmap
 import time
 import requests
 from firebase_admin import db
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaDocument
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaDocument, error
 from telegram.ext import CallbackContext
-from telegram.constants import ParseMode
 import fitz
+
+
+def populate_preference_buttons(user_preferences: dict) -> InlineKeyboardMarkup:
+    """Populate the InlineKeyboardMarkup with the current preferences of the user.
+
+    Args:
+        user_preferences (dict): The current preferences of the user.
+
+    Returns:
+        InlineKeyboardMarkup: The InlineKeyboardMarkup with the current preferences of the user.
+    """
+
+    buttons = []
+
+    for i, name_n_callbackdata in enumerate(Starmap.NAME_TO_CALLBACK_DATA.items()):
+        name = name_n_callbackdata[0]
+        callbackdata = name_n_callbackdata[1]
+
+        db_key = Starmap.CALLBACK_DATA_TO_DB_KEYS[callbackdata]
+
+        if (i+1) % 2 == 1:
+            buttons.append([InlineKeyboardButton(
+                text = f"{name} {'✔' if user_preferences[db_key] else '❌'}",
+                callback_data = callbackdata
+            )])
+        else:
+            buttons[-1].append(InlineKeyboardButton(
+                text = f"{name} {'✔' if user_preferences[db_key] else '❌'}",
+                callback_data = callbackdata
+            ))
+
+    buttons.append([InlineKeyboardButton(
+        text = "Reset to default ↺",
+        callback_data = Starmap.RESET_TO_DEFAULT_CALLBACK_DATA)
+    ])
+
+    buttons.append([InlineKeyboardButton(
+        text = "Generate Star Map →",
+        callback_data = Starmap.GENERATE_CALLBACK_DATA
+    )])
+
+    return InlineKeyboardMarkup(buttons)
+
+
+async def preference_setting_message(update: Update, context: CallbackContext) -> None:
+    """Send a message with the current preferences of the user."""
+
+    user_id = update.effective_user.id
+
+    ref = db.reference(f"/Users/{user_id}")
+    data = ref.get()
+
+    if data is not None:
+        await update.message.reply_photo(
+            photo = open("assets/star_map_params.png", "rb"),
+            caption = "Set your star map preferences below:",
+            reply_markup = populate_preference_buttons(data["starmap_preferences"])
+        )
+
+    else:
+        await update.message.reply_text("Please set your location with /setlocation first!")
+
+
+async def update_preference(update: Update, context: CallbackContext) -> str:
+    """Update preferences on the Firebase database."""
+
+    db_key = Starmap.CALLBACK_DATA_TO_DB_KEYS[update.callback_query.data]
+
+    user_id = update.effective_user.id
+    ref = db.reference(f"/Users/{user_id}/starmap_preferences")
+    user_preferences = ref.get()
+
+    user_preferences[db_key] = not user_preferences[db_key]
+    # ref.update(user_preferences)
+    ref.update({db_key: user_preferences[db_key]})
+
+    await update.callback_query.message.edit_reply_markup(
+        reply_markup = populate_preference_buttons(user_preferences)
+    )
+
+    return f"{db_key} is now set to {user_preferences[db_key]}"
+
+
+async def reset_to_default_preferences(update: Update, context: CallbackContext) -> str:
+    """Reset the preferences to default."""
+
+    try:
+        await update.callback_query.message.edit_reply_markup(
+            reply_markup = populate_preference_buttons(Starmap.DEFAULT_PREFERENCES)
+        )
+    except error.BadRequest:
+        pass
+    else:
+        user_id = update.effective_user.id
+        ref = db.reference(f"/Users/{user_id}/starmap_preferences")
+        ref.update(Starmap.DEFAULT_PREFERENCES)
+
+    return "Preferences reset to default"
 
 
 async def star_map_subscription(context: CallbackContext) -> None:
@@ -39,10 +136,11 @@ async def send_star_map(update: Update, context: CallbackContext) -> None:
         longi = str(data["longitude"])
         address = data["address"]
         utcOffset = data["utcOffset"]
+        star_map_param = data["starmap_preferences"]
 
         current_date_time = get_current_date_time_string(utcOffset)
 
-        star_map_bytes = fetch_star_map(lat, longi, address, utcOffset)
+        star_map_bytes = fetch_star_map(lat, longi, address, utcOffset, star_map_param)
 
         # update.message.reply_document(document = fetch_target) # pdf
         await context.bot.send_document(
@@ -78,10 +176,11 @@ async def update_star_map(update: Update, context: CallbackContext) -> str:
         longi = str(data["longitude"])
         address = data["address"]
         utcOffset = data["utcOffset"]
+        star_map_param = data["starmap_preferences"]
 
         current_date_time = get_current_date_time_string(utcOffset)
 
-        star_map_bytes = fetch_star_map(lat, longi, address, utcOffset)
+        star_map_bytes = fetch_star_map(lat, longi, address, utcOffset, star_map_param)
 
         await update.callback_query.message.edit_media(
             media = InputMediaDocument(
@@ -98,7 +197,7 @@ async def update_star_map(update: Update, context: CallbackContext) -> str:
         return "To get a star map, set a location with /setlocation first."
 
 
-def fetch_star_map(latitude, longitude, address, utcOffset):
+def fetch_star_map(latitude, longitude, address, utcOffset, preferences):
     """Fetch a star map from skyandtelescope.com.
 
     Args:
@@ -106,6 +205,7 @@ def fetch_star_map(latitude, longitude, address, utcOffset):
         longitude (str): longitude of the location
         address (str): address text of the above location
         utcOffset (int): UTC offset in seconds
+        preferences (dict): preferences of the user
 
     Returns:
         bytes: bytes object of a plane rectangular sets of pixels
@@ -119,7 +219,7 @@ def fetch_star_map(latitude, longitude, address, utcOffset):
         "utcOffset": utcOffset * 1000
     }
 
-    response = requests.get(Starmap.STAR_MAP_BASE_URL, params=params_inject|Starmap.REST_OF_THE_STAR_MAP_PARAM) # | to merge two dictionaries
+    response = requests.get(Starmap.STAR_MAP_BASE_URL, params=params_inject|preferences)    # | to merge two dictionaries
     doc = fitz.open(stream=response.content)
     page = doc.load_page(0)  # number of page
     pix = page.get_pixmap(
