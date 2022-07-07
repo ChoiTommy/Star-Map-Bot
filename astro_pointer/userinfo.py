@@ -7,13 +7,13 @@ Command /deletemyinfo is defined by deletion_confirmation and delete_user_info
 Command /cancel is defined by cancel_location_setup or cancel_deletion
 """
 
-from astro_pointer import helpers
-from astro_pointer.constants import NOMINATIM_REVERSE_API_BASE_URL, Starmap
-import requests
 from datetime import timezone, timedelta
+import requests
 from firebase_admin import db
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import CallbackContext, ConversationHandler
+from astro_pointer import helpers
+from astro_pointer.constants import NOMINATIM_REVERSE_API_BASE_URL, Starmap
 
 
 async def show_user_info(update: Update, context: CallbackContext) -> None:
@@ -24,7 +24,7 @@ async def show_user_info(update: Update, context: CallbackContext) -> None:
     data = ref.get()
 
     if data is not None:
-        tz = timezone(offset=timedelta(seconds=data["utcOffset"]))
+        tz = timezone(offset=timedelta(seconds=data["utc_offset"]))
         msg = await update.message.reply_location(latitude=data["latitude"], longitude=data["longitude"])
         await update.message.reply_html(
             text = (f'Hi {update.effective_user.mention_html()}, \n'
@@ -90,36 +90,36 @@ async def update_location(update: Update, context: CallbackContext) -> int:
         await update.message.reply_text("You are in the middle of nowhere, my man. Send me a new location of a less remote place, please.")
         return 0                    # ask for a new location until user has given a valid one
 
+
+    address_string = address_data["display_name"]           # from nominatim
+    utc_offset = int(helpers.get_offset(lat, longi))         # in seconds
+
+    ref = db.reference(f"/Users/{user_id}")
+    data = ref.get()
+
+    if data is None:
+        username = update.effective_user.username
+        ref.set({
+            "username": username if username is not None else "None",
+            "latitude": lat,
+            "longitude": longi,
+            "address": address_string,
+            "utc_offset": utc_offset,
+            "creation_timestamp": helpers.get_current_date_time_string(),    # UTC time
+        }|{
+            "starmap_preferences": Starmap.DEFAULT_PREFERENCES
+        })
     else:
-        address_string = address_data["display_name"]           # from nominatim
-        utcOffset = int(helpers.get_offset(lat, longi))         # in seconds
+        ref.update({
+            "latitude" : lat,
+            "longitude" : longi,
+            "address" : address_string,
+            "utc_offset" : utc_offset,
+            "update_timestamp": helpers.get_current_date_time_string()      # UTC time
+        })
 
-        ref = db.reference(f"/Users/{user_id}")
-        data = ref.get()
-
-        if data is None:
-            username = update.effective_user.username
-            ref.set({
-                "username": username if username is not None else "None",
-                "latitude": lat,
-                "longitude": longi,
-                "address": address_string,
-                "utcOffset": utcOffset,
-                "creation_timestamp": helpers.get_current_date_time_string(),    # UTC time
-            }|{
-                "starmap_preferences": Starmap.DEFAULT_PREFERENCES
-            })
-        else:
-            ref.update({
-                "latitude" : lat,
-                "longitude" : longi,
-                "address" : address_string,
-                "utcOffset" : utcOffset,
-                "update_timestamp": helpers.get_current_date_time_string()      # UTC time
-            })
-
-        await update.message.reply_html(f"All set! Your new location is {lat}, {longi} (<i>{address_string}</i>).")
-        return ConversationHandler.END
+    await update.message.reply_html(f"All set! Your new location is {lat}, {longi} (<i>{address_string}</i>).")
+    return ConversationHandler.END
 
 
 async def cancel_location_setup(update: Update, context: CallbackContext) -> int:
@@ -142,12 +142,12 @@ async def deletion_confirmation(update: Update, context: CallbackContext) -> int
                     "Perhaps you can try /setlocation and give me something to delete afterwards?")
         )
         return ConversationHandler.END
-    else:
-        await update.message.reply_text(
-            "Are you sure you want to delete your location data? Note that this action cannot be undone.",
-            reply_markup = ReplyKeyboardMarkup([['Yes', 'No']], resize_keyboard = True)
-        )
-        return 0
+
+    await update.message.reply_text(
+        "Are you sure you want to delete your location data? Note that this action cannot be undone.",
+        reply_markup = ReplyKeyboardMarkup([['Yes', 'No']], resize_keyboard = True)
+    )
+    return 0
 
 
 async def delete_user_info(update: Update, context: CallbackContext) -> int:
@@ -166,8 +166,8 @@ async def delete_user_info(update: Update, context: CallbackContext) -> int:
             reply_markup = ReplyKeyboardRemove()
         )
         return ConversationHandler.END
-    else:
-        return await cancel_deletion(update, context)
+
+    return await cancel_deletion(update, context)
 
 
 async def cancel_deletion(update: Update, context: CallbackContext) -> int:

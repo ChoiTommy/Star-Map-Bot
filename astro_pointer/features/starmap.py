@@ -5,14 +5,14 @@ Usage:
 Command /starmap is defined by preference_setting_message
 """
 
-from astro_pointer.helpers import get_current_date_time_string
-from astro_pointer.constants import Starmap
 import time
 import requests
 from firebase_admin import db
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaDocument, error
 from telegram.ext import CallbackContext
 import fitz
+from astro_pointer.helpers import get_current_date_time_string
+from astro_pointer.constants import Starmap
 
 
 def populate_preference_buttons(user_preferences: dict) -> InlineKeyboardMarkup:
@@ -68,7 +68,7 @@ async def preference_setting_message(update: Update, context: CallbackContext) -
     if data is not None:
         await update.message.reply_photo(
             photo = open("assets/star_map_params.png", "rb"),
-            caption = "Set your star map preferences below:",
+            caption = "Toggle your star map preferences by clicking the buttons below. They will be saved automatically and used for future star map generation.",
             reply_markup = populate_preference_buttons(data["starmap_preferences"])
         )
 
@@ -135,12 +135,12 @@ async def send_star_map(update: Update, context: CallbackContext) -> None:
         lat = str(data["latitude"])
         longi = str(data["longitude"])
         address = data["address"]
-        utcOffset = data["utcOffset"]
+        utc_offset = data["utc_offset"]
         star_map_param = data["starmap_preferences"]
 
-        current_date_time = get_current_date_time_string(utcOffset)
+        current_date_time = get_current_date_time_string(utc_offset)
 
-        star_map_bytes = fetch_star_map(lat, longi, address, utcOffset, star_map_param)
+        star_map_bytes = fetch_star_map(lat, longi, address, utc_offset, star_map_param)
 
         # update.message.reply_document(document = fetch_target) # pdf
         await context.bot.send_document(
@@ -175,12 +175,12 @@ async def update_star_map(update: Update, context: CallbackContext) -> str:
         lat = str(data["latitude"])
         longi = str(data["longitude"])
         address = data["address"]
-        utcOffset = data["utcOffset"]
+        utc_offset = data["utc_offset"]
         star_map_param = data["starmap_preferences"]
 
-        current_date_time = get_current_date_time_string(utcOffset)
+        current_date_time = get_current_date_time_string(utc_offset)
 
-        star_map_bytes = fetch_star_map(lat, longi, address, utcOffset, star_map_param)
+        star_map_bytes = fetch_star_map(lat, longi, address, utc_offset, star_map_param)
 
         await update.callback_query.message.edit_media(
             media = InputMediaDocument(
@@ -192,19 +192,19 @@ async def update_star_map(update: Update, context: CallbackContext) -> str:
         )
 
         return "Star map updated"
-    else:
-        await update.callback_query.message.delete()
-        return "To get a star map, set a location with /setlocation first."
+
+    await update.callback_query.message.delete()
+    return "To get a star map, set a location with /setlocation first."
 
 
-def fetch_star_map(latitude, longitude, address, utcOffset, preferences):
+def fetch_star_map(latitude, longitude, address, utc_offset, preferences):
     """Fetch a star map from skyandtelescope.com.
 
     Args:
         latitude (str): latitude of the location
         longitude (str): longitude of the location
         address (str): address text of the above location
-        utcOffset (int): UTC offset in seconds
+        utc_offset (int): UTC offset in seconds
         preferences (dict): preferences of the user
 
     Returns:
@@ -216,7 +216,7 @@ def fetch_star_map(latitude, longitude, address, utcOffset, preferences):
         "latitude": latitude,
         "longitude": longitude,
         "location": address,
-        "utcOffset": utcOffset * 1000
+        "utcOffset": utc_offset * 1000
     }
 
     response = requests.get(Starmap.STAR_MAP_BASE_URL, params=params_inject|preferences)    # | to merge two dictionaries

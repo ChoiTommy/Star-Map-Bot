@@ -1,7 +1,6 @@
+import os
 import firebase_admin
 from firebase_admin import credentials, db
-import os
-import os
 from dotenv import load_dotenv
 from astro_pointer.constants import Starmap
 
@@ -19,7 +18,7 @@ def main():
         }
     )
 
-    ref = db.reference(f"/Users")
+    ref = db.reference("/Users")
     users = ref.get()
 
     for user_id in users:

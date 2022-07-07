@@ -11,16 +11,16 @@ Usage: /unsub(scribe) [starmap|astrodata|weather|iss|sun]
 Example: /unsub starmap,astrodata,weather,iss,sun
 """
 
-from astro_pointer.features.starmap import star_map_subscription
-from astro_pointer.features.astrodata import astro_data_subscription
-from astro_pointer.features.weather import weather_subscription
-from astro_pointer.features.iss import iss_subscription
-from astro_pointer.features.sun import sun_subscription
 from datetime import time, timedelta, timezone
 from firebase_admin import db
 from telegram import Update
 from telegram.ext import CallbackContext
 from tabulate import tabulate
+from astro_pointer.features.starmap import star_map_subscription
+from astro_pointer.features.astrodata import astro_data_subscription
+from astro_pointer.features.weather import weather_subscription
+from astro_pointer.features.iss import iss_subscription
+from astro_pointer.features.sun import sun_subscription
 
 
 DEFAULT_FEATURES = {
@@ -136,7 +136,7 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
         return
 
     ref = db.reference(f"/Users/{user_id}")
-    utcOffset = ref.get()["utcOffset"] if ref.get() is not None else 0
+    utc_offset = ref.get()["utc_offset"] if ref.get() is not None else 0
 
     ref = db.reference(f"/Subscriptions/{user_id}/{chat_id}")
     user_data = DEFAULT_DB if ref.get() is None else ref.get()
@@ -156,7 +156,7 @@ async def subscribe(update: Update, context: CallbackContext) -> None:
         t = time(
             hour = int(h),
             minute = int(m),
-            tzinfo = timezone(offset=timedelta(seconds=utcOffset))
+            tzinfo = timezone(offset=timedelta(seconds=utc_offset))
         )        # Time in accordance with user's timezone set with /setlocation
 
         user_data[feature]["enabled"] = True
@@ -246,7 +246,7 @@ async def unsubscribe(update: Update, context: CallbackContext) -> None:
 async def load_jobs_into_jobqueue(context: CallbackContext) -> None:
     """Load subscriptions into jobqueue while starting up the bot"""
 
-    ref = db.reference(f"/Subscriptions")
+    ref = db.reference("/Subscriptions")
     user_sub_data = ref.get()
 
     if user_sub_data is not None:
@@ -255,12 +255,12 @@ async def load_jobs_into_jobqueue(context: CallbackContext) -> None:
                 for feature_name, sub_info in feature_info.items():
                     if sub_info["enabled"]:
                         ref = db.reference(f"/Users/{user_id}")
-                        utcOffset = ref.get()["utcOffset"]
+                        utc_offset = ref.get()["utc_offset"]
 
                         t = time(
                             hour = int(sub_info["timing"]["hour"]),
                             minute = int(sub_info["timing"]["minute"]),
-                            tzinfo = timezone(offset=timedelta(seconds=utcOffset))
+                            tzinfo = timezone(offset=timedelta(seconds=utc_offset))
                         )
 
                         context.job_queue.run_daily(

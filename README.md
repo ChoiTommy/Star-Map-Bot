@@ -41,7 +41,7 @@ WIP
             "longitude": 0,
             "address": "Your address",
             "username": "telegram_username_0",
-            "utcOffset": 0,
+            "utc_offset": 0,
             "creation_timestamp": "1970-01-01 00:00:00",
             "update_timestamp": "1970-01-01 00:00:00",
             "starmap_preferences": {    // default starmap preferences

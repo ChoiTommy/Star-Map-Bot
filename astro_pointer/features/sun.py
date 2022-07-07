@@ -5,12 +5,13 @@ Usage:
 Command /sun is defined by send_sun_photo
 """
 
-from astro_pointer.helpers import get_current_date_time_string
-from astro_pointer.constants import Sun
-import time, httpx, asyncio
+import asyncio
+import httpx
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto, error
 from telegram.ext import CallbackContext
 from telegram.constants import ParseMode
+from astro_pointer.helpers import get_current_date_time_string
+from astro_pointer.constants import Sun
 
 
 async def fetch_sun_photos(context: CallbackContext) -> None:
@@ -41,21 +42,22 @@ async def send_sun_photo(update: Update, context: CallbackContext) -> None:
         last_fetched = txt.read()
     default_starting_point = 0
 
-    await context.bot.send_photo(
-        chat_id = chat_id,
-        photo = open(f"{Sun.PHOTO_PATH}{default_starting_point}.jpg", "rb"),
-        caption = (f"🌞 Live Photos of the Sun \n"
-                    f"{Sun.PHOTO_NAMES[default_starting_point]} \n"
-                    f"({last_fetched})"),
-        reply_markup = InlineKeyboardMarkup([
-                            [
-                                InlineKeyboardButton("<<", callback_data=f"{Sun.UPDATE_PHOTO}_{(default_starting_point - 1) % Sun.PHOTO_COUNT}"),
-                                InlineKeyboardButton("↻", callback_data=f"{Sun.UPDATE_PHOTO}_{default_starting_point}"),
-                                InlineKeyboardButton(">>", callback_data=f"{Sun.UPDATE_PHOTO}_{(default_starting_point + 1) % Sun.PHOTO_COUNT}")
-                            ],
-                            [InlineKeyboardButton("⇣ Show description", callback_data=f"{Sun.SHOW_DESCRIPTION}_{default_starting_point}")]
-                        ])
-    )
+    with open(f"{Sun.PHOTO_PATH}{default_starting_point}.jpg", "rb") as pic:
+        await context.bot.send_photo(
+            chat_id = chat_id,
+            photo = pic,
+            caption = (f"🌞 Live Photos of the Sun \n"
+                        f"{Sun.PHOTO_NAMES[default_starting_point]} \n"
+                        f"({last_fetched})"),
+            reply_markup = InlineKeyboardMarkup([
+                [
+                    InlineKeyboardButton("<<", callback_data=f"{Sun.UPDATE_PHOTO}_{(default_starting_point - 1) % Sun.PHOTO_COUNT}"),
+                    InlineKeyboardButton("↻", callback_data=f"{Sun.UPDATE_PHOTO}_{default_starting_point}"),
+                    InlineKeyboardButton(">>", callback_data=f"{Sun.UPDATE_PHOTO}_{(default_starting_point + 1) % Sun.PHOTO_COUNT}")
+                ],
+                [InlineKeyboardButton("⇣ Show description", callback_data=f"{Sun.SHOW_DESCRIPTION}_{default_starting_point}")]
+            ])
+        )
 
 
 async def show_description(update: Update, context: CallbackContext) -> str:
@@ -73,13 +75,13 @@ async def show_description(update: Update, context: CallbackContext) -> str:
                     f"{Sun.PHOTO_DESCRIPTIONS[sun_number]}"),
         parse_mode = ParseMode.HTML,
         reply_markup = InlineKeyboardMarkup([
-                            [
-                                InlineKeyboardButton("<<", callback_data=f"{Sun.UPDATE_PHOTO}_{(sun_number - 1) % Sun.PHOTO_COUNT}"),
-                                InlineKeyboardButton("↻", callback_data=f"{Sun.UPDATE_PHOTO}_{sun_number}"),
-                                InlineKeyboardButton(">>", callback_data=f"{Sun.UPDATE_PHOTO}_{(sun_number + 1) % Sun.PHOTO_COUNT}")
-                            ],
-                            [InlineKeyboardButton("⇡ Hide description", callback_data=f"{Sun.HIDE_DESCRIPTION}_{sun_number}")]
-                        ])
+            [
+                InlineKeyboardButton("<<", callback_data=f"{Sun.UPDATE_PHOTO}_{(sun_number - 1) % Sun.PHOTO_COUNT}"),
+                InlineKeyboardButton("↻", callback_data=f"{Sun.UPDATE_PHOTO}_{sun_number}"),
+                InlineKeyboardButton(">>", callback_data=f"{Sun.UPDATE_PHOTO}_{(sun_number + 1) % Sun.PHOTO_COUNT}")
+            ],
+            [InlineKeyboardButton("⇡ Hide description", callback_data=f"{Sun.HIDE_DESCRIPTION}_{sun_number}")]
+        ])
     )
     return "Description shown"
 
@@ -96,13 +98,13 @@ async def hide_description(update: Update, context: CallbackContext) -> str:
     await update.callback_query.message.edit_caption(
         caption = (f"{update.callback_query.message.caption[:update.callback_query.message.caption.find('*')]}"),
         reply_markup = InlineKeyboardMarkup([
-                            [
-                                InlineKeyboardButton("<<", callback_data=f"{Sun.UPDATE_PHOTO}_{(sun_number - 1) % Sun.PHOTO_COUNT}"),
-                                InlineKeyboardButton("↻", callback_data=f"{Sun.UPDATE_PHOTO}_{sun_number}"),
-                                InlineKeyboardButton(">>", callback_data=f"{Sun.UPDATE_PHOTO}_{(sun_number + 1) % Sun.PHOTO_COUNT}")
-                            ],
-                            [InlineKeyboardButton("⇣ Show description", callback_data=f"{Sun.SHOW_DESCRIPTION}_{sun_number}")]
-                        ])
+            [
+                InlineKeyboardButton("<<", callback_data=f"{Sun.UPDATE_PHOTO}_{(sun_number - 1) % Sun.PHOTO_COUNT}"),
+                InlineKeyboardButton("↻", callback_data=f"{Sun.UPDATE_PHOTO}_{sun_number}"),
+                InlineKeyboardButton(">>", callback_data=f"{Sun.UPDATE_PHOTO}_{(sun_number + 1) % Sun.PHOTO_COUNT}")
+            ],
+            [InlineKeyboardButton("⇣ Show description", callback_data=f"{Sun.SHOW_DESCRIPTION}_{sun_number}")]
+        ])
     )
     return "Description hidden"
 
@@ -119,22 +121,24 @@ async def update_sun_photo(update: Update, context: CallbackContext) -> str:
         last_fetched = txt.read()
 
     try:
-        await update.callback_query.message.edit_media(
-            media = InputMediaPhoto(
-                media = open(f"{Sun.PHOTO_PATH}{sun_number}.jpg", "rb"),
-                caption = (f"🌞 Live Photos of the Sun \n"
-                            f"{Sun.PHOTO_NAMES[sun_number]} \n"
-                            f"({last_fetched})")
-            ),
-            reply_markup = InlineKeyboardMarkup([
-                                [
-                                    InlineKeyboardButton("<<", callback_data=f"{Sun.UPDATE_PHOTO}_{(sun_number - 1) % Sun.PHOTO_COUNT}"),
-                                    InlineKeyboardButton("↻", callback_data=f"{Sun.UPDATE_PHOTO}_{sun_number}"),
-                                    InlineKeyboardButton(">>", callback_data=f"{Sun.UPDATE_PHOTO}_{(sun_number + 1) % Sun.PHOTO_COUNT}")
-                                ],
-                                [InlineKeyboardButton("⇣ Show description", callback_data=f"{Sun.SHOW_DESCRIPTION}_{sun_number}")]
-                            ])
-        )
+        with open(f"{Sun.PHOTO_PATH}{sun_number}.jpg", "rb") as pic:
+            await update.callback_query.message.edit_media(
+                media = InputMediaPhoto(
+                    media = pic,
+                    caption = (f"🌞 Live Photos of the Sun \n"
+                                f"{Sun.PHOTO_NAMES[sun_number]} \n"
+                                f"({last_fetched})")
+                ),
+                reply_markup = InlineKeyboardMarkup([
+                    [
+                        InlineKeyboardButton("<<", callback_data=f"{Sun.UPDATE_PHOTO}_{(sun_number - 1) % Sun.PHOTO_COUNT}"),
+                        InlineKeyboardButton("↻", callback_data=f"{Sun.UPDATE_PHOTO}_{sun_number}"),
+                        InlineKeyboardButton(">>", callback_data=f"{Sun.UPDATE_PHOTO}_{(sun_number + 1) % Sun.PHOTO_COUNT}")
+                    ],
+                    [InlineKeyboardButton("⇣ Show description", callback_data=f"{Sun.SHOW_DESCRIPTION}_{sun_number}")]
+                ])
+            )
+
     except error.BadRequest:
         return "The photo is up-to-date. Please try again later."
     else:

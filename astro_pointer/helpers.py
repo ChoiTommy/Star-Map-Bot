@@ -31,7 +31,7 @@ def get_offset(lat=0, longi=0) -> float:
     return (today_utc - today_target).total_seconds()
 
 
-def utcOffset_to_tzstring(offset=0) -> str:
+def utc_offset_to_tzstring(offset=0) -> str:
     """This function generates a timezone string (e.g. UTC+9:00) from a UTC offset in integer.
         Deprecated. Use `timezone(offset=timedelta(seconds=offset)).tzname(None)` instead.
 
@@ -47,18 +47,18 @@ def utcOffset_to_tzstring(offset=0) -> str:
     tz_minutes = int((abs(offset) - abs(tz_hour)) * 60)
     if tz_hour >= 0:
         return f"UTC+{tz_hour:02d}:{tz_minutes:02d}"
-    else:
-        return f"UTC{tz_hour:03d}:{tz_minutes:02d}"
+
+    return f"UTC{tz_hour:03d}:{tz_minutes:02d}"
 
 
-def get_current_date_time_string(utcOffset=0) -> str:
+def get_current_date_time_string(utc_offset=0) -> str:
     """Get a string of current date and time. e.g. 2022-05-26 00:00:00. Default is UTC time.
 
     Args:
-        utcOffset (int): UTC offset in seconds
+        utc_offset (int): UTC offset in seconds
 
     Returns:
         str: a string consisting of date and time
     """
     current_timestamp = int(time.time()) # in UTC
-    return str(datetime.utcfromtimestamp(current_timestamp + utcOffset))
+    return str(datetime.utcfromtimestamp(current_timestamp + utc_offset))

@@ -5,17 +5,19 @@ Usage:
 Command /iss is defined by iss_live_location
 """
 
-from astro_pointer.constants import ISS
-import requests, asyncio
+import asyncio
+import requests
 from telegram import Update, Location
 from telegram.ext import CallbackContext
+from astro_pointer.constants import ISS
 
 
 async def iss_subscription(context: CallbackContext) -> None:
     await iss_live_location(update=None, context=context)
 
 
-async def iss_live_location(update: Update, context: CallbackContext) -> None: # TODO switch to depending on context only
+async def iss_live_location(update: Update, context: CallbackContext) -> None:
+    """Send a live location of the International Space Station to the user."""
 
     chat_id = context.job.chat_id if update is None else update.effective_chat.id
 
@@ -35,7 +37,7 @@ async def iss_live_location(update: Update, context: CallbackContext) -> None: #
             msg = await context.bot.send_location(
                 chat_id = chat_id,
                 location = loc,
-                live_period = 120,        # in seconds
+                live_period = 130,        # in seconds
                 reply_to_message_id = title.message_id
             )
         else:

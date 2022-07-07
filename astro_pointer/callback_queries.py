@@ -3,6 +3,8 @@ A module handles callback queries
 
 """
 
+from telegram import Update
+from telegram.ext import CallbackContext
 from astro_pointer.features import (
     weather,
     astrodata,
@@ -10,8 +12,6 @@ from astro_pointer.features import (
     sun
 )
 from astro_pointer.constants import Weather, Astrodata, Starmap, Sun
-from telegram import Update
-from telegram.ext import CallbackContext
 
 
 async def callback(update: Update, context: CallbackContext) -> None:

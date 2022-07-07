@@ -5,14 +5,14 @@ Usage:
 Command /astrodata is defined by show_astro_data
 """
 
-from astro_pointer.helpers import get_current_date_time_string
-from astro_pointer.constants import Astrodata
 import requests
 from firebase_admin import db
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, error
+from telegram import Update
 from telegram.ext import CallbackContext
 from telegram.constants import ParseMode
 from tabulate import tabulate
+from astro_pointer.helpers import get_current_date_time_string
+from astro_pointer.constants import Astrodata
 
 
 async def astro_data_subscription(context: CallbackContext) -> None:
@@ -37,7 +37,7 @@ async def show_astro_data(update: Update, context: CallbackContext) -> None:
         longi = data["longitude"]
 
         tble = fetch_astro_data(lat, longi)
-        current_date_time = get_current_date_time_string(data["utcOffset"])
+        current_date_time = get_current_date_time_string(data["utc_offset"])
 
         await context.bot.send_message(
             chat_id = chat_id,
@@ -72,7 +72,7 @@ async def update_astro_data(update: Update, context: CallbackContext) -> str:
         longi = data["longitude"]
 
         tble = fetch_astro_data(lat, longi)
-        current_date_time = get_current_date_time_string(data["utcOffset"])
+        current_date_time = get_current_date_time_string(data["utc_offset"])
 
         new_text = ("🌠 <b>Astronomical data</b>: \n"
                     f"<code>{tabulate(tble, tablefmt='simple')}</code> \n"
@@ -86,9 +86,8 @@ async def update_astro_data(update: Update, context: CallbackContext) -> str:
 
         return "Astrodata refreshed"
 
-    else:
-        await update.callback_query.message.delete()
-        return "I need your location to get the astronomical data."
+    await update.callback_query.message.delete()
+    return "I need your location to get the astronomical data."
 
 
 def fetch_astro_data(latitude, longitude):

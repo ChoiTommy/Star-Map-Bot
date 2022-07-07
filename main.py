@@ -18,6 +18,17 @@ Send /cancel to halt any operations.
 """
 
 # TODO API request async, astronomy news rss
+import logging
+import firebase_admin
+from firebase_admin import credentials
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    ConversationHandler,
+    MessageHandler,
+    CallbackQueryHandler,
+    filters
+)
 from astro_pointer import misc, userinfo, callback_queries
 from astro_pointer.constants import BOT_TOKEN, DATABASE_URL, GOOGLE_APPLICATION_CREDENTIALS
 from astro_pointer.features import (
@@ -28,10 +39,6 @@ from astro_pointer.features import (
     iss,
     subscription
 )
-import logging
-import firebase_admin
-from firebase_admin import credentials
-from telegram.ext import Application, CommandHandler, ConversationHandler, MessageHandler, CallbackQueryHandler, filters
 
 
 # Enable logging
@@ -74,7 +81,10 @@ def main() -> None:
     application.add_handler(ConversationHandler(
         entry_points = [CommandHandler("setlocation", userinfo.set_location)],
         states = {
-            0: [MessageHandler(filters.LOCATION | filters.Regex("[0-9]*\.[0-9]+,[ ]?[0-9]*\.[0-9]+"), userinfo.update_location)]
+            0: [MessageHandler(
+                filters.LOCATION | filters.Regex("[0-9]*\.[0-9]+,[ ]?[0-9]*\.[0-9]+"),
+                userinfo.update_location
+            )]
         },
         fallbacks = [CommandHandler("cancel", userinfo.cancel_location_setup)],
         conversation_timeout = 300 # 5 mins
