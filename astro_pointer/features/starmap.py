@@ -220,15 +220,14 @@ def fetch_star_map(latitude, longitude, address, utc_offset, preferences):
     }
 
     response = requests.get(Starmap.STAR_MAP_BASE_URL, params=params_inject|preferences)    # | to merge two dictionaries
-    doc = fitz.open(stream=response.content)
-    page = doc.load_page(0)  # number of page
-    pix = page.get_pixmap(
-        dpi = 200,
-        colorspace = fitz.csRGB,
-        annots = False,
-        clip = fitz.IRect(1, 1, 600, 650)
-    )
-    pix.tint_with(black=-129010, white=0) # no idea on how these values work, just do trial and error
-    doc.close()
+    with fitz.open(stream=response.content) as doc:
+        page = doc.load_page(0)  # load the first page
+        pix = page.get_pixmap(
+            dpi = 200,
+            colorspace = fitz.csRGB,
+            annots = False,
+            clip = fitz.IRect(1, 1, 600, 650)
+        )
+        pix.tint_with(black=-129010, white=0) # no idea on how these values work, just do trial and error
 
     return pix.tobytes()

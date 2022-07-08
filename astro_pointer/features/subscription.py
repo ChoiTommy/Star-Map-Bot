@@ -293,6 +293,7 @@ def get_user_subscription_info(user_id, chat_id) -> list[list[str]]:
         }
         for key in DEFAULT_FEATURES
     }
+
     ref = db.reference(f"/Subscriptions/{user_id}/{chat_id}")
     display_text = []
     user_data = ref.get() if ref.get() is not None else DEFAULT_DB
