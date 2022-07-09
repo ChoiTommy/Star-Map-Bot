@@ -108,7 +108,6 @@ def fetch_weather_data(latitude, longitude):
         list of list of str: for generating pretty table
         str : URL to the icon of current condition
         str : Description of the current condition
-        ~~str : Current date and time~~
     """
 
     params_inject = {

@@ -132,8 +132,8 @@ async def send_star_map(update: Update, context: CallbackContext) -> None:
 
     if data is not None:
 
-        lat = str(data["latitude"])
-        longi = str(data["longitude"])
+        lat = data["latitude"]
+        longi = data["longitude"]
         address = data["address"]
         utc_offset = data["utc_offset"]
         star_map_param = data["starmap_preferences"]
@@ -172,8 +172,8 @@ async def update_star_map(update: Update, context: CallbackContext) -> str:
 
     if data is not None:
 
-        lat = str(data["latitude"])
-        longi = str(data["longitude"])
+        lat = data["latitude"]
+        longi = data["longitude"]
         address = data["address"]
         utc_offset = data["utc_offset"]
         star_map_param = data["starmap_preferences"]
@@ -197,12 +197,12 @@ async def update_star_map(update: Update, context: CallbackContext) -> str:
     return "To get a star map, set a location with /setlocation first."
 
 
-def fetch_star_map(latitude, longitude, address, utc_offset, preferences):
+def fetch_star_map(latitude: float, longitude: float, address: str, utc_offset: int, preferences: dict):
     """Fetch a star map from skyandtelescope.com.
 
     Args:
-        latitude (str): latitude of the location
-        longitude (str): longitude of the location
+        latitude (float): latitude of the location
+        longitude (float): longitude of the location
         address (str): address text of the above location
         utc_offset (int): UTC offset in seconds
         preferences (dict): preferences of the user
@@ -212,11 +212,11 @@ def fetch_star_map(latitude, longitude, address, utc_offset, preferences):
     """
 
     params_inject = {
-        "time": int(time.time()*1000), # time.time(): seconds (floating point) since the epoch in UTC
+        "time": int(time.time()*1000),  # time.time(): seconds (floating point) since the epoch in UTC
         "latitude": latitude,
         "longitude": longitude,
         "location": address,
-        "utcOffset": utc_offset * 1000
+        "utcOffset": utc_offset * 1000  # convert to milliseconds
     }
 
     response = requests.get(Starmap.STAR_MAP_BASE_URL, params=params_inject|preferences)    # | to merge two dictionaries
