@@ -10,10 +10,10 @@ Command /cancel is defined by cancel_location_setup or cancel_deletion
 from datetime import timezone, timedelta
 import requests
 from firebase_admin import db
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import CallbackContext, ConversationHandler
 from astro_pointer import helpers
-from astro_pointer.constants import NOMINATIM_REVERSE_API_BASE_URL, Starmap
+from astro_pointer.constants import NOMINATIM_REVERSE_API_BASE_URL, Starmap, COMMAND_KEYBOARD
 
 
 async def show_user_info(update: Update, context: CallbackContext) -> None:
@@ -163,7 +163,7 @@ async def delete_user_info(update: Update, context: CallbackContext) -> int:
         await update.message.reply_text(
             text = ("Voilà! I have erased your existence. Keep it up and leave no trace in the cyber world! \n"
                     "/myinfo <- click it to see for yourself, scumbag"),
-            reply_markup = ReplyKeyboardRemove()
+            reply_markup = COMMAND_KEYBOARD
         )
         return ConversationHandler.END
 
@@ -173,5 +173,5 @@ async def delete_user_info(update: Update, context: CallbackContext) -> int:
 async def cancel_deletion(update: Update, context: CallbackContext) -> int:
     """Cancel the deletion operation with the command /cancel. Return ConversationHandler.END"""
 
-    await update.message.reply_text("Got it! My generous user. Your data are still in my hands.", reply_markup=ReplyKeyboardRemove())
+    await update.message.reply_text("Got it! My generous user. Your data are still in my hands.", reply_markup=COMMAND_KEYBOARD)
     return ConversationHandler.END

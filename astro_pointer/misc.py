@@ -9,7 +9,7 @@ Command /start is defined by bot_tutorial
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from telegram.constants import ParseMode
-from astro_pointer.constants import TUTORIAL_TEXT
+from astro_pointer.constants import TUTORIAL_TEXT, COMMAND_KEYBOARD
 
 
 async def show_credits(update: Update, context: CallbackContext) -> None:
@@ -26,12 +26,13 @@ async def show_credits(update: Update, context: CallbackContext) -> None:
     )
 
 
-async def bot_tutorial(update: Update, context: CallbackContext) -> None: # TODO: privacy policy
+async def bot_tutorial(update: Update, context: CallbackContext) -> None:   # TODO: privacy policy
     """Act as a welcome message and tutorial to anyone who starts the bot"""
 
     with open("assets/description_pic.png", "rb") as pic:
         await update.message.reply_photo(
             photo = pic,
             caption = TUTORIAL_TEXT,
-            parse_mode = ParseMode.HTML
+            parse_mode = ParseMode.HTML,
+            reply_markup = COMMAND_KEYBOARD
         )

@@ -5,7 +5,7 @@ A module consists of all the constants used in this bot
 
 import os
 # from dotenv import load_dotenv
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
 
 
 # Load credentials from environment variables
@@ -215,3 +215,13 @@ As weather and astronomical data do not differ much within a few kilometers' ran
 
 Press the menu button at the bottom left of your screen to view all the commands available.
 """
+
+COMMAND_KEYBOARD = ReplyKeyboardMarkup(
+    [
+        ['/starmap', '/astrodata'],
+        ['/sun', '/weather', '/iss'],
+        ['/sub', '/unsub'],
+        ['/myinfo', '/setlocation', '/deletemyinfo'],
+    ],
+    resize_keyboard = True
+)
