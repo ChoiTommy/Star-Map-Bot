@@ -45,9 +45,14 @@ def populate_preference_buttons(user_preferences: dict) -> InlineKeyboardMarkup:
             ))
 
     buttons.append([InlineKeyboardButton(
+        text = f"Redscaling {'✔' if user_preferences[Starmap.REDSCALE_DB_KEY] else '❌'}",
+        callback_data = Starmap.REDSCALE_CALLBACK_DATA,
+    )])
+
+    buttons.append([InlineKeyboardButton(
         text = "Reset to default ↺",
-        callback_data = Starmap.RESET_TO_DEFAULT_CALLBACK_DATA)
-    ])
+        callback_data = Starmap.RESET_TO_DEFAULT_CALLBACK_DATA
+    )])
 
     buttons.append([InlineKeyboardButton(
         text = "Generate Star Map →",
@@ -59,6 +64,12 @@ def populate_preference_buttons(user_preferences: dict) -> InlineKeyboardMarkup:
 
 async def preference_setting_message(update: Update, context: CallbackContext) -> None:
     """Send a message with the current preferences of the user."""
+
+    args = context.args
+
+    if "skip" in args or "-s" in args:
+        await send_star_map(update, context)
+        return
 
     user_id = update.effective_user.id
 
@@ -140,13 +151,13 @@ async def send_star_map(update: Update, context: CallbackContext) -> None:
 
         current_date_time = get_current_date_time_string(utc_offset)
 
-        star_map_bytes = fetch_star_map(lat, longi, address, utc_offset, star_map_param)
+        star_map_bytes, file_extension = fetch_star_map(lat, longi, address, utc_offset, star_map_param)
 
         # update.message.reply_document(document = fetch_target) # pdf
         await context.bot.send_document(
             chat_id = chat_id,
             document = star_map_bytes,
-            filename = f"Star_Map_{current_date_time.replace(' ', '_').replace(':', '_')}.png",
+            filename = f"Star_Map_{current_date_time.replace(' ', '_').replace(':', '_')}.{file_extension}",
             caption = f"Enjoy the stunning stars! Be considerate and leave no trace while stargazing! \n ({current_date_time})",
             reply_markup = Starmap.REFRESH_BUTTON
         )
@@ -180,12 +191,12 @@ async def update_star_map(update: Update, context: CallbackContext) -> str:
 
         current_date_time = get_current_date_time_string(utc_offset)
 
-        star_map_bytes = fetch_star_map(lat, longi, address, utc_offset, star_map_param)
+        star_map_bytes, file_extension = fetch_star_map(lat, longi, address, utc_offset, star_map_param)
 
         await update.callback_query.message.edit_media(
             media = InputMediaDocument(
                 media = star_map_bytes,
-                filename = f"Star_Map_{current_date_time.replace(' ', '_').replace(':', '_')}.png",
+                filename = f"Star_Map_{current_date_time.replace(' ', '_').replace(':', '_')}.{file_extension}",
                 caption = f"Enjoy the stunning stars! Be considerate and leave no trace while stargazing! \n ({current_date_time})"
             ),
             reply_markup = Starmap.REFRESH_BUTTON
@@ -209,6 +220,7 @@ def fetch_star_map(latitude: float, longitude: float, address: str, utc_offset: 
 
     Returns:
         bytes: bytes object of a plane rectangular sets of pixels
+        str: file extension of the image
     """
 
     params_inject = {
@@ -219,15 +231,21 @@ def fetch_star_map(latitude: float, longitude: float, address: str, utc_offset: 
         "utcOffset": utc_offset * 1000  # convert to milliseconds
     }
 
-    response = requests.get(Starmap.STAR_MAP_BASE_URL, params=params_inject|preferences)    # | to merge two dictionaries
-    with fitz.open(stream=response.content) as doc:
-        page = doc.load_page(0)  # load the first page
-        pix = page.get_pixmap(
-            dpi = 200,
-            colorspace = fitz.csRGB,
-            annots = False,
-            clip = fitz.IRect(1, 1, 600, 650)
-        )
-        pix.tint_with(black=-129010, white=0) # no idea on how these values work, just do trial and error
+    redscale = preferences.pop(Starmap.REDSCALE_DB_KEY, False)
 
-    return pix.tobytes()
+    response = requests.get(Starmap.STAR_MAP_BASE_URL, params=params_inject|preferences)    # | to merge two dictionaries
+
+    if redscale:
+        with fitz.open(stream=response.content) as doc:
+            page = doc.load_page(0)  # load the first page
+            pix = page.get_pixmap(
+                dpi = 200,
+                colorspace = fitz.csRGB,
+                annots = False,
+                clip = fitz.IRect(1, 1, 600, 650)
+            )
+            pix.tint_with(black=-129010, white=0) # no idea on how these values work, just do trial and error
+
+        return pix.tobytes(), "png"
+
+    return response.content, "pdf"

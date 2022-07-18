@@ -53,7 +53,8 @@ WIP
                 "showConsLines": true,
                 "showConsBoundaries": false,
                 "showSpecials": false,
-                "use24hClock": true
+                "use24hClock": true,
+                "useRedscale": false
             },
         },
         // ...

@@ -25,6 +25,7 @@ class Starmap:
     REFRESH_BUTTON = InlineKeyboardMarkup([
         [InlineKeyboardButton("↻ Refresh", callback_data=REFRESH_CALLBACK_DATA)]
     ])
+    REDSCALE_DB_KEY = "useRedscale"
     DEFAULT_PREFERENCES = {
         "showEquator": False,
         "showEcliptic": True,
@@ -34,11 +35,13 @@ class Starmap:
         "showConsLines": True,
         "showConsBoundaries": False,
         "showSpecials": False,
-        "use24hClock": True         # NEVER change this to False, 24-hr gang
+        "use24hClock": True,         # NEVER change this to False, 24-hr gang
+        REDSCALE_DB_KEY: False,      # will be deleted when passed in the request
     }
-    PREFERENCE_CALLBACK_DATA = "PREF_STAR_MAP"      # in the form of "PREF_STAR_MAP_PARAM_NAME"
+    PREFERENCE_CALLBACK_DATA = "PREF_STAR_MAP"      # in the form of "PREF_STAR_MAP_<PARAM_NAME>"
     GENERATE_CALLBACK_DATA = "GENERATE_STAR_MAP"
     RESET_TO_DEFAULT_CALLBACK_DATA = "RESET_TO_DEFAULT_STAR_MAP"
+    REDSCALE_CALLBACK_DATA = "PREF_STAR_MAP_REDSCALE"
     NAME_TO_CALLBACK_DATA = {
         "Equator": "PREF_STAR_MAP_EQUATOR",
         "Ecliptic": "PREF_STAR_MAP_ECLIPTIC",
@@ -59,6 +62,7 @@ PARAMETERS_DESCRIPTION = {
     "Cons Lines": "lines of constellations",
     "Cons Bound": "boundaries of constellations",
     "Specials": "special celestial objects",
+    "Redscaling": "red light helps with maintaining scotopic vision (night vision)",
 }
     '''
     CALLBACK_DATA_TO_DB_KEYS = {
@@ -70,6 +74,7 @@ PARAMETERS_DESCRIPTION = {
         "PREF_STAR_MAP_CONS_LINES": "showConsLines",
         "PREF_STAR_MAP_CONS_BOUNDARIES": "showConsBoundaries",
         "PREF_STAR_MAP_SPECIALS": "showSpecials",
+        REDSCALE_CALLBACK_DATA: REDSCALE_DB_KEY,
     }
 
 
