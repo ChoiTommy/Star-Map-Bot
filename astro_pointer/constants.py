@@ -25,6 +25,7 @@ class Starmap:
     REFRESH_BUTTON = InlineKeyboardMarkup([
         [InlineKeyboardButton("↻ Refresh", callback_data=REFRESH_CALLBACK_DATA)]
     ])
+
     REDSCALE_DB_KEY = "useRedscale"
     DEFAULT_PREFERENCES = {
         "showEquator": False,
@@ -38,19 +39,21 @@ class Starmap:
         "use24hClock": True,         # NEVER change this to False, 24-hr gang
         REDSCALE_DB_KEY: False,      # will be deleted when passed in the request
     }
-    PREFERENCE_CALLBACK_DATA = "PREF_STAR_MAP"      # in the form of "PREF_STAR_MAP_<PARAM_NAME>"
+
     GENERATE_CALLBACK_DATA = "GENERATE_STAR_MAP"
     RESET_TO_DEFAULT_CALLBACK_DATA = "RESET_TO_DEFAULT_STAR_MAP"
-    REDSCALE_CALLBACK_DATA = "PREF_STAR_MAP_REDSCALE"
-    NAME_TO_CALLBACK_DATA = {
-        "Equator": "PREF_STAR_MAP_EQUATOR",
-        "Ecliptic": "PREF_STAR_MAP_ECLIPTIC",
-        "Star Names": "PREF_STAR_MAP_STAR_NAMES",
-        "Planet Names": "PREF_STAR_MAP_PLANET_NAMES",
-        "Cons Names": "PREF_STAR_MAP_CONS_NAMES",
-        "Cons Lines": "PREF_STAR_MAP_CONS_LINES",
-        "Cons Bound": "PREF_STAR_MAP_CONS_BOUNDARIES",
-        "Specials": "PREF_STAR_MAP_SPECIALS",
+
+    PREF_CALLBACK_DATA_PREFIX = "PREF_STAR_MAP"      # in the form of "PREF_STAR_MAP_<PARAM_NAME>"
+    REDSCALE_CALLBACK_DATA = f"{PREF_CALLBACK_DATA_PREFIX}_REDSCALE"
+    NAME_TO_CALLBACK_DATA = {       # for easy population of inline keyboard buttons
+        "Equator": f"{PREF_CALLBACK_DATA_PREFIX}_EQUATOR",
+        "Ecliptic": f"{PREF_CALLBACK_DATA_PREFIX}_ECLIPTIC",
+        "Star Names": f"{PREF_CALLBACK_DATA_PREFIX}_STAR_NAMES",
+        "Planet Names": f"{PREF_CALLBACK_DATA_PREFIX}_PLANET_NAMES",
+        "Cons Names": f"{PREF_CALLBACK_DATA_PREFIX}_CONS_NAMES",
+        "Cons Lines": f"{PREF_CALLBACK_DATA_PREFIX}_CONS_LINES",
+        "Cons Bound": f"{PREF_CALLBACK_DATA_PREFIX}_CONS_BOUNDARIES",
+        "Specials": f"{PREF_CALLBACK_DATA_PREFIX}_SPECIALS",
     }
     '''
 PARAMETERS_DESCRIPTION = {
@@ -65,15 +68,15 @@ PARAMETERS_DESCRIPTION = {
     "Redscaling": "red light helps with maintaining scotopic vision (night vision)",
 }
     '''
-    CALLBACK_DATA_TO_DB_KEYS = {
-        "PREF_STAR_MAP_EQUATOR": "showEquator",
-        "PREF_STAR_MAP_ECLIPTIC": "showEcliptic",
-        "PREF_STAR_MAP_STAR_NAMES": "showStarNames",
-        "PREF_STAR_MAP_PLANET_NAMES": "showPlanetNames",
-        "PREF_STAR_MAP_CONS_NAMES": "showConsNames",
-        "PREF_STAR_MAP_CONS_LINES": "showConsLines",
-        "PREF_STAR_MAP_CONS_BOUNDARIES": "showConsBoundaries",
-        "PREF_STAR_MAP_SPECIALS": "showSpecials",
+    CALLBACK_DATA_TO_DB_KEYS = {    # lookup table for getting db keys
+        f"{PREF_CALLBACK_DATA_PREFIX}_EQUATOR": "showEquator",
+        f"{PREF_CALLBACK_DATA_PREFIX}_ECLIPTIC": "showEcliptic",
+        f"{PREF_CALLBACK_DATA_PREFIX}_STAR_NAMES": "showStarNames",
+        f"{PREF_CALLBACK_DATA_PREFIX}_PLANET_NAMES": "showPlanetNames",
+        f"{PREF_CALLBACK_DATA_PREFIX}_CONS_NAMES": "showConsNames",
+        f"{PREF_CALLBACK_DATA_PREFIX}_CONS_LINES": "showConsLines",
+        f"{PREF_CALLBACK_DATA_PREFIX}_CONS_BOUNDARIES": "showConsBoundaries",
+        f"{PREF_CALLBACK_DATA_PREFIX}_SPECIALS": "showSpecials",
         REDSCALE_CALLBACK_DATA: REDSCALE_DB_KEY,
     }
 

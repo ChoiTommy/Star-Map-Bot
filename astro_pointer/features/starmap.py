@@ -8,6 +8,7 @@ Command /starmap is defined by preference_setting_message
 import time
 import requests
 from firebase_admin import db
+from requests.models import PreparedRequest
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaDocument, error
 from telegram.ext import CallbackContext
 import fitz
@@ -153,7 +154,6 @@ async def send_star_map(update: Update, context: CallbackContext) -> None:
 
         star_map_bytes, file_extension = fetch_star_map(lat, longi, address, utc_offset, star_map_param)
 
-        # update.message.reply_document(document = fetch_target) # pdf
         await context.bot.send_document(
             chat_id = chat_id,
             document = star_map_bytes,
@@ -219,7 +219,7 @@ def fetch_star_map(latitude: float, longitude: float, address: str, utc_offset: 
         preferences (dict): preferences of the user
 
     Returns:
-        bytes: bytes object of a plane rectangular sets of pixels
+        bytes or str: bytes object of a plane rectangular sets of pixels or a URL string
         str: file extension of the image
     """
 
@@ -233,9 +233,8 @@ def fetch_star_map(latitude: float, longitude: float, address: str, utc_offset: 
 
     redscale = preferences.pop(Starmap.REDSCALE_DB_KEY, False)
 
-    response = requests.get(Starmap.STAR_MAP_BASE_URL, params=params_inject|preferences)    # | to merge two dictionaries
-
     if redscale:
+        response = requests.get(Starmap.STAR_MAP_BASE_URL, params=params_inject|preferences)    # | to merge two dictionaries
         with fitz.open(stream=response.content) as doc:
             page = doc.load_page(0)  # load the first page
             pix = page.get_pixmap(
@@ -248,4 +247,6 @@ def fetch_star_map(latitude: float, longitude: float, address: str, utc_offset: 
 
         return pix.tobytes(), "png"
 
-    return response.content, "pdf"
+    req = PreparedRequest()
+    req.prepare_url(url=Starmap.STAR_MAP_BASE_URL, params=params_inject|preferences)
+    return req.url, "pdf"   # TODO: rename the file

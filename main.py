@@ -64,7 +64,7 @@ def main() -> None:
 
     # Pushing jobs into the job queue
     application.job_queue.run_once(subscription.load_jobs_into_jobqueue, when=1)        # 1 second from now
-    application.job_queue.run_repeating(sun.fetch_sun_photos, interval=900, first=2)    # 900s = 15 mins, do almost immediately
+    application.job_queue.run_repeating(sun.fetch_sun_photos, interval=900, first=4)    # 900s = 15 mins, do almost immediately
 
     # Register command handlers
     application.add_handler(CommandHandler("start", misc.bot_tutorial))

@@ -48,7 +48,7 @@ async def callback(update: Update, context: CallbackContext) -> None:
         await query.answer(text=status)
 
     # Star map preference update
-    elif Starmap.PREFERENCE_CALLBACK_DATA in query.data:
+    elif Starmap.PREF_CALLBACK_DATA_PREFIX in query.data:
         status = await starmap.update_preference(update, context)
         await query.answer(text=status)
 
