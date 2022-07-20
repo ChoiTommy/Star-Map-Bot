@@ -13,96 +13,12 @@
 ## Introduction
 WIP
 
+
+## How to use?
+Refer to the tutorial in the [wiki](https://github.com/ChoiTommy/astro-pointer-bot/wiki/Tutorial)
+
 ## Features
-
-| Command         	            | Function 	|
-|---------------------------	|----------	|
-| `/start`                  	| -        	|
-| `/starmap`                	| -        	|
-| `/astrodata`              	| -        	|
-| `/weather`            	    | -        	|
-| `/sun`                 	    | -        	|
-| `/iss`                	    | -        	|
-| `/subscribe` (or `/sub`)      | -        	|
-| `/unsubscribe` (or `/unsub`)  | -        	|
-| `/myinfo`             	    | -        	|
-| `/deletemyinfo`       	    | -        	|
-| `/setlocation`        	    | -        	|
-| `/cancel`             	    | -        	|
-| `/credits`            	    | -        	|
-
-## Database Structure
-
-```jsonc
-{
-    "Users": {
-        "telegram_user_id_0": {
-            "latitude": 0,
-            "longitude": 0,
-            "address": "Your address",
-            "username": "telegram_username_0",
-            "utc_offset": 0,
-            "creation_timestamp": "1970-01-01 00:00:00",
-            "update_timestamp": "1970-01-01 00:00:00",
-            "starmap_preferences": {    // default starmap preferences
-                "showEquator": false,
-                "showEcliptic": true,
-                "showStarNames": false,
-                "showPlanetNames": true,
-                "showConsNames": true,
-                "showConsLines": true,
-                "showConsBoundaries": false,
-                "showSpecials": false,
-                "use24hClock": true,
-                "useRedscale": false
-            },
-        },
-        // ...
-    },
-    "Subscriptions": {
-        "telegram_user_id_0": {
-            "telegram_chat_id_0": {     // chat_id == user_id for private chats
-                "astrodata": {
-                    "enabled": true, 
-                    "timing": {
-                        "hour": "19",   // default to UTC time if no location is set
-                        "minute": "30"
-                    }
-                },
-                "iss": {
-                    "enabled": false, 
-                    "timing": {
-                        "hour": "-1", 
-                        "minute": "-1"
-                    }
-                },
-                "starmap": {
-                    "enabled": true, 
-                    "timing": {
-                        "hour": "00", 
-                        "minute": "05"
-                    }
-                },
-                "sun": {
-                    "enabled": false, 
-                    "timing": {
-                        "hour": "-1", 
-                        "minute": "-1"
-                    }
-                },
-                "weather": {
-                    "enabled": false, 
-                    "timing": {
-                        "hour": "-1", 
-                        "minute": "-1"
-                    }
-                },
-            },
-        },
-        // ...
-    },
-}
-```
+WIP
 
 ## Credits
 - [Skyandtelescope](https://skyandtelescope.org)

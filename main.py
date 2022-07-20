@@ -17,7 +17,7 @@ Send /credits to view the data sources of all the information this bot provides.
 Send /cancel to halt any operations.
 """
 
-# TODO API request async, astronomy news rss
+# TODO API request async, astronomy news rss, user manual
 import logging
 import firebase_admin
 from firebase_admin import credentials
