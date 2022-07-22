@@ -82,7 +82,7 @@ def main() -> None:
         entry_points = [CommandHandler("setlocation", userinfo.set_location)],
         states = {
             0: [MessageHandler(
-                filters.LOCATION | filters.Regex("[0-9]*\.[0-9]+,[ ]?[0-9]*\.[0-9]+"),
+                filters.LOCATION | filters.Regex("(\d+|\d*.\d+), ?(\d+|\d*.\d+)"),
                 userinfo.update_location
             )]
         },

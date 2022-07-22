@@ -62,4 +62,4 @@ async def callback(update: Update, context: CallbackContext) -> None:
         await query.answer(text="Star map generated")
 
     else:
-        await query.answer()
+        await query.answer(text="Unknown callback query")

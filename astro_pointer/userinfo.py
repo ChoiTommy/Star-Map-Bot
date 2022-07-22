@@ -91,8 +91,8 @@ async def update_location(update: Update, context: CallbackContext) -> int:
         return 0                    # ask for a new location until user has given a valid one
 
 
-    address_string = address_data["display_name"]           # from nominatim
-    utc_offset = int(helpers.get_offset(lat, longi))         # in seconds
+    address_string = address_data["display_name"]               # from nominatim
+    utc_offset = int(helpers.get_offset(lat, longi))            # in seconds
 
     ref = db.reference(f"/Users/{user_id}")
     data = ref.get()
@@ -118,7 +118,8 @@ async def update_location(update: Update, context: CallbackContext) -> int:
             "update_timestamp": helpers.get_current_date_time_string()      # UTC time
         })
 
-    await update.message.reply_html(f"All set! Your new location is {lat}, {longi} (<i>{address_string}</i>).")
+    persistent_msg = await update.message.reply_html(f"All set! You are now at <i>{address_string}</i> ({lat}, {longi}).")
+    await persistent_msg.pin(disable_notification=True)
     return ConversationHandler.END
 
 

@@ -92,9 +92,9 @@ async def update_weather_data(update: Update, context: CallbackContext) -> str:
         )
 
         return "Weather refreshed"
-    else:
-        await update.callback_query.message.delete()
-        return "Set a location first to use this feature."
+
+    await update.callback_query.message.delete()
+    return "Set a location first to use this feature."
 
 
 def fetch_weather_data(latitude, longitude):
