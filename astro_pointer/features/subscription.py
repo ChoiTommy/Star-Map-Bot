@@ -209,11 +209,15 @@ async def unsubscribe(update: Update, context: CallbackContext) -> None:
 
         else:
             # not providing enough arguments
+            tble = get_user_subscription_info(user_id, chat_id)
             await update.message.reply_markdown_v2(
                 text = ("Arguments missing\. \n"
                         "Syntax: `/unsub [starmap|astrodata|weather|iss|sun]` \n"
                         "Separate multiple features with commas and no spaces in between\. \n"
-                        "e\.g\. `/unsub starmap,weather,astrodata,iss,sun`")
+                        "e\.g\. `/unsub starmap,weather,astrodata,iss,sun` \n\n"
+
+                        "Here are your current subscriptions: \n"
+                        f"`{tabulate(tble, tablefmt='fancy_grid', headers=['Subs', 'Daily Time'])}`")
             )
             return
 
