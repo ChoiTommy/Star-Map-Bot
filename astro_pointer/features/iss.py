@@ -38,7 +38,8 @@ async def iss_live_location(update: Update, context: CallbackContext) -> None:
                 chat_id = chat_id,
                 location = loc,
                 live_period = 130,        # in seconds
-                reply_to_message_id = title.message_id
+                reply_to_message_id = title.message_id,
+                disable_notification = True
             )
         else:
             await msg.edit_live_location(
