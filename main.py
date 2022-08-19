@@ -37,7 +37,8 @@ from astro_pointer.features import (
     weather,
     sun,
     iss,
-    subscription
+    subscription,
+    subscription_rework
 )
 
 
@@ -75,8 +76,8 @@ def main() -> None:
     application.add_handler(CommandHandler("weather", weather.show_weather_data))
     application.add_handler(CommandHandler("sun", sun.send_sun_photo))
     application.add_handler(CommandHandler("iss", iss.iss_live_location, block=False))
-    application.add_handler(CommandHandler(["subscribe", "sub"], subscription.subscribe))
-    application.add_handler(CommandHandler(["unsubscribe", "unsub"], subscription.unsubscribe))
+    application.add_handler(CommandHandler(["subscribe", "sub"], subscription_rework.subscription_overview))
+    # application.add_handler(CommandHandler(["unsubscribe", "unsub"], subscription.unsubscribe))
 
     application.add_handler(ConversationHandler(
         entry_points = [CommandHandler("setlocation", userinfo.set_location)],
