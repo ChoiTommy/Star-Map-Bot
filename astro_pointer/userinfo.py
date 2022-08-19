@@ -119,6 +119,8 @@ async def update_location(update: Update, context: CallbackContext) -> int:
         })
 
     persistent_msg = await update.message.reply_html(f"All set! You are now at <i>{address_string}</i> ({lat}, {longi}).")
+    # unpin all previous message first
+    await update.effective_chat.unpin_all_messages()
     await persistent_msg.pin(disable_notification=True)
     return ConversationHandler.END
 
