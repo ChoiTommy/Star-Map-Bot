@@ -77,6 +77,7 @@ def main() -> None:
     application.add_handler(CommandHandler("iss", iss.iss_live_location, block=False))
     application.add_handler(CommandHandler(["subscribe", "sub"], subscription.subscribe))
     application.add_handler(CommandHandler(["unsubscribe", "unsub"], subscription.unsubscribe))
+    application.add_handler(CommandHandler("allcommands", misc.show_commands))
 
     application.add_handler(ConversationHandler(
         entry_points = [CommandHandler("setlocation", userinfo.set_location)],

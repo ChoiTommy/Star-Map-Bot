@@ -9,7 +9,7 @@ Command /start is defined by bot_tutorial
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from telegram.constants import ParseMode
-from astro_pointer.constants import TUTORIAL_TEXT, COMMAND_KEYBOARD
+from astro_pointer.constants import COMMAND_DESCRIPTIONS, TUTORIAL_TEXT, COMMAND_KEYBOARD
 
 
 async def show_credits(update: Update, context: CallbackContext) -> None:
@@ -36,3 +36,11 @@ async def bot_tutorial(update: Update, context: CallbackContext) -> None:   # TO
             parse_mode = ParseMode.HTML,
             reply_markup = COMMAND_KEYBOARD
         )
+
+async def show_commands(update: Update, context: CallbackContext) -> None:
+    """Display the list of commands"""
+
+    await update.message.reply_text(
+        text = COMMAND_DESCRIPTIONS,
+        parse_mode = ParseMode.HTML
+    )

@@ -42,5 +42,6 @@ Feeling like you want to be notified rather than asking for information on deman
 - [Python telegram bot](https://github.com/python-telegram-bot/python-telegram-bot)
 - [Google material icons](https://fonts.google.com/icons)
 
-### † Sidenotes
-The name of this project/bot is obviously inspired by the C/C++ language. Now, you might be wondering, why wasn't this project in C/C++? Well, glad you asked. The reason is that Python is easier to learn and use for a novice like myself. In hindsight, Python is built on top of C. So yeah, I can _C_ the relationship between this name and Python :)
+---
+<sub>† Sidenotes:
+The name of this project/bot is obviously inspired by the C/C++ language. Now, you might be wondering, why wasn't this project in C/C++? Well, glad you asked. The reason is that Python is easier to learn and use for a novice like myself. In hindsight, Python is built on top of C. So yeah, I can _C_ the relationship between this name and Python :)</sub>

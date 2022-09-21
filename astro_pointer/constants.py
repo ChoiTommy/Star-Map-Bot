@@ -230,6 +230,24 @@ COMMAND_KEYBOARD = ReplyKeyboardMarkup(
         ['/sun', '/weather', '/iss'],
         ['/sub', '/unsub'],
         ['/myinfo', '/setlocation', '/deletemyinfo'],
+        ['/allcommands']
     ],
     resize_keyboard = True
 )
+
+COMMAND_DESCRIPTIONS = """
+/starmap - Get a starmap of the current sky
+/astrodata - Get astronomical data
+/sun - View Sun images in various wavelengths
+/weather - Know the weather before stargazing 
+/iss - Track the live location of ISS for 2 mins
+/sub - Subscribe to receive notifications every day 
+/unsub - Unsubscribe from features
+/myinfo - Display your set location
+/setlocation - Modify your location
+/deletemyinfo - Delete your data
+/cancel - Halt any conversation
+/credits - Learn more on the data source provider
+/start - Brief introduction of the bot
+/allcommands - Feel the power of self-referencing
+"""
