@@ -41,7 +41,7 @@ async def show_astro_data(update: Update, context: CallbackContext) -> None:
 
         await context.bot.send_message(
             chat_id = chat_id,
-            text = ("🌠 <b>Astronomical data</b>: \n"
+            text = ("🌠 <b>Astronomical data</b> 🔭\n"
                     f"<code>{tabulate(tble, tablefmt='simple')}</code> \n"
 
                     f"({current_date_time}) \n"),

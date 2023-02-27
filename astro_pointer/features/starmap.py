@@ -36,17 +36,17 @@ def populate_preference_buttons(user_preferences: dict) -> InlineKeyboardMarkup:
 
         if (i+1) % 2 == 1:
             buttons.append([InlineKeyboardButton(
-                text = f"{name} {'✔' if user_preferences[db_key] else '❌'}",
+                text = f"{name} {'✅' if user_preferences[db_key] else '❌'}",
                 callback_data = callbackdata
             )])
         else:
             buttons[-1].append(InlineKeyboardButton(
-                text = f"{name} {'✔' if user_preferences[db_key] else '❌'}",
+                text = f"{name} {'✅' if user_preferences[db_key] else '❌'}",
                 callback_data = callbackdata
             ))
 
     buttons.append([InlineKeyboardButton(
-        text = f"Redscaling {'✔' if user_preferences[Starmap.REDSCALE_DB_KEY] else '❌'}",
+        text = f"Redscaling {'✅' if user_preferences[Starmap.REDSCALE_DB_KEY] else '❌'}",
         callback_data = Starmap.REDSCALE_CALLBACK_DATA,
     )])
 

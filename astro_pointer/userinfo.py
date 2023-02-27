@@ -146,8 +146,8 @@ async def deletion_confirmation(update: Update, context: CallbackContext) -> int
         )
         return ConversationHandler.END
 
-    await update.message.reply_text(
-        "Are you sure you want to delete your location data? Note that this action cannot be undone.",
+    await update.message.reply_html(
+        "⁉️ Are you sure you want to delete your data? Note that this action <b>cannot be undone</b>.",
         reply_markup = ReplyKeyboardMarkup([['Yes', 'No']], resize_keyboard = True)
     )
     return 0

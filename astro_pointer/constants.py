@@ -221,7 +221,7 @@ To get the most out of this bot, you are required to set a location (/setlocatio
 
 As weather and astronomical data do not differ much within a few kilometers' range, feel free to turn off 'Precise Location' (on iOS) or choose "Approximate location" (on Android) for Telegram in Settings. When setting up your location, you can move the map around in the Telegram app to provide a location wherever you want too.
 
-Press the menu button at the bottom left of your screen to view all the commands available.
+Press the menu button at the bottom right of your screen to switch between commands and keyboard.
 """
 
 COMMAND_KEYBOARD = ReplyKeyboardMarkup(
@@ -236,6 +236,8 @@ COMMAND_KEYBOARD = ReplyKeyboardMarkup(
 )
 
 COMMAND_DESCRIPTIONS = """
+Command list:
+
 /starmap - Get a starmap of the current sky
 /astrodata - Get astronomical data
 /sun - View Sun images in various wavelengths
