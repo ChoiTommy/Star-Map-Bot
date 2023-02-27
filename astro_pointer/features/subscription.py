@@ -12,6 +12,7 @@ Example: /unsub starmap,astrodata,weather,iss,sun
 """
 
 from datetime import time, timedelta, timezone
+from typing import Tuple
 from firebase_admin import db
 from telegram import Update
 from telegram.ext import CallbackContext
@@ -32,7 +33,7 @@ DEFAULT_FEATURES = {
 }
 
 
-def are_timings_valid(timings_list: list[str]) -> (bool, list[str], list[str]):
+def are_timings_valid(timings_list: list[str]) -> Tuple[bool, list[str], list[str]]:
     """Check the format and the ranges of the timing inputs
 
     Args:

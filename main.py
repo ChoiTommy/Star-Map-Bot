@@ -17,12 +17,16 @@ Send /credits to view the data sources of all the information this bot provides.
 Send /cancel to halt any operations.
 """
 
-# TODO API request async, astronomy news rss, user manual
+# TODO: 
+# 1. Streamline the subscription process with the help of a webapp
+# 2. User manual 
+# 3. ~~ChatGPT integration 👀~~
+
 import logging
 import firebase_admin
 from firebase_admin import credentials
 from telegram.ext import (
-    Application,
+    ApplicationBuilder,
     CommandHandler,
     ConversationHandler,
     MessageHandler,
@@ -60,7 +64,7 @@ def main() -> None:
     )
 
     # Create the Application and pass it your bot's token.
-    application = Application.builder().token(BOT_TOKEN).build()
+    application = ApplicationBuilder().token(BOT_TOKEN).build()
 
     # Pushing jobs into the job queue
     application.job_queue.run_once(subscription.load_jobs_into_jobqueue, when=1)        # 1 second from now

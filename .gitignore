@@ -5,3 +5,5 @@ assets/sun/log.txt
 *.json
 __pycache__
 .DS_Store
+.venv
+.vscode
