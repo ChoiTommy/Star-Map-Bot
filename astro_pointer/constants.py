@@ -226,7 +226,7 @@ Press the menu button at the bottom right of your screen to switch between comma
 
 COMMAND_KEYBOARD = ReplyKeyboardMarkup(
     [
-        ['/starmap', '/astrodata'],
+        ['/starmap', '/starmap skip', '/astrodata'],
         ['/sun', '/weather', '/iss'],
         ['/sub', '/unsub'],
         ['/myinfo', '/setlocation', '/deletemyinfo'],
@@ -239,6 +239,7 @@ COMMAND_DESCRIPTIONS = """
 Command list:
 
 /starmap - Get a starmap of the current sky
+Option: skip, -s to generate a star map right away
 /astrodata - Get astronomical data
 /sun - View Sun images in various wavelengths
 /weather - Know the weather before stargazing 

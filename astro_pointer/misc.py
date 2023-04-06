@@ -44,3 +44,4 @@ async def show_commands(update: Update, context: CallbackContext) -> None:
         text = COMMAND_DESCRIPTIONS,
         parse_mode = ParseMode.HTML
     )
+    

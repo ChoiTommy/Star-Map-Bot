@@ -99,7 +99,6 @@ def fetch_astro_data(latitude, longitude):
 
     Returns:
         list of list of str : for generating pretty table
-        ~~str : Current date and time~~
     """
 
     params_inject = {
