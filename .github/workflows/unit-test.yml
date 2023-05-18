@@ -1,4 +1,4 @@
-name: Helper Functions Test
+name: Unit Test
 run-name: Testing Helper Functions
 
 on:
@@ -8,11 +8,11 @@ on:
     branches: [ "main" ]
 
 jobs:
-  Helper-Functions-Tests:
+  unit-test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ '3.7', '3.8', '3.9', '3.10', '3.11' ]
+        python-version: [ '3.8', '3.9', '3.10', '3.11' ]
 
     name: Python ${{ matrix.python-version }} Unit Test
     steps:
