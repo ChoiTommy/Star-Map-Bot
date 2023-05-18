@@ -1,7 +1,8 @@
-python-telegram-bot[job-queue]==20.1
-pymupdf==1.21.1
-pytz==2022.7.1
-timezonefinder==6.1.9
-requests==2.28.2
-firebase-admin==6.1.0
-tabulate==0.9.0
+python-telegram-bot[job-queue]~=20.3
+pymupdf~=1.21.1
+pytz~=2022.7.1
+timezonefinder~=6.1.9
+requests~=2.28.2
+firebase-admin~=6.1.0
+tabulate~=0.9.0
+pytest~=7.3.1
