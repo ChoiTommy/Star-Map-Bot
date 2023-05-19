@@ -1,5 +1,5 @@
 """
-A module consists of all the constants used in this bot
+This file consists of constants used in this bot.
 
 """
 

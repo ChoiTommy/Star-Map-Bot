@@ -1,10 +1,6 @@
 """
-A module consists of functions regarding displaying, setting up, and deleting user's info
+This file consists of functions regarding displaying, setting up, and deleting user's info.
 
-Usage:
-Command /myinfo is defined by show_user_info
-Command /deletemyinfo is defined by deletion_confirmation and delete_user_info
-Command /cancel is defined by cancel_location_setup or cancel_deletion
 """
 
 from datetime import timezone, timedelta

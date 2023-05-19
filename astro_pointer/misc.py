@@ -1,9 +1,6 @@
 """
-A module consists of miscellaneous features not relating to the core features of the bot
+This file consists of miscellaneous features of the bot.
 
-Usage:
-Command /credits is defined by show_credits
-Command /start is defined by bot_tutorial
 """
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup

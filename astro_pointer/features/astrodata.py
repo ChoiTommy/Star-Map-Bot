@@ -1,8 +1,6 @@
 """
-A module consists of functions fetching and displaying astronomical data
+This file consists of functions fetching and displaying astronomical data.
 
-Usage:
-Command /astrodata is defined by show_astro_data
 """
 
 import requests

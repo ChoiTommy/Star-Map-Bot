@@ -1,8 +1,6 @@
 """
-A module consists of functions fetching and displaying weather data relevant to stargazing
+This file consists of functions fetching and displaying weather data relevant to stargazing.
 
-Usage:
-Command /weather is defined by show_weather_data
 """
 
 import requests

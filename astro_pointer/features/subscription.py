@@ -1,14 +1,6 @@
 """
-A module handling user subscriptions of daily notifications
+This file handles user subscription of daily notifications.
 
-Usage: /sub(scribe) [starmap|astrodata|weather|iss|sun] [timings]
-timings:
-    schedule every day, separated by commas
-    one subscription per feature, old sub timings will be replaced by the new one
-Example: /sub astrodata,sun 22:00,12:00
-
-Usage: /unsub(scribe) [starmap|astrodata|weather|iss|sun]
-Example: /unsub starmap,astrodata,weather,iss,sun
 """
 
 from datetime import time, timedelta, timezone

@@ -1,8 +1,6 @@
 """
-A module consists of functions fetching and forwarding a star map (sky chart) to user
+This file consists of functions fetching and forwarding a star map (sky chart) to user.
 
-Usage:
-Command /starmap is defined by preference_setting_message
 """
 
 import time

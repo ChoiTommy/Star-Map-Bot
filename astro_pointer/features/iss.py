@@ -1,8 +1,6 @@
 """
-A module consists of functions fetching and displaying live location of the International Space Station
+This file consists of functions fetching and displaying live location of the International Space Station.
 
-Usage:
-Command /iss is defined by iss_live_location
 """
 
 import asyncio

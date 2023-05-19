@@ -1,26 +1,17 @@
 """
-@AstroPointerBot is an easy-to-use astronomical bot that provides you with
+`astro* bot;` is an easy-to-use astronomical bot that provides you with
 all the necessary stargazing information including star maps (sky
 charts), weather and astronomical data, etc.
 
-Usage:
-Send /start to get a welcome message from the bot.
-Send /setlocation to set your location to enable the the core features.
-Send /starmap to get a star map pdf at the location set.
-Send /astrodata to get a list of astronomical data at the location set.
-Send /sun to view a series of sun photos in various wavelengths.
-Send /weather to get a weather report at the location set.
-Send /iss to get the live location of the International Space Station.
-Send /myinfo to view the data associate with you stored on the server.
-Send /deletemyinfo to purge you data permanently on the server.
-Send /credits to view the data sources of all the information this bot provides.
-Send /cancel to halt any operations.
-"""
+This file is the entry point to the bot. It also specifies handlers 
+registered for the bot. 
 
-# TODO: 
-# 1. Streamline the subscription process with the help of a webapp
-# 2. User manual 
-# 3. ~~ChatGPT integration 👀~~
+TODO: 
+1. Streamline the subscription process with the help of a webapp
+2. User manual 
+3. ~~ChatGPT integration 👀~~
+4. Integration test
+"""
 
 import logging
 import firebase_admin

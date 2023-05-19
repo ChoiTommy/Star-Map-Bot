@@ -1,8 +1,6 @@
 """
-A module that consists of functions fetching and displaying near-real-time sun photos from NASA.
+This file consists of functions fetching and displaying near-real-time sun photos from NASA.
 
-Usage:
-Command /sun is defined by send_sun_photo
 """
 
 import asyncio

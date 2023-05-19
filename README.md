@@ -4,11 +4,13 @@
 </div>
 
 ![Banner](assets/description_pic.png)
+![Unit testing](https://github.com/ChoiTommy/astro-pointer-bot/actions/workflows/unit-test.yml/badge.svg)
+![CodeQL](https://github.com/ChoiTommy/astro-pointer-bot/actions/workflows/codeql.yml/badge.svg)
 [![CodeFactor](https://www.codefactor.io/repository/github/choitommy/astro-pointer-bot/badge)](https://www.codefactor.io/repository/github/choitommy/astro-pointer-bot)
 [![Telegram Bot](https://img.shields.io/badge/Telegram-bot-blue?logo=telegram)](https://t.me/AstroPointerBot)
 
 ## Introduction
-`astro* bot;`† (pronounced as _astro pointer bot_) is a simple and easy-to-use telegram bot that provides you with stargazing and astronomical information.
+Astro pointer bot (stylized as `astro* bot;`†) is a simple and easy-to-use telegram bot that provides you with stargazing and astronomical information.
 
 ## How to use?
 Make sure you have a telegram user account. Send the command `/start` to `astro* bot;` at [@AstroPointerBot](https://t.me/AstroPointerBot), and you will be greeted with some instructions.
