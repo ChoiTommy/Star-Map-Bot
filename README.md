@@ -9,41 +9,43 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/choitommy/astro-pointer-bot/badge)](https://www.codefactor.io/repository/github/choitommy/astro-pointer-bot)
 [![Telegram Bot](https://img.shields.io/badge/Telegram-bot-blue?logo=telegram)](https://t.me/AstroPointerBot)
 
-## Introduction
 Astro pointer bot (stylized as `astro* bot;`†) is a simple and easy-to-use telegram bot that provides you with stargazing and astronomical information.
 
 ## How to use?
-Make sure you have a telegram user account. Send the command `/start` to `astro* bot;` at [@AstroPointerBot](https://t.me/AstroPointerBot), and you will be greeted with some instructions.
+Make sure you have a Telegram user account. Send the command `/start` to `astro* bot;` at [@AstroPointerBot](https://t.me/AstroPointerBot), and you will be greeted with some instructions.
 
 Alternatively, you may refer to a [full tutorial](https://github.com/ChoiTommy/astro-pointer-bot/wiki/Tutorial) on how to make the best use of this bot, or go through the [documentation page](https://github.com/ChoiTommy/astro-pointer-bot/wiki/Documentations) in the wiki.
 
-## Key features
+## Key features*
 
-### Star map (sky chart)
-Wanna know which constellations you are looking at above the sky? Fret not, a star map comes in handy in such a situation. The bot can send you a star map (or sky chart) based on the location you set with the bot initially on demand. Simply send the command `/starmap` to configure your settings, or `/starmap -s` to retrieve the star map right away. 
+### Star map (sky chart) 🌠
+Ever wondered what those cool patterns of stars are called up there in the night sky? No worries, we've got your back with a nifty star map! Our bot can hook you up with a personalized star map (or sky chart) based on your location. Just hit us up with the `/starmap` command, and we'll help you set things up. Or if you're feeling impatient and need that star map pronto, go ahead and shoot us a `/starmap -s` command. We're here to make your stargazing adventures a breeze!
 
-### Astronomical data
-Get some insights into the current astronomical data of the set location. It can be triggered with the command `/astrodata`. Believe me, you won't miss out on any precious time to see the sunrise/sunset with your beloved ones.
+### Astronomical data 🌟
+Want the scoop on the latest astronomical data for your chosen location? Just give us a shout with the `/astrodata` command, and we'll fill you in on all the cosmic details. Trust me, you won't miss a beat when it comes to catching those epic sunrises or sunsets with your loved ones. So let's stay in the know and make the most of those magical celestial moments together!
 
-### Weather data
-Meteorology and astronomy are completely different things, but one may affect the observation of the other. Know the weather well before setting out for a stargazing trip. Type in `/weather` to the bot to get the weather data of the set location.
+### Weather data ☁️
+Okay, so meteorology and astronomy might be worlds apart, but they can definitely impact each other. Before embarking on a mind-blowing stargazing adventure, it's wise to stay in the loop about the weather conditions. Just drop a `/weather` command to our bot, and we'll dish out all the juicy weather data for your chosen location. Because let's face it, nobody wants rainclouds raining on their cosmic parade. Stay prepared and keep those telescopes ready for action!
 
-### Sun images
-Astronomy is not just about the night sky. Our #1 energy source, the Sun, is also worth looking at too. The bot can send you a gorgeous while up-to-date sun image (usually captured every 15 mins) with the command `/sun`.  
+### Sun images ☀️
+When it comes to astronomy, it's not all about the mesmerizing night sky. Our beloved Sun, the ultimate powerhouse, deserves some love too! Brace yourself for stunning, up-to-the-minute sun images that will leave you in awe. Just hit us up with a `/sun` command, and we'll deliver a jaw-dropping snapshot of the Sun's radiant glory straight to your screen. These images are so fresh, they're usually captured every 15 minutes! Let's shine some light on the wonders of our cosmic neighborhood!
 
-### ISS live location
-Do you know that the International Space Station (ISS) orbits around the Earth 90 mins per revolution? Super fast, ain't it? The `/iss` command is here to help you follow it closely as if you were a creature standing at a distance far away from the Earth, watching it orbits around our planet.
+### ISS live location 🛰️
+Did you know that the International Space Station (ISS) completes a full orbit around Earth in just 90 minutes? Talk about speed! But fear not, we've got you covered with the `/iss` command. Consider yourself a cosmic observer, standing at a distance from our blue planet, as you track the ISS's fascinating journey through space. Get ready to witness the marvel of human exploration like never before.
 
-### Subscriptions
-Feeling like you want to be notified rather than asking for information on demand? The `/sub features timings` command is here to help you. You can subscribe to any of the above features/commands to receive notifications whenever you like. You can also unsubscribe by sending the command `/unsub features`. Read the [tutorial](https://github.com/ChoiTommy/astro-pointer-bot/wiki/Tutorial) for more information on the subscription system.
+### Subscriptions 📋
+Tired of constantly asking for updates and wish you could get notifications instead? Well, we've got just the thing for you! Introducing the mighty `/sub [features] [timings]` command. With this power in your hands, you can subscribe to any of the awesome features mentioned above and receive timely notifications whenever you please. Want to take a break? No worries! Just send `/unsub [features]` to gracefully unsubscribe.  Read the [tutorial](https://github.com/ChoiTommy/astro-pointer-bot/wiki/Tutorial) for more information on this wonderful subscription system.
 
 ## Credits
 - [Skyandtelescope](https://skyandtelescope.org)
 - [WeatherAPI](https://www.weatherapi.com)
 - [NASA SDO Data](https://sdo.gsfc.nasa.gov/data/)
-- [Python telegram bot](https://github.com/python-telegram-bot/python-telegram-bot)
+- [Python Telegram bot](https://github.com/python-telegram-bot/python-telegram-bot)
 - [Google material icons](https://fonts.google.com/icons)
 
 ---
 <sub>† Sidenotes:
-The name of this project/bot is obviously inspired by the C/C++ language. Now, you might be wondering, why wasn't this project in C/C++? Well, glad you asked. The reason is that Python is easier to learn and use for a novice like myself. In hindsight, CPython is built on top of C. So yeah, I can _C_ the relationship between this name and Python :)</sub>
+The name of this project/bot is inspired by the C/C++ language. Now, you might be wondering: why wasn't this project in C/C++? Well, glad you asked. The reason is that Python is easier to learn and use for a novice like myself. In hindsight, CPython is built on top of C. So yeah, I can _C_ the relation between this name and Python :)</sub>
+
+<sub>* Note:
+Cringe paragraphs generated by ChatGPT. May revert to my own text in the future.</sub>

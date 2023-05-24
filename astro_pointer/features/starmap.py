@@ -78,7 +78,7 @@ async def preference_setting_message(update: Update, context: CallbackContext) -
     if data is not None:
         await update.message.reply_photo(
             photo = open("assets/star_map_params.png", "rb"),
-            caption = "Toggle your star map preferences by clicking the buttons below. They will be saved automatically and used for future star map generation.",
+            caption = "Toggle star map preferences by clicking the buttons below. They are saved automatically and will be used for future star map generation.",
             reply_markup = populate_preference_buttons(data["starmap_preferences"])
         )
 

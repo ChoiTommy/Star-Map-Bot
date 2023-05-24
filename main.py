@@ -9,8 +9,7 @@ registered for the bot.
 TODO: 
 1. Streamline the subscription process with the help of a webapp
 2. User manual 
-3. ~~ChatGPT integration 👀~~
-4. Integration test
+3. Integration test
 """
 
 import logging
