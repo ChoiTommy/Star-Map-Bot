@@ -213,17 +213,15 @@ NOMINATIM_REVERSE_API_BASE_URL = "https://nominatim.openstreetmap.org/reverse"
 
 # Misc
 TUTORIAL_TEXT = """
-<code>astro* bot;</code> is specially designed for mobile devices, ensuring a seamless experience on the go.
-
-This bot is your ultimate companion for stargazing adventures, providing easy access to essential information such as star maps (sky charts), weather updates, astronomical data, and so on.
+<code>astro* bot;</code> is your ultimate companion for stargazing adventures, providing easy access to essential information.
 
 To unlock the bot's full potential, it's important to set your location using the /setlocation command. This location data enables us to generate accurate star maps and display weather and astronomical data specific to your chosen spot. Rest assured, you have full control over your data and can delete it anytime using the /deletemyinfo command.
 
-Since weather and astronomical conditions don't vary significantly within a few kilometers, feel free to disable the 'Precise Location' setting on iOS or choose "Approximate location" on Android within your Telegram app settings. When setting up your location, you can easily move the map around in the Telegram app to pinpoint your desired spot.
+Since weather and astronomical conditions don't vary significantly within a few kilometers, feel free to disable the 'Precise Location' setting on iOS or choose 'Approximate location' on Android within your Telegram app settings. When setting up your location, you can easily move the map around in the Telegram app to pinpoint your desired spot.
 
 To navigate through the bot's features, simply tap the menu button located at the bottom right of your screen. This allows you to effortlessly switch between commands and the keyboard.
 
-Get ready to explore the cosmos with ease and enjoy the wonders of the night sky with the <code>astro* bot;</code> by your side! 🌌✨
+Get ready to explore the cosmos with ease and enjoy the wonders of the night sky with <code>astro* bot;</code> by your side! 🌌✨
 """
 
 COMMAND_KEYBOARD = ReplyKeyboardMarkup(

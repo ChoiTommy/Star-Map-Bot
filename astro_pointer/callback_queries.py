@@ -1,5 +1,5 @@
 """
-A module handles callback queries
+A module handles callback queries.
 
 """
 

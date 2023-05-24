@@ -95,7 +95,7 @@ async def update_weather_data(update: Update, context: CallbackContext) -> str:
     return "Set a location first to use this feature."
 
 
-def fetch_weather_data(latitude, longitude):
+def fetch_weather_data(latitude: float, longitude: float):
     """Fetch weather data from weatherapi.com.
 
     Args:
